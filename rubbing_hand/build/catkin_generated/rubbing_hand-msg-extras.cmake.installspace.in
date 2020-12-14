@@ -1,0 +1,2 @@
+set(rubbing_hand_MESSAGE_FILES "msg/dynamixel_msg.msg")
+set(rubbing_hand_SERVICE_FILES "")
