@@ -1,0 +1,5 @@
+<launch>
+  <include file="$(find rubbing_hand)/launch/fv_core_2cameras.launch"/>
+
+  <node type="dynamixel_node.py" pkg="rubbing_hand" name="dynamixel_node" ns="fingervision" output="screen"/>
+</launch>

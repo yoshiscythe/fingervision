@@ -1,0 +1,2 @@
+- setup-file:
+    local-name: /home/suzuki/ros_ws/ay_tools/fingervision/suzuki/rubbing_hand/build/devel/setup.sh
