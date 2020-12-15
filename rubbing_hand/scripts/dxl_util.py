@@ -22,6 +22,7 @@
 import dynamixel_sdk as dynamixel  #Using Dynamixel SDK
 import struct
 import math, time, threading
+import time
 
 class TDynamixelPortHandler(object):
   def __init__(self):
@@ -852,6 +853,14 @@ class TDynamixel1(object):
   def SetPosLimit(self, min_pos, max_pos):
     self.Write("MIN_POS_LIMIT", min_pos)
     self.Write("MAX_POS_LIMIT", max_pos)
+    self.CheckTxRxResult()
+
+  def SetBaudRate(self, baudrate):
+    try:
+      self.Write('BAUD_RATE',self.BAUD_RATE.index(baudrate))
+      print("changed Baundrate to", baudrate, self.BAUD_RATE.index(baudrate))
+    except ValueError:
+      print("invalid Baudrate\nlist[9600,57600,115200,1e6,2e6,3e6,4e6,4.5e6]")
     self.CheckTxRxResult()
 
 

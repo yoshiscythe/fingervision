@@ -57,13 +57,13 @@ class Rubbing():
         pos_l = (-90 + deg_l)*self.pos_per_deg + self.init_pos_l
         return pos_r, pos_l
 
-    def calculation_proportional(self, now_pos_r, now_pos_l):
-        right_finger_deg, left_finger_deg = self.calculation_degree()
-        abs_deg_r, abs_deg_l = self.pos2deg(now_pos_r, now_pos_l)
+    # def calculation_proportional(self, now_pos_r, now_pos_l):
+    #     right_finger_deg, left_finger_deg = self.calculation_degree()
+    #     abs_deg_r, abs_deg_l = self.pos2deg(now_pos_r, now_pos_l)
 
-        pro_r = right_finger_deg - abs_deg_r
-        pro_l = left_finger_deg - abs_deg_l
-        return pro_r, pro_l
+    #     pro_r = right_finger_deg - abs_deg_r
+    #     pro_l = left_finger_deg - abs_deg_l
+    #     return pro_r, pro_l
 
     def range_check(self):
         range_max = int(-self.finger_interval/2 + self.interval/2 + self.link_length)
