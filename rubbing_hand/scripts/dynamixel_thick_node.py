@@ -2,7 +2,7 @@
 #coding: utf-8
 #Control dynamixel with key input (velocity control ver 1).
 #use bottom before this program. fpsが上がる
-#$ bash fix_usb_latency.sh
+#$ bash /home/suzuki/prg/DynamixelSDK/python/src/ay_Dynamixel/robots/dynamixel/fix_usb_latency.sh
 
 import roslib; roslib.load_manifest('rubbing_hand')
 import rospy
@@ -23,6 +23,7 @@ import evdev
 from rub import Rubbing, PID
 import yaml
 from subscribe import Subscribe
+from inhand_util import Inhand
 
 file_name = "/home/suzuki/prg/DynamixelSDK/python/src/ay_Dynamixel/robots/dynamixel/init_pos.yaml"
 
@@ -36,7 +37,9 @@ sub_fv_filtered1_objinfo = Subscribe("Filter1ObjInfo")
 
 #Setup the device
 DXL_ID= [1,2,3,4]   #Note: value and 
-BAUDRATE= 57600
+# BAUDRATE= 57600
+# BAUDRATE= 115200
+BAUDRATE = 2e6
 DXL_TYPE= 'XM430-W350'
 dev='/dev/ttyUSB0'
 dxl= [TDynamixel1(DXL_TYPE,dev), TDynamixel1(DXL_TYPE,dev), TDynamixel1(DXL_TYPE,dev), TDynamixel1(DXL_TYPE,dev)]
@@ -50,13 +53,13 @@ for id in range(len(dxl)):
   dxl[id].OpMode= 'EXTPOS' # ただのPOSITIONだと一回転のレンジでしか動かない
   dxl[id].Setup()
   dxl[id].SetPosLimit(-4095, 4095)
+  dxl[id].SetBaudRate(BAUDRATE)
   dxl[id].SetPosGain(500, 50, 10) #fps20ちょっと
   # dxl[id].SetPosGain(150, 50, 10)  #fps7くらいの時に使ってた
   # dxl[id].SetPosGain(900, 0, 0)
   dxl[id].EnableTorque()
 dxl[0].SetupPosSyncWrite()
 dxl[0].SetupSyncRead()
-
 
 # def ReadKeyboard(is_running, key_cmd, key_locker):
 #   kbhit= TKBHit()
@@ -235,6 +238,8 @@ class TDxlHolding(object):
       # pos = [dxl[id].Position() for id in range(len(dxl))]
       pos, vel, pwm, cur = self.observer()
 
+      time_get = time.time() - start
+
       for i in range(4):
         self.trg_pos[i] = pos[i]
 
@@ -262,9 +267,9 @@ class TDxlHolding(object):
 
       #スティックX軸は擦り動作
       if self.DIRECTIONS[0] == 1:
-        rubbing.surface_pos = rubbing.surface_pos + self.v*0.1
+        rubbing.surface_pos = rubbing.surface_pos + self.v*0.01
       elif self.DIRECTIONS[0] == -1:
-        rubbing.surface_pos = rubbing.surface_pos - self.v*0.1
+        rubbing.surface_pos = rubbing.surface_pos - self.v*0.01
       
       #スティックY軸は指缶距離調整
       if self.DIRECTIONS[1] == 1:
@@ -340,8 +345,9 @@ class TDxlHolding(object):
       dy_param.trg_pos = self.trg_pos
       param_pub.publish(dy_param)
 
-      print(sub_fv_filtered1_objinfo.req.obj_orientation)
+      time_all = time.time() - start
 
+      # print(time_get, time_all)
 
       # rate.sleep()
 
@@ -379,6 +385,7 @@ def sync_observer():
 rubbing = Rubbing()
 rubbing.filename = file_name
 rubbing.read_initial_position()
+inhand = Inhand(rubbing, sub_fv_filtered1_objinfo)
 holding= TDxlHolding()
 holding.observer= sync_observer
 holding.controller= syncpos_controller
@@ -477,7 +484,8 @@ for event in device.read_loop():
       elif event.value == 1:
         holding.FLAG_MOVES[channel]  = True
         holding.DIRECTIONS[channel]  = -1
-        holding.thick_f = 1
+        inhand.Start()
+        # holding.thick_f = 1
 
     
 
@@ -526,6 +534,7 @@ for event in device.read_loop():
 # is_running[0]= False
 # t1.join()
 holding.Stop()
+inhand.Stop()
 
 for id in range(len(dxl)):
   #dxl[id].PrintStatus()
