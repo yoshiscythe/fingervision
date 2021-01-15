@@ -14,6 +14,7 @@
 
 #include "ros/assert.h"
 
+#include "std_msgs/Header.h"
 
 namespace rubbing_hand
 {
@@ -22,7 +23,8 @@ struct dynamixel_param_msg_ {
   typedef dynamixel_param_msg_<ContainerAllocator> Type;
 
   dynamixel_param_msg_()
-  : surface_pos(0)
+  : header()
+  , surface_pos(0)
   , interval(0.0)
   , fps(0.0)
   , trg_pos()
@@ -30,12 +32,16 @@ struct dynamixel_param_msg_ {
   }
 
   dynamixel_param_msg_(const ContainerAllocator& _alloc)
-  : surface_pos(0)
+  : header(_alloc)
+  , surface_pos(0)
   , interval(0.0)
   , fps(0.0)
   , trg_pos(_alloc)
   {
   }
+
+  typedef  ::std_msgs::Header_<ContainerAllocator>  _header_type;
+   ::std_msgs::Header_<ContainerAllocator>  header;
 
   typedef int32_t _surface_pos_type;
   int32_t surface_pos;
@@ -77,12 +83,12 @@ template<class ContainerAllocator>
 struct MD5Sum< ::rubbing_hand::dynamixel_param_msg_<ContainerAllocator> > {
   static const char* value() 
   {
-    return "cdac21b3e022c4862c8d9fd54fe39a8b";
+    return "341740f27b57027720d1dbaf35286c72";
   }
 
   static const char* value(const  ::rubbing_hand::dynamixel_param_msg_<ContainerAllocator> &) { return value(); } 
-  static const uint64_t static_value1 = 0xcdac21b3e022c486ULL;
-  static const uint64_t static_value2 = 0x2c8d9fd54fe39a8bULL;
+  static const uint64_t static_value1 = 0x341740f27b570277ULL;
+  static const uint64_t static_value2 = 0x20d1dbaf35286c72ULL;
 };
 
 template<class ContainerAllocator>
@@ -99,10 +105,29 @@ template<class ContainerAllocator>
 struct Definition< ::rubbing_hand::dynamixel_param_msg_<ContainerAllocator> > {
   static const char* value() 
   {
-    return "int32 surface_pos\n\
+    return "Header header\n\
+int32 surface_pos\n\
 float64 interval\n\
 float64 fps\n\
 int32[] trg_pos\n\
+\n\
+================================================================================\n\
+MSG: std_msgs/Header\n\
+# Standard metadata for higher-level stamped data types.\n\
+# This is generally used to communicate timestamped data \n\
+# in a particular coordinate frame.\n\
+# \n\
+# sequence ID: consecutively increasing ID \n\
+uint32 seq\n\
+#Two-integer timestamp that is expressed as:\n\
+# * stamp.sec: seconds (stamp_secs) since epoch (in Python the variable is called 'secs')\n\
+# * stamp.nsec: nanoseconds since stamp_secs (in Python the variable is called 'nsecs')\n\
+# time-handling sugar is provided by the client library\n\
+time stamp\n\
+#Frame this data is associated with\n\
+# 0: no frame\n\
+# 1: global frame\n\
+string frame_id\n\
 \n\
 ";
   }
@@ -110,6 +135,8 @@ int32[] trg_pos\n\
   static const char* value(const  ::rubbing_hand::dynamixel_param_msg_<ContainerAllocator> &) { return value(); } 
 };
 
+template<class ContainerAllocator> struct HasHeader< ::rubbing_hand::dynamixel_param_msg_<ContainerAllocator> > : public TrueType {};
+template<class ContainerAllocator> struct HasHeader< const ::rubbing_hand::dynamixel_param_msg_<ContainerAllocator> > : public TrueType {};
 } // namespace message_traits
 } // namespace ros
 
@@ -122,6 +149,7 @@ template<class ContainerAllocator> struct Serializer< ::rubbing_hand::dynamixel_
 {
   template<typename Stream, typename T> inline static void allInOne(Stream& stream, T m)
   {
+    stream.next(m.header);
     stream.next(m.surface_pos);
     stream.next(m.interval);
     stream.next(m.fps);
@@ -143,6 +171,9 @@ struct Printer< ::rubbing_hand::dynamixel_param_msg_<ContainerAllocator> >
 {
   template<typename Stream> static void stream(Stream& s, const std::string& indent, const  ::rubbing_hand::dynamixel_param_msg_<ContainerAllocator> & v) 
   {
+    s << indent << "header: ";
+s << std::endl;
+    Printer< ::std_msgs::Header_<ContainerAllocator> >::stream(s, indent + "  ", v.header);
     s << indent << "surface_pos: ";
     Printer<int32_t>::stream(s, indent + "  ", v.surface_pos);
     s << indent << "interval: ";

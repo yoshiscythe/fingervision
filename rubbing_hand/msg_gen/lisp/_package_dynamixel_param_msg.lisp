@@ -1,5 +1,7 @@
 (cl:in-package rubbing_hand-msg)
-(cl:export '(SURFACE_POS-VAL
+(cl:export '(HEADER-VAL
+          HEADER
+          SURFACE_POS-VAL
           SURFACE_POS
           INTERVAL-VAL
           INTERVAL

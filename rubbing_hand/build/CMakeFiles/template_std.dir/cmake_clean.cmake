@@ -1,7 +1,10 @@
 file(REMOVE_RECURSE
   "../msg_gen"
+  "../srv_gen"
   "../msg_gen"
+  "../srv_gen"
   "../src/rubbing_hand/msg"
+  "../src/rubbing_hand/srv"
   "CMakeFiles/template_std.dir/src/template_std.cpp.o"
   "../bin/template_std.pdb"
   "../bin/template_std"

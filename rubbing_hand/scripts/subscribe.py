@@ -6,7 +6,7 @@ import rospy
 import roslib
 roslib.load_manifest('rubbing_hand')
 roslib.load_manifest('fingervision_msgs')
-from rubbing_hand.msg import dynamixel_msg
+from rubbing_hand.msg import dynamixel_msg, dynamixel_param_msg
 from fingervision_msgs.msg import ProxVision
 from fingervision_msgs.msg import Filter1ObjInfo
 from std_srvs.srv import Empty
@@ -19,6 +19,12 @@ class Subscribe:
         elif topic == "Filter1ObjInfo":
             self.topic_name = "/fingervision/fv_filter1_objinfo"
             self.topic_type = Filter1ObjInfo
+        elif topic == "dynamixel_param":
+            self.topic_name = "/dynamixel_param"
+            self.topic_type = dynamixel_param_msg
+        elif topic == "dynamixel_data":
+            self.topic_name = "/dynamixel_data"
+            self.topic_type = dynamixel_msg
         else:
             self.topic_name = None
             self.topic_type = None

@@ -168,6 +168,19 @@ template_std/fast:
 .PHONY : template_std/fast
 
 #=============================================================================
+# Target rules for targets named rospack_gensrv_all
+
+# Build rule for target.
+rospack_gensrv_all: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 rospack_gensrv_all
+.PHONY : rospack_gensrv_all
+
+# fast build rule for target.
+rospack_gensrv_all/fast:
+	$(MAKE) -f CMakeFiles/rospack_gensrv_all.dir/build.make CMakeFiles/rospack_gensrv_all.dir/build
+.PHONY : rospack_gensrv_all/fast
+
+#=============================================================================
 # Target rules for targets named download_extra_data
 
 # Build rule for target.
@@ -402,6 +415,32 @@ _catkin_empty_exported_target/fast:
 .PHONY : _catkin_empty_exported_target/fast
 
 #=============================================================================
+# Target rules for targets named ROSBUILD_genmsg_cpp
+
+# Build rule for target.
+ROSBUILD_genmsg_cpp: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 ROSBUILD_genmsg_cpp
+.PHONY : ROSBUILD_genmsg_cpp
+
+# fast build rule for target.
+ROSBUILD_genmsg_cpp/fast:
+	$(MAKE) -f CMakeFiles/ROSBUILD_genmsg_cpp.dir/build.make CMakeFiles/ROSBUILD_genmsg_cpp.dir/build
+.PHONY : ROSBUILD_genmsg_cpp/fast
+
+#=============================================================================
+# Target rules for targets named rospack_genmsg_all
+
+# Build rule for target.
+rospack_genmsg_all: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 rospack_genmsg_all
+.PHONY : rospack_genmsg_all
+
+# fast build rule for target.
+rospack_genmsg_all/fast:
+	$(MAKE) -f CMakeFiles/rospack_genmsg_all.dir/build.make CMakeFiles/rospack_genmsg_all.dir/build
+.PHONY : rospack_genmsg_all/fast
+
+#=============================================================================
 # Target rules for targets named rosbuild_premsgsrvgen
 
 # Build rule for target.
@@ -428,19 +467,6 @@ ROSBUILD_genmsg_py/fast:
 .PHONY : ROSBUILD_genmsg_py/fast
 
 #=============================================================================
-# Target rules for targets named rospack_genmsg_all
-
-# Build rule for target.
-rospack_genmsg_all: cmake_check_build_system
-	$(MAKE) -f CMakeFiles/Makefile2 rospack_genmsg_all
-.PHONY : rospack_genmsg_all
-
-# fast build rule for target.
-rospack_genmsg_all/fast:
-	$(MAKE) -f CMakeFiles/rospack_genmsg_all.dir/build.make CMakeFiles/rospack_genmsg_all.dir/build
-.PHONY : rospack_genmsg_all/fast
-
-#=============================================================================
 # Target rules for targets named ROSBUILD_genmsg_lisp
 
 # Build rule for target.
@@ -454,17 +480,17 @@ ROSBUILD_genmsg_lisp/fast:
 .PHONY : ROSBUILD_genmsg_lisp/fast
 
 #=============================================================================
-# Target rules for targets named ROSBUILD_genmsg_cpp
+# Target rules for targets named ROSBUILD_gensrv_py
 
 # Build rule for target.
-ROSBUILD_genmsg_cpp: cmake_check_build_system
-	$(MAKE) -f CMakeFiles/Makefile2 ROSBUILD_genmsg_cpp
-.PHONY : ROSBUILD_genmsg_cpp
+ROSBUILD_gensrv_py: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 ROSBUILD_gensrv_py
+.PHONY : ROSBUILD_gensrv_py
 
 # fast build rule for target.
-ROSBUILD_genmsg_cpp/fast:
-	$(MAKE) -f CMakeFiles/ROSBUILD_genmsg_cpp.dir/build.make CMakeFiles/ROSBUILD_genmsg_cpp.dir/build
-.PHONY : ROSBUILD_genmsg_cpp/fast
+ROSBUILD_gensrv_py/fast:
+	$(MAKE) -f CMakeFiles/ROSBUILD_gensrv_py.dir/build.make CMakeFiles/ROSBUILD_gensrv_py.dir/build
+.PHONY : ROSBUILD_gensrv_py/fast
 
 #=============================================================================
 # Target rules for targets named gmock
@@ -584,6 +610,7 @@ help:
 	@echo "... edit_cache"
 	@echo "... install/strip"
 	@echo "... template_std"
+	@echo "... rospack_gensrv_all"
 	@echo "... download_extra_data"
 	@echo "... test-results-run"
 	@echo "... tests"
@@ -603,11 +630,12 @@ help:
 	@echo "... clean_test_results"
 	@echo "... install/local"
 	@echo "... _catkin_empty_exported_target"
+	@echo "... ROSBUILD_genmsg_cpp"
+	@echo "... rospack_genmsg_all"
 	@echo "... rosbuild_premsgsrvgen"
 	@echo "... ROSBUILD_genmsg_py"
-	@echo "... rospack_genmsg_all"
 	@echo "... ROSBUILD_genmsg_lisp"
-	@echo "... ROSBUILD_genmsg_cpp"
+	@echo "... ROSBUILD_gensrv_py"
 	@echo "... gmock"
 	@echo "... gmock_main"
 	@echo "... gtest"

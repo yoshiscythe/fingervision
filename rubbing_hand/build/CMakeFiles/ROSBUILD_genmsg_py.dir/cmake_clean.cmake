@@ -1,7 +1,10 @@
 file(REMOVE_RECURSE
   "../msg_gen"
+  "../srv_gen"
   "../msg_gen"
+  "../srv_gen"
   "../src/rubbing_hand/msg"
+  "../src/rubbing_hand/srv"
   "CMakeFiles/ROSBUILD_genmsg_py"
   "../src/rubbing_hand/msg/__init__.py"
   "../src/rubbing_hand/msg/_dynamixel_msg.py"

@@ -1,7 +1,10 @@
 file(REMOVE_RECURSE
   "../msg_gen"
+  "../srv_gen"
   "../msg_gen"
+  "../srv_gen"
   "../src/rubbing_hand/msg"
+  "../src/rubbing_hand/srv"
   "CMakeFiles/ROSBUILD_genmsg_cpp"
   "../msg_gen/cpp/include/rubbing_hand/dynamixel_msg.h"
   "../msg_gen/cpp/include/rubbing_hand/dynamixel_param_msg.h"

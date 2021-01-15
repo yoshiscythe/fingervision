@@ -1,7 +1,10 @@
 file(REMOVE_RECURSE
   "../msg_gen"
+  "../srv_gen"
   "../msg_gen"
+  "../srv_gen"
   "../src/rubbing_hand/msg"
+  "../src/rubbing_hand/srv"
   "CMakeFiles/color_detect_node.dir/src/color_detect_node.cpp.o"
   "../bin/color_detect_node.pdb"
   "../bin/color_detect_node"

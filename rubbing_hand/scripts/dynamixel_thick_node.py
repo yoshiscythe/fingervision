@@ -9,6 +9,7 @@ import rospy
 rospy.init_node("dynamixel_node")
 
 from rubbing_hand.msg import dynamixel_msg, dynamixel_param_msg
+from rubbing_hand.srv import SetFloat64
 
 from dxl_util import *
 from _config import *
@@ -309,6 +310,7 @@ class TDxlHolding(object):
       #目標位置の計算
       if rubbing.running:
         rubbing.range_check()
+        rubbing.update_interval()
         a, b = rubbing.calculation_degree()
         pos_r, pos_l = rubbing.deg2pos(a, b)
         pos_r_dist, pos_l_dist = rubbing.calculation_pos_dist()
@@ -325,6 +327,7 @@ class TDxlHolding(object):
         self.Manual_Calibration_initial_position()
         self.calibration_f = 0
 
+      # 目標位置をdynamixelへ送信
       # print(self.trg_pos)
       self.controller(self.trg_pos)
 
@@ -338,12 +341,15 @@ class TDxlHolding(object):
       # print '\033[3A', 
 
       #各種パラメータをパブリッシュ
+      #------------------------------
       dy_param = dynamixel_param_msg()
+      dy_param.header.stamp = rospy.Time.now()
       dy_param.surface_pos = rubbing.surface_pos
       dy_param.interval = rubbing.interval
       dy_param.fps = update_fps
       dy_param.trg_pos = self.trg_pos
       param_pub.publish(dy_param)
+      #-------------------------------
 
       time_all = time.time() - start
 
@@ -386,6 +392,8 @@ rubbing = Rubbing()
 rubbing.filename = file_name
 rubbing.read_initial_position()
 inhand = Inhand(rubbing, sub_fv_filtered1_objinfo)
+rospy.Service('Set_interval', SetFloat64, lambda srv:rubbing.Set_interval(srv.data))
+rospy.Service('Go2itv', SetFloat64, lambda srv:rubbing.Go2itv(srv.data))
 holding= TDxlHolding()
 holding.observer= sync_observer
 holding.controller= syncpos_controller

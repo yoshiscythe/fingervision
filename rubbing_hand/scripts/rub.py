@@ -32,6 +32,7 @@ class Rubbing():
         self.init_pos_l_dist = 0
         self.offset_r_dist = 0
         self.offset_l_dist = 0
+        self.go2itv_f = 0
 
         self.running = 0
 
@@ -96,6 +97,37 @@ class Rubbing():
                 'init_pos_l_dist': clb_init_pos_l_dist}
         with open(self.filename, 'w') as file:
             yaml.dump(obj, file)
+
+    def Set_interval(self, data):
+        self.interval = data
+
+        return True
+
+    # Go2itv()用の目標距離アップデート
+    # go2itv_arrayの先頭から順に目標値へセット
+    def update_interval(self):
+        if self.go2itv_f:
+            # pop: 指定した位置の要素を削除し、その値を取得
+            set_data, self.go2itv_array = self.go2itv_array[0], self.go2itv_array[1:]
+
+            # 番兵
+            if set_data == -1:
+                self.go2itv_f = 0
+                return
+
+            self.Set_interval(set_data)
+
+
+    # 現在の指間距離から入力した指間距離itv_goalまで、入力された速度runvel[mm/step]で動かす
+    # 指間距離のアレイを生成してupdate_interval()によって順に動かす
+    # itvはintervalの略のつもり
+    def Go2itv(self, itv_goal, runvel= 0.01):
+        itv_start = self.interval
+        self.go2itv_array = np.arange(itv_start, itv_goal, -runvel)
+        self.go2itv_array = np.append(self.go2itv_array, [itv_goal, -1])
+        self.go2itv_f = 1
+
+        return True
 
 class PID:
     def __init__(self, P=0.2, I=0.0, D=0.0):
