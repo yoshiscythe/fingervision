@@ -513,7 +513,8 @@ class TDynamixel1(object):
       dxl_getdata_result = self.groupsyncread.isAvailable(id, addr, size)
       if dxl_getdata_result != True:
         print("[ID:%03d] groupSyncRead getdata failed" % id)
-        quit()
+        # quit()
+        return [0, 0, 0, 0]
       get_data.append(self.fix_value(self.groupsyncread.getData(id, addr, size), size))
     return get_data
 

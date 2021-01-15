@@ -107,6 +107,7 @@ CMakeFiles/ROSBUILD_genmsg_py: ../src/rubbing_hand/msg/__init__.py
 ../src/rubbing_hand/msg/_dynamixel_param_msg.py: ../msg/dynamixel_param_msg.msg
 ../src/rubbing_hand/msg/_dynamixel_param_msg.py: /opt/ros/kinetic/share/rospy/rosbuild/scripts/genmsg_py.py
 ../src/rubbing_hand/msg/_dynamixel_param_msg.py: /opt/ros/kinetic/lib/roslib/gendeps
+../src/rubbing_hand/msg/_dynamixel_param_msg.py: /opt/ros/kinetic/share/std_msgs/msg/Header.msg
 ../src/rubbing_hand/msg/_dynamixel_param_msg.py: ../manifest.xml
 ../src/rubbing_hand/msg/_dynamixel_param_msg.py: /opt/ros/kinetic/share/cpp_common/package.xml
 ../src/rubbing_hand/msg/_dynamixel_param_msg.py: /opt/ros/kinetic/share/rostime/package.xml

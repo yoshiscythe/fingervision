@@ -7,7 +7,12 @@
 ;//! \htmlinclude dynamixel_param_msg.msg.html
 
 (cl:defclass <dynamixel_param_msg> (roslisp-msg-protocol:ros-message)
-  ((surface_pos
+  ((header
+    :reader header
+    :initarg :header
+    :type std_msgs-msg:Header
+    :initform (cl:make-instance 'std_msgs-msg:Header))
+   (surface_pos
     :reader surface_pos
     :initarg :surface_pos
     :type cl:integer
@@ -37,6 +42,11 @@
   (cl:unless (cl:typep m 'dynamixel_param_msg)
     (roslisp-msg-protocol:msg-deprecation-warning "using old message class name rubbing_hand-msg:<dynamixel_param_msg> is deprecated: use rubbing_hand-msg:dynamixel_param_msg instead.")))
 
+(cl:ensure-generic-function 'header-val :lambda-list '(m))
+(cl:defmethod header-val ((m <dynamixel_param_msg>))
+  (roslisp-msg-protocol:msg-deprecation-warning "Using old-style slot reader rubbing_hand-msg:header-val is deprecated.  Use rubbing_hand-msg:header instead.")
+  (header m))
+
 (cl:ensure-generic-function 'surface_pos-val :lambda-list '(m))
 (cl:defmethod surface_pos-val ((m <dynamixel_param_msg>))
   (roslisp-msg-protocol:msg-deprecation-warning "Using old-style slot reader rubbing_hand-msg:surface_pos-val is deprecated.  Use rubbing_hand-msg:surface_pos instead.")
@@ -58,6 +68,7 @@
   (trg_pos m))
 (cl:defmethod roslisp-msg-protocol:serialize ((msg <dynamixel_param_msg>) ostream)
   "Serializes a message object of type '<dynamixel_param_msg>"
+  (roslisp-msg-protocol:serialize (cl:slot-value msg 'header) ostream)
   (cl:let* ((signed (cl:slot-value msg 'surface_pos)) (unsigned (cl:if (cl:< signed 0) (cl:+ signed 4294967296) signed)))
     (cl:write-byte (cl:ldb (cl:byte 8 0) unsigned) ostream)
     (cl:write-byte (cl:ldb (cl:byte 8 8) unsigned) ostream)
@@ -97,6 +108,7 @@
 )
 (cl:defmethod roslisp-msg-protocol:deserialize ((msg <dynamixel_param_msg>) istream)
   "Deserializes a message object of type '<dynamixel_param_msg>"
+  (roslisp-msg-protocol:deserialize (cl:slot-value msg 'header) istream)
     (cl:let ((unsigned 0))
       (cl:setf (cl:ldb (cl:byte 8 0) unsigned) (cl:read-byte istream))
       (cl:setf (cl:ldb (cl:byte 8 8) unsigned) (cl:read-byte istream))
@@ -147,18 +159,19 @@
   "rubbing_hand/dynamixel_param_msg")
 (cl:defmethod roslisp-msg-protocol:md5sum ((type (cl:eql '<dynamixel_param_msg>)))
   "Returns md5sum for a message object of type '<dynamixel_param_msg>"
-  "cdac21b3e022c4862c8d9fd54fe39a8b")
+  "341740f27b57027720d1dbaf35286c72")
 (cl:defmethod roslisp-msg-protocol:md5sum ((type (cl:eql 'dynamixel_param_msg)))
   "Returns md5sum for a message object of type 'dynamixel_param_msg"
-  "cdac21b3e022c4862c8d9fd54fe39a8b")
+  "341740f27b57027720d1dbaf35286c72")
 (cl:defmethod roslisp-msg-protocol:message-definition ((type (cl:eql '<dynamixel_param_msg>)))
   "Returns full string definition for message of type '<dynamixel_param_msg>"
-  (cl:format cl:nil "int32 surface_pos~%float64 interval~%float64 fps~%int32[] trg_pos~%~%~%"))
+  (cl:format cl:nil "Header header~%int32 surface_pos~%float64 interval~%float64 fps~%int32[] trg_pos~%~%================================================================================~%MSG: std_msgs/Header~%# Standard metadata for higher-level stamped data types.~%# This is generally used to communicate timestamped data ~%# in a particular coordinate frame.~%# ~%# sequence ID: consecutively increasing ID ~%uint32 seq~%#Two-integer timestamp that is expressed as:~%# * stamp.sec: seconds (stamp_secs) since epoch (in Python the variable is called 'secs')~%# * stamp.nsec: nanoseconds since stamp_secs (in Python the variable is called 'nsecs')~%# time-handling sugar is provided by the client library~%time stamp~%#Frame this data is associated with~%# 0: no frame~%# 1: global frame~%string frame_id~%~%~%"))
 (cl:defmethod roslisp-msg-protocol:message-definition ((type (cl:eql 'dynamixel_param_msg)))
   "Returns full string definition for message of type 'dynamixel_param_msg"
-  (cl:format cl:nil "int32 surface_pos~%float64 interval~%float64 fps~%int32[] trg_pos~%~%~%"))
+  (cl:format cl:nil "Header header~%int32 surface_pos~%float64 interval~%float64 fps~%int32[] trg_pos~%~%================================================================================~%MSG: std_msgs/Header~%# Standard metadata for higher-level stamped data types.~%# This is generally used to communicate timestamped data ~%# in a particular coordinate frame.~%# ~%# sequence ID: consecutively increasing ID ~%uint32 seq~%#Two-integer timestamp that is expressed as:~%# * stamp.sec: seconds (stamp_secs) since epoch (in Python the variable is called 'secs')~%# * stamp.nsec: nanoseconds since stamp_secs (in Python the variable is called 'nsecs')~%# time-handling sugar is provided by the client library~%time stamp~%#Frame this data is associated with~%# 0: no frame~%# 1: global frame~%string frame_id~%~%~%"))
 (cl:defmethod roslisp-msg-protocol:serialization-length ((msg <dynamixel_param_msg>))
   (cl:+ 0
+     (roslisp-msg-protocol:serialization-length (cl:slot-value msg 'header))
      4
      8
      8
@@ -167,6 +180,7 @@
 (cl:defmethod roslisp-msg-protocol:ros-message-to-list ((msg <dynamixel_param_msg>))
   "Converts a ROS message object to a list"
   (cl:list 'dynamixel_param_msg
+    (cl:cons ':header (header msg))
     (cl:cons ':surface_pos (surface_pos msg))
     (cl:cons ':interval (interval msg))
     (cl:cons ':fps (fps msg))
