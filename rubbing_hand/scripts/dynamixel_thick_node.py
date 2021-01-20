@@ -9,7 +9,7 @@ import rospy
 rospy.init_node("dynamixel_node")
 
 from rubbing_hand.msg import dynamixel_msg, dynamixel_param_msg
-from rubbing_hand.srv import SetFloat64
+from rubbing_hand.srv import SetFloat64, Set2Float64
 
 from dxl_util import *
 from _config import *
@@ -286,9 +286,9 @@ class TDxlHolding(object):
       
       #ボタン上下は両指先を逆方向へ動かす
       if self.DIRECTIONS[2] == 1:
-        rubbing.degree_of_finger += self.p
+        rubbing.degree_of_finger += self.p*0.1
       elif self.DIRECTIONS[2] == -1:
-        rubbing.degree_of_finger -= self.p
+        rubbing.degree_of_finger -= self.p*0.1
 
       # if self.DIRECTIONS[4] == 1:
       #   self.trg_vel[0] = self.v
@@ -309,8 +309,7 @@ class TDxlHolding(object):
 
       #目標位置の計算
       if rubbing.running:
-        rubbing.range_check()
-        rubbing.update_interval()
+        rubbing.Update()
         a, b = rubbing.calculation_degree()
         pos_r, pos_l = rubbing.deg2pos(a, b)
         pos_r_dist, pos_l_dist = rubbing.calculation_pos_dist()
@@ -331,14 +330,7 @@ class TDxlHolding(object):
       # print(self.trg_pos)
       self.controller(self.trg_pos)
 
-      # print ''  
-      # print rubbing.surface_pos, rubbing.interval
       update_fps = 1/(time.time() - start)
-      # print "fps: ", update_fps
-      # # for id in range(len(dxl)):
-      # #   print pos[id],
-      # # print ''
-      # print '\033[3A', 
 
       #各種パラメータをパブリッシュ
       #------------------------------
@@ -354,6 +346,7 @@ class TDxlHolding(object):
       time_all = time.time() - start
 
       # print(time_get, time_all)
+      print(rubbing.interval, rubbing.degree_of_finger)
 
       # rate.sleep()
 
@@ -393,7 +386,7 @@ rubbing.filename = file_name
 rubbing.read_initial_position()
 inhand = Inhand(rubbing, sub_fv_filtered1_objinfo)
 rospy.Service('Set_interval', SetFloat64, lambda srv:rubbing.Set_interval(srv.data))
-rospy.Service('Go2itv', SetFloat64, lambda srv:rubbing.Go2itv(srv.data))
+rospy.Service('Go2itv', Set2Float64, lambda srv:rubbing.Go2itv(srv.data1, srv.data2))
 holding= TDxlHolding()
 holding.observer= sync_observer
 holding.controller= syncpos_controller

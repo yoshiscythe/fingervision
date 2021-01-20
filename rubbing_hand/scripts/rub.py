@@ -117,13 +117,40 @@ class Rubbing():
 
             self.Set_interval(set_data)
 
+    def update_degfinger(self):
+        # --------------------------------------------------
+        # CAVS
+        min_deg = 0.0
+        max_deg = 6.0
+        self.degree_of_finger = self.interval*(-0.48) + 13.8
+        # --------------------------------------------------
+
+        # # -----------------------------------------------------
+        # # FLAT
+        # min_deg = 0.0
+        # max_deg = 5.0
+        # self.degree_of_finger = self.interval*(-0.681) + 15.7
+        # # -----------------------------------------------------
+
+        if self.degree_of_finger > max_deg:
+            self.degree_of_finger = max_deg
+        if self.degree_of_finger < min_deg:
+            self.degree_of_finger = min_deg
+
+    def Update(self):
+        self.update_interval()
+        self.range_check()
+        self.update_degfinger()
+
 
     # 現在の指間距離から入力した指間距離itv_goalまで、入力された速度runvel[mm/step]で動かす
     # 指間距離のアレイを生成してupdate_interval()によって順に動かす
     # itvはintervalの略のつもり
     def Go2itv(self, itv_goal, runvel= 0.01):
         itv_start = self.interval
-        self.go2itv_array = np.arange(itv_start, itv_goal, -runvel)
+        if itv_start > itv_goal:
+            runvel = -abs(runvel)
+        self.go2itv_array = np.arange(itv_start, itv_goal, runvel)
         self.go2itv_array = np.append(self.go2itv_array, [itv_goal, -1])
         self.go2itv_f = 1
 

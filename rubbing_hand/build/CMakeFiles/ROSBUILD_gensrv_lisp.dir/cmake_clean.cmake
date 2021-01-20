@@ -9,6 +9,9 @@ file(REMOVE_RECURSE
   "../srv_gen/lisp/SetFloat64.lisp"
   "../srv_gen/lisp/_package.lisp"
   "../srv_gen/lisp/_package_SetFloat64.lisp"
+  "../srv_gen/lisp/Set2Float64.lisp"
+  "../srv_gen/lisp/_package.lisp"
+  "../srv_gen/lisp/_package_Set2Float64.lisp"
 )
 
 # Per-language clean rules from dependency scanning.

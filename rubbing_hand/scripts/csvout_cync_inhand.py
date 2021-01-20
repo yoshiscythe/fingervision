@@ -7,6 +7,7 @@ import csv
 import os
 import re
 import datetime
+import time
 
 import rospy
 import roslib
@@ -68,6 +69,14 @@ def set_interval_client(data):
   except rospy.ServiceException, e:
     print "Service call failed: %s"%e
 
+def Go2itv_client(data1, data2):
+  rospy.wait_for_service('/Go2itv')
+  try:
+    Go2itv = rospy.ServiceProxy('/Go2itv', Set2Float64)
+    Go2itv(data1, data2)
+  except rospy.ServiceException, e:
+    print "Service call failed: %s"%e
+
 def hoge(msg):
   # rospy.loginfo(msg)
   s = storing.present_data
@@ -85,34 +94,34 @@ def hoge(msg):
 
 
 class CSVoutput:
-  def __init__(self, name = "test"):
+  def __init__(self, name = "test", msg_list = []):
     self.data = []
-    self.file_dir = "/home/suzuki/ros_ws/ay_tools/fingervision/suzuki/rubbing_hand/data/0115/"
+    self.file_dir = "/home/suzuki/ros_ws/ay_tools/fingervision/suzuki/rubbing_hand/data/0117/FLAT/0.01/"
     self.file_Name = name
     today = datetime.datetime.now().strftime("%Y%m%d")
     self.file_name = self.file_dir + self.file_Name + today + "(000).csv"
     self.file_name = duplicate_rename(self.file_name)
     print("file name is: %s" %self.file_name)
 
-    header =[
-      "time",
-      "orientation of object",
-      "interval of finger"
-    ]
+    header = self.create_header(msg_list)
 
     with open(self.file_name, 'a') as f:
       writer = csv.writer(f)
       # print "File is opened!
       writer.writerow(header)
 
-  def Storing(self, msg_objdata, msg_dyna_param):
-    time_stamp = [format(msg_objdata.header.stamp.secs+msg_objdata.header.stamp.nsecs*10**-9, '.3f')]
-    seq_stamp_obj = [msg_objdata.header.seq]
-    seq_stamp_dyna = [msg_dyna_param.header.seq]
-    obj_orientation = [msg_objdata.obj_orientation]
-    interval = [msg_dyna_param.interval]
-    data = time_stamp + seq_stamp_obj + seq_stamp_dyna + obj_orientation + interval
+  def create_header(self, msg_list):
+      header = []
+      for name, mag in msg_list:
+        header += dictionary_key2flatten_list(message_converter.convert_ros_message_to_dictionary(mag), name)
+      return header
 
+  def Storing(self, msg_list):
+    data = []
+    # time_stamp = [format(msg_objdata.header.stamp.secs+msg_objdata.header.stamp.nsecs*10**-9, '.3f')]
+    for msg in msg_list:
+      dictionary = message_converter.convert_ros_message_to_dictionary(msg)
+      data += dictionary2flatten_list(dictionary)
     self.data.append(data)
 
   def Write(self):
@@ -122,6 +131,24 @@ class CSVoutput:
       for i in range(len(self.data)):
         writer.writerow(self.data[i])
 
+def dictionary2flatten_list(d):
+    l = d.values()
+    value_list = []
+    for el in l:
+        if isinstance(el, dict):
+            value_list += dictionary2flatten_list(el)
+        else:
+            value_list += [el]
+    return value_list
+
+def dictionary_key2flatten_list(d, initial_path):
+    key_list = []
+    for k, v in d.items():
+        if isinstance(v, dict):
+            key_list += dictionary_key2flatten_list(v, initial_path+k+"/")
+        else:
+            key_list += [initial_path+k]
+    return key_list
 
 class Storing_dydata:
   def __init__(self):
@@ -174,49 +201,44 @@ def main():
 
   # storing = Storing_dydata()
   # mycsv_l = CSVoutput("thick_l(000).csv")
-  file_name = "inhand" + str(interval) + "_"
-  mycsv = CSVoutput(file_name)
+  runvel = 0.01
+  file_name = "inhand" + str(interval) + "-" + str(runvel) + "_"
+  msg_list = [["/dynamixel_param/", dynamixel_param_msg()], ["/fingervision/fv_filter1_objinfo/", Filter1ObjInfo()], ["/dynamixel_data/", dynamixel_msg()]]
+  mycsv = CSVoutput(file_name, msg_list)
 
   # start_record_client("l")
   # start_record_client("r")
 
   # print "start record!"
-  
-  # # sub_prox_l = message_filters.Subscriber("/fingervision/rh_l/prox_vision", ProxVision)
-  # # sub_prox_r = message_filters.Subscriber("/fingervision/rh_r/prox_vision", ProxVision)
-  # sub_objdata = message_filters.Subscriber("/fingervision/fv_filter1_objinfo", Filter1ObjInfo)
-  # sub_dyna_param = message_filters.Subscriber("dynamixel_param", dynamixel_param_msg)
-  
-  # fps = 10. #fpsが整数だと、1/fpsをpython2が評価すると0になってしまう(整数同士の除算は切り捨て除算)
-  # delay = 1/fps*0.5
-
-  # ts = message_filters.ApproximateTimeSynchronizer([sub_objdata, sub_dyna_param], 10, delay)
-  # ts.registerCallback(mycsv.Storing)
-  
-  # rospy.Subscriber("/fingervision/rh_l/prox_vision", ProxVision, lambda msg:output2csv(msg, mycsv_l, storing))
-  # rospy.Subscriber("/fingervision/rh_r/prox_vision", ProxVision, lambda msg:output2csv(msg, mycsv_r, storing))
-  # rospy.Subscriber("/fingervision/dynamixel_data", dynamixel_msg, storing.SetCurrentData)
 
   #subscribe設定
   sub_fv_filtered1_objinfo = Subscribe("Filter1ObjInfo")
-  rospy.Subscriber("/dynamixel_param", dynamixel_param_msg, lambda msg:mycsv.Storing(sub_fv_filtered1_objinfo.req, msg))
+  sub_dynamixel_data = Subscribe("dynamixel_data")
+  rospy.sleep(0.5)
+  rospy.Subscriber("/dynamixel_param", dynamixel_param_msg, lambda msg:mycsv.Storing([msg, sub_fv_filtered1_objinfo.req, sub_dynamixel_data.req]))
 
-  set_interval_client(interval)
+  # set_interval_client(interval)
+  Go2itv_client(interval, runvel)
+
+  time_start = time.time()
 
   print "ready OK!"
 
-  dictionary = message_converter.convert_ros_message_to_dictionary(sub_fv_filtered1_objinfo.req)
-  print(dictionary)
-
-  while True:
-    s = raw_input('type "q" to finish: ')
-    print s=="q"
-    if s=="q":
-      mycsv.Write()
-      # stop_record_client("l")
-      # stop_record_client("r")
-      break
+  # while True:
+  #   s = raw_input('type "q" to finish: ')
+  #   print s=="q"
+  #   if s=="q":
+  #     mycsv.Write()
+  #     # stop_record_client("l")
+  #     # stop_record_client("r")
+  #     break
   
+  while True:
+    if time.time()-time_start > 20:
+      mycsv.Write()
+      break
+    rospy.sleep(0.01)
+
   set_interval_client(16.0)
 
   rospy.signal_shutdown('finish')

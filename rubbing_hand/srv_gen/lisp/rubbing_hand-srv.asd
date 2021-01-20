@@ -6,4 +6,6 @@
   :components ((:file "_package")
     (:file "SetFloat64" :depends-on ("_package_SetFloat64"))
     (:file "_package_SetFloat64" :depends-on ("_package"))
+    (:file "Set2Float64" :depends-on ("_package_Set2Float64"))
+    (:file "_package_Set2Float64" :depends-on ("_package"))
   ))
