@@ -6,7 +6,9 @@ file(REMOVE_RECURSE
   "../src/rubbing_hand/msg"
   "../src/rubbing_hand/srv"
   "CMakeFiles/ROSBUILD_genmsg_cpp"
+  "../msg_gen/cpp/include/rubbing_hand/Float64.h"
   "../msg_gen/cpp/include/rubbing_hand/dynamixel_msg.h"
+  "../msg_gen/cpp/include/rubbing_hand/Float64Array.h"
   "../msg_gen/cpp/include/rubbing_hand/dynamixel_param_msg.h"
 )
 

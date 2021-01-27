@@ -56,10 +56,54 @@ include CMakeFiles/ROSBUILD_genmsg_py.dir/progress.make
 CMakeFiles/ROSBUILD_genmsg_py: ../src/rubbing_hand/msg/__init__.py
 
 
+../src/rubbing_hand/msg/__init__.py: ../src/rubbing_hand/msg/_Float64.py
 ../src/rubbing_hand/msg/__init__.py: ../src/rubbing_hand/msg/_dynamixel_msg.py
+../src/rubbing_hand/msg/__init__.py: ../src/rubbing_hand/msg/_Float64Array.py
 ../src/rubbing_hand/msg/__init__.py: ../src/rubbing_hand/msg/_dynamixel_param_msg.py
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --blue --bold --progress-dir=/home/suzuki/ros_ws/ay_tools/fingervision/suzuki/rubbing_hand/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Generating ../src/rubbing_hand/msg/__init__.py"
-	/opt/ros/kinetic/share/rospy/rosbuild/scripts/genmsg_py.py --initpy /home/suzuki/ros_ws/ay_tools/fingervision/suzuki/rubbing_hand/msg/dynamixel_msg.msg /home/suzuki/ros_ws/ay_tools/fingervision/suzuki/rubbing_hand/msg/dynamixel_param_msg.msg
+	/opt/ros/kinetic/share/rospy/rosbuild/scripts/genmsg_py.py --initpy /home/suzuki/ros_ws/ay_tools/fingervision/suzuki/rubbing_hand/msg/Float64.msg /home/suzuki/ros_ws/ay_tools/fingervision/suzuki/rubbing_hand/msg/dynamixel_msg.msg /home/suzuki/ros_ws/ay_tools/fingervision/suzuki/rubbing_hand/msg/Float64Array.msg /home/suzuki/ros_ws/ay_tools/fingervision/suzuki/rubbing_hand/msg/dynamixel_param_msg.msg
+
+../src/rubbing_hand/msg/_Float64.py: ../msg/Float64.msg
+../src/rubbing_hand/msg/_Float64.py: /opt/ros/kinetic/share/rospy/rosbuild/scripts/genmsg_py.py
+../src/rubbing_hand/msg/_Float64.py: /opt/ros/kinetic/lib/roslib/gendeps
+../src/rubbing_hand/msg/_Float64.py: ../manifest.xml
+../src/rubbing_hand/msg/_Float64.py: /opt/ros/kinetic/share/cpp_common/package.xml
+../src/rubbing_hand/msg/_Float64.py: /opt/ros/kinetic/share/rostime/package.xml
+../src/rubbing_hand/msg/_Float64.py: /opt/ros/kinetic/share/roscpp_traits/package.xml
+../src/rubbing_hand/msg/_Float64.py: /opt/ros/kinetic/share/roscpp_serialization/package.xml
+../src/rubbing_hand/msg/_Float64.py: /opt/ros/kinetic/share/catkin/package.xml
+../src/rubbing_hand/msg/_Float64.py: /opt/ros/kinetic/share/genmsg/package.xml
+../src/rubbing_hand/msg/_Float64.py: /opt/ros/kinetic/share/genpy/package.xml
+../src/rubbing_hand/msg/_Float64.py: /opt/ros/kinetic/share/message_runtime/package.xml
+../src/rubbing_hand/msg/_Float64.py: /opt/ros/kinetic/share/std_msgs/package.xml
+../src/rubbing_hand/msg/_Float64.py: /home/suzuki/ros_ws/ay_tools/fingervision/fingervision_msgs/manifest.xml
+../src/rubbing_hand/msg/_Float64.py: /opt/ros/kinetic/share/gencpp/package.xml
+../src/rubbing_hand/msg/_Float64.py: /opt/ros/kinetic/share/geneus/package.xml
+../src/rubbing_hand/msg/_Float64.py: /opt/ros/kinetic/share/gennodejs/package.xml
+../src/rubbing_hand/msg/_Float64.py: /opt/ros/kinetic/share/genlisp/package.xml
+../src/rubbing_hand/msg/_Float64.py: /opt/ros/kinetic/share/message_generation/package.xml
+../src/rubbing_hand/msg/_Float64.py: /opt/ros/kinetic/share/rosbuild/package.xml
+../src/rubbing_hand/msg/_Float64.py: /opt/ros/kinetic/share/rosconsole/package.xml
+../src/rubbing_hand/msg/_Float64.py: /opt/ros/kinetic/share/rosgraph_msgs/package.xml
+../src/rubbing_hand/msg/_Float64.py: /opt/ros/kinetic/share/xmlrpcpp/package.xml
+../src/rubbing_hand/msg/_Float64.py: /opt/ros/kinetic/share/roscpp/package.xml
+../src/rubbing_hand/msg/_Float64.py: /opt/ros/kinetic/share/std_srvs/package.xml
+../src/rubbing_hand/msg/_Float64.py: /opt/ros/kinetic/share/message_filters/package.xml
+../src/rubbing_hand/msg/_Float64.py: /opt/ros/kinetic/share/class_loader/package.xml
+../src/rubbing_hand/msg/_Float64.py: /opt/ros/kinetic/share/ros_environment/package.xml
+../src/rubbing_hand/msg/_Float64.py: /opt/ros/kinetic/share/rospack/package.xml
+../src/rubbing_hand/msg/_Float64.py: /opt/ros/kinetic/share/roslib/package.xml
+../src/rubbing_hand/msg/_Float64.py: /opt/ros/kinetic/share/pluginlib/package.xml
+../src/rubbing_hand/msg/_Float64.py: /opt/ros/kinetic/share/geometry_msgs/package.xml
+../src/rubbing_hand/msg/_Float64.py: /opt/ros/kinetic/share/sensor_msgs/package.xml
+../src/rubbing_hand/msg/_Float64.py: /opt/ros/kinetic/share/image_transport/package.xml
+../src/rubbing_hand/msg/_Float64.py: /opt/ros/kinetic/share/camera_calibration_parsers/package.xml
+../src/rubbing_hand/msg/_Float64.py: /opt/ros/kinetic/share/camera_info_manager/package.xml
+../src/rubbing_hand/msg/_Float64.py: /home/suzuki/ros_ws/ay_tools/fingervision/fingervision/manifest.xml
+../src/rubbing_hand/msg/_Float64.py: /home/suzuki/ros_ws/ay_tools/fingervision/fingervision_msgs/msg_gen/generated
+../src/rubbing_hand/msg/_Float64.py: /home/suzuki/ros_ws/ay_tools/fingervision/fingervision_msgs/srv_gen/generated
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --blue --bold --progress-dir=/home/suzuki/ros_ws/ay_tools/fingervision/suzuki/rubbing_hand/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Generating ../src/rubbing_hand/msg/_Float64.py"
+	/opt/ros/kinetic/share/rospy/rosbuild/scripts/genmsg_py.py --noinitpy /home/suzuki/ros_ws/ay_tools/fingervision/suzuki/rubbing_hand/msg/Float64.msg
 
 ../src/rubbing_hand/msg/_dynamixel_msg.py: ../msg/dynamixel_msg.msg
 ../src/rubbing_hand/msg/_dynamixel_msg.py: /opt/ros/kinetic/share/rospy/rosbuild/scripts/genmsg_py.py
@@ -101,8 +145,50 @@ CMakeFiles/ROSBUILD_genmsg_py: ../src/rubbing_hand/msg/__init__.py
 ../src/rubbing_hand/msg/_dynamixel_msg.py: /home/suzuki/ros_ws/ay_tools/fingervision/fingervision/manifest.xml
 ../src/rubbing_hand/msg/_dynamixel_msg.py: /home/suzuki/ros_ws/ay_tools/fingervision/fingervision_msgs/msg_gen/generated
 ../src/rubbing_hand/msg/_dynamixel_msg.py: /home/suzuki/ros_ws/ay_tools/fingervision/fingervision_msgs/srv_gen/generated
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --blue --bold --progress-dir=/home/suzuki/ros_ws/ay_tools/fingervision/suzuki/rubbing_hand/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Generating ../src/rubbing_hand/msg/_dynamixel_msg.py"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --blue --bold --progress-dir=/home/suzuki/ros_ws/ay_tools/fingervision/suzuki/rubbing_hand/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Generating ../src/rubbing_hand/msg/_dynamixel_msg.py"
 	/opt/ros/kinetic/share/rospy/rosbuild/scripts/genmsg_py.py --noinitpy /home/suzuki/ros_ws/ay_tools/fingervision/suzuki/rubbing_hand/msg/dynamixel_msg.msg
+
+../src/rubbing_hand/msg/_Float64Array.py: ../msg/Float64Array.msg
+../src/rubbing_hand/msg/_Float64Array.py: /opt/ros/kinetic/share/rospy/rosbuild/scripts/genmsg_py.py
+../src/rubbing_hand/msg/_Float64Array.py: /opt/ros/kinetic/lib/roslib/gendeps
+../src/rubbing_hand/msg/_Float64Array.py: ../manifest.xml
+../src/rubbing_hand/msg/_Float64Array.py: /opt/ros/kinetic/share/cpp_common/package.xml
+../src/rubbing_hand/msg/_Float64Array.py: /opt/ros/kinetic/share/rostime/package.xml
+../src/rubbing_hand/msg/_Float64Array.py: /opt/ros/kinetic/share/roscpp_traits/package.xml
+../src/rubbing_hand/msg/_Float64Array.py: /opt/ros/kinetic/share/roscpp_serialization/package.xml
+../src/rubbing_hand/msg/_Float64Array.py: /opt/ros/kinetic/share/catkin/package.xml
+../src/rubbing_hand/msg/_Float64Array.py: /opt/ros/kinetic/share/genmsg/package.xml
+../src/rubbing_hand/msg/_Float64Array.py: /opt/ros/kinetic/share/genpy/package.xml
+../src/rubbing_hand/msg/_Float64Array.py: /opt/ros/kinetic/share/message_runtime/package.xml
+../src/rubbing_hand/msg/_Float64Array.py: /opt/ros/kinetic/share/std_msgs/package.xml
+../src/rubbing_hand/msg/_Float64Array.py: /home/suzuki/ros_ws/ay_tools/fingervision/fingervision_msgs/manifest.xml
+../src/rubbing_hand/msg/_Float64Array.py: /opt/ros/kinetic/share/gencpp/package.xml
+../src/rubbing_hand/msg/_Float64Array.py: /opt/ros/kinetic/share/geneus/package.xml
+../src/rubbing_hand/msg/_Float64Array.py: /opt/ros/kinetic/share/gennodejs/package.xml
+../src/rubbing_hand/msg/_Float64Array.py: /opt/ros/kinetic/share/genlisp/package.xml
+../src/rubbing_hand/msg/_Float64Array.py: /opt/ros/kinetic/share/message_generation/package.xml
+../src/rubbing_hand/msg/_Float64Array.py: /opt/ros/kinetic/share/rosbuild/package.xml
+../src/rubbing_hand/msg/_Float64Array.py: /opt/ros/kinetic/share/rosconsole/package.xml
+../src/rubbing_hand/msg/_Float64Array.py: /opt/ros/kinetic/share/rosgraph_msgs/package.xml
+../src/rubbing_hand/msg/_Float64Array.py: /opt/ros/kinetic/share/xmlrpcpp/package.xml
+../src/rubbing_hand/msg/_Float64Array.py: /opt/ros/kinetic/share/roscpp/package.xml
+../src/rubbing_hand/msg/_Float64Array.py: /opt/ros/kinetic/share/std_srvs/package.xml
+../src/rubbing_hand/msg/_Float64Array.py: /opt/ros/kinetic/share/message_filters/package.xml
+../src/rubbing_hand/msg/_Float64Array.py: /opt/ros/kinetic/share/class_loader/package.xml
+../src/rubbing_hand/msg/_Float64Array.py: /opt/ros/kinetic/share/ros_environment/package.xml
+../src/rubbing_hand/msg/_Float64Array.py: /opt/ros/kinetic/share/rospack/package.xml
+../src/rubbing_hand/msg/_Float64Array.py: /opt/ros/kinetic/share/roslib/package.xml
+../src/rubbing_hand/msg/_Float64Array.py: /opt/ros/kinetic/share/pluginlib/package.xml
+../src/rubbing_hand/msg/_Float64Array.py: /opt/ros/kinetic/share/geometry_msgs/package.xml
+../src/rubbing_hand/msg/_Float64Array.py: /opt/ros/kinetic/share/sensor_msgs/package.xml
+../src/rubbing_hand/msg/_Float64Array.py: /opt/ros/kinetic/share/image_transport/package.xml
+../src/rubbing_hand/msg/_Float64Array.py: /opt/ros/kinetic/share/camera_calibration_parsers/package.xml
+../src/rubbing_hand/msg/_Float64Array.py: /opt/ros/kinetic/share/camera_info_manager/package.xml
+../src/rubbing_hand/msg/_Float64Array.py: /home/suzuki/ros_ws/ay_tools/fingervision/fingervision/manifest.xml
+../src/rubbing_hand/msg/_Float64Array.py: /home/suzuki/ros_ws/ay_tools/fingervision/fingervision_msgs/msg_gen/generated
+../src/rubbing_hand/msg/_Float64Array.py: /home/suzuki/ros_ws/ay_tools/fingervision/fingervision_msgs/srv_gen/generated
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --blue --bold --progress-dir=/home/suzuki/ros_ws/ay_tools/fingervision/suzuki/rubbing_hand/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Generating ../src/rubbing_hand/msg/_Float64Array.py"
+	/opt/ros/kinetic/share/rospy/rosbuild/scripts/genmsg_py.py --noinitpy /home/suzuki/ros_ws/ay_tools/fingervision/suzuki/rubbing_hand/msg/Float64Array.msg
 
 ../src/rubbing_hand/msg/_dynamixel_param_msg.py: ../msg/dynamixel_param_msg.msg
 ../src/rubbing_hand/msg/_dynamixel_param_msg.py: /opt/ros/kinetic/share/rospy/rosbuild/scripts/genmsg_py.py
@@ -144,12 +230,14 @@ CMakeFiles/ROSBUILD_genmsg_py: ../src/rubbing_hand/msg/__init__.py
 ../src/rubbing_hand/msg/_dynamixel_param_msg.py: /home/suzuki/ros_ws/ay_tools/fingervision/fingervision/manifest.xml
 ../src/rubbing_hand/msg/_dynamixel_param_msg.py: /home/suzuki/ros_ws/ay_tools/fingervision/fingervision_msgs/msg_gen/generated
 ../src/rubbing_hand/msg/_dynamixel_param_msg.py: /home/suzuki/ros_ws/ay_tools/fingervision/fingervision_msgs/srv_gen/generated
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --blue --bold --progress-dir=/home/suzuki/ros_ws/ay_tools/fingervision/suzuki/rubbing_hand/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Generating ../src/rubbing_hand/msg/_dynamixel_param_msg.py"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --blue --bold --progress-dir=/home/suzuki/ros_ws/ay_tools/fingervision/suzuki/rubbing_hand/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_5) "Generating ../src/rubbing_hand/msg/_dynamixel_param_msg.py"
 	/opt/ros/kinetic/share/rospy/rosbuild/scripts/genmsg_py.py --noinitpy /home/suzuki/ros_ws/ay_tools/fingervision/suzuki/rubbing_hand/msg/dynamixel_param_msg.msg
 
 ROSBUILD_genmsg_py: CMakeFiles/ROSBUILD_genmsg_py
 ROSBUILD_genmsg_py: ../src/rubbing_hand/msg/__init__.py
+ROSBUILD_genmsg_py: ../src/rubbing_hand/msg/_Float64.py
 ROSBUILD_genmsg_py: ../src/rubbing_hand/msg/_dynamixel_msg.py
+ROSBUILD_genmsg_py: ../src/rubbing_hand/msg/_Float64Array.py
 ROSBUILD_genmsg_py: ../src/rubbing_hand/msg/_dynamixel_param_msg.py
 ROSBUILD_genmsg_py: CMakeFiles/ROSBUILD_genmsg_py.dir/build.make
 

@@ -35,6 +35,7 @@ class Rubbing():
         self.go2itv_f = 0
 
         self.running = 0
+        self.control_f = False
 
     #条件下での各指の根本角度を計算する
     def calculation_degree(self):
@@ -98,20 +99,25 @@ class Rubbing():
         with open(self.filename, 'w') as file:
             yaml.dump(obj, file)
 
+    # 目標インターバルの変更
+    # インターバルが変更されると操作済みフラグを立てる。
+    # Update()で毎ステップの終わりに折る
     def Set_interval(self, data):
         self.interval = data
+        self.control_f = True
 
         return True
 
     # Go2itv()用の目標距離アップデート
     # go2itv_arrayの先頭から順に目標値へセット
+    # Set_interval()でインターバルが変更されてるとgo2itvは終了
     def update_interval(self):
         if self.go2itv_f:
-            # pop: 指定した位置の要素を削除し、その値を取得
+            # 指定した位置の要素を削除し、その値を取得
             set_data, self.go2itv_array = self.go2itv_array[0], self.go2itv_array[1:]
 
-            # 番兵
-            if set_data == -1:
+            # 番兵もしくはインターバルの変更を感知すると終了
+            if set_data == -1 or self.control_f:
                 self.go2itv_f = 0
                 return
 
@@ -141,6 +147,7 @@ class Rubbing():
         self.update_interval()
         self.range_check()
         self.update_degfinger()
+        self.control_f = False
 
 
     # 現在の指間距離から入力した指間距離itv_goalまで、入力された速度runvel[mm/step]で動かす

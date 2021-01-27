@@ -96,7 +96,7 @@ def hoge(msg):
 class CSVoutput:
   def __init__(self, name = "test", msg_list = []):
     self.data = []
-    self.file_dir = "/home/suzuki/ros_ws/ay_tools/fingervision/suzuki/rubbing_hand/data/0117/FLAT/0.01/"
+    self.file_dir = "/home/suzuki/ros_ws/ay_tools/fingervision/suzuki/rubbing_hand/data/0120/"
     self.file_Name = name
     today = datetime.datetime.now().strftime("%Y%m%d")
     self.file_name = self.file_dir + self.file_Name + today + "(000).csv"
@@ -202,7 +202,7 @@ def main():
   # storing = Storing_dydata()
   # mycsv_l = CSVoutput("thick_l(000).csv")
   runvel = 0.01
-  file_name = "inhand" + str(interval) + "-" + str(runvel) + "_"
+  file_name = "test" + str(interval) + "-" + str(runvel) + "_"
   msg_list = [["/dynamixel_param/", dynamixel_param_msg()], ["/fingervision/fv_filter1_objinfo/", Filter1ObjInfo()], ["/dynamixel_data/", dynamixel_msg()]]
   mycsv = CSVoutput(file_name, msg_list)
 
