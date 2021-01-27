@@ -5,5 +5,6 @@
   <node type="fv_filter1.py" pkg="fingervision" name="fv_filter1" ns="fingervision" output="screen">
     <param name="fv" value="rh_l" />
     <param name="side" value="l" />
+    <param name="filter_len" value="10" />
   </node>
 </launch>

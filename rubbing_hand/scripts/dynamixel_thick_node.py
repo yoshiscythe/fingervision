@@ -278,17 +278,19 @@ class TDxlHolding(object):
       elif self.DIRECTIONS[1] == -1:
         rubbing.interval = rubbing.interval + self.p*0.1
 
-      #ボタン左右は両指先を同方向へ動かす
+      #ボタン左右は仮想面の傾き
       if self.DIRECTIONS[3] == 1:
-        rubbing.degree_of_surface += self.p
+        rubbing.degree_of_surface += self.p*0.1
       elif self.DIRECTIONS[3] == -1:
-        rubbing.degree_of_surface -= self.p
+        rubbing.degree_of_surface -= self.p*0.1
       
-      #ボタン上下は両指先を逆方向へ動かす
+      #ボタン上下は指の傾き
       if self.DIRECTIONS[2] == 1:
         rubbing.degree_of_finger += self.p*0.1
       elif self.DIRECTIONS[2] == -1:
         rubbing.degree_of_finger -= self.p*0.1
+
+      rubbing.control_f = any(self.FLAG_MOVES[:4])
 
       # if self.DIRECTIONS[4] == 1:
       #   self.trg_vel[0] = self.v
@@ -319,8 +321,10 @@ class TDxlHolding(object):
       # 指先を平行に保つの開始
       if self.offset_f:
         rubbing.surface_pos = 0
+        rubbing.degree_of_surface = 0
         rubbing.running = 1
 
+      # キャリブレーション
       if self.calibration_f:
         # self.Calibration_initial_position()
         self.Manual_Calibration_initial_position()
@@ -345,8 +349,8 @@ class TDxlHolding(object):
 
       time_all = time.time() - start
 
-      # print(time_get, time_all)
-      print(rubbing.interval, rubbing.degree_of_finger)
+      # # print(time_get, time_all)
+      # print(rubbing.interval, rubbing.degree_of_finger)
 
       # rate.sleep()
 
