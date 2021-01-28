@@ -7,8 +7,8 @@ file(REMOVE_RECURSE
   "../src/rubbing_hand/srv"
   "CMakeFiles/ROSBUILD_gensrv_py"
   "../src/rubbing_hand/srv/__init__.py"
-  "../src/rubbing_hand/srv/_SetFloat64.py"
   "../src/rubbing_hand/srv/_Set2Float64.py"
+  "../src/rubbing_hand/srv/_SetFloat64.py"
 )
 
 # Per-language clean rules from dependency scanning.

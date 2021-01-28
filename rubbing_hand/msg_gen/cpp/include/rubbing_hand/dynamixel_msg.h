@@ -125,8 +125,6 @@ uint32 seq\n\
 # time-handling sugar is provided by the client library\n\
 time stamp\n\
 #Frame this data is associated with\n\
-# 0: no frame\n\
-# 1: global frame\n\
 string frame_id\n\
 \n\
 ";

@@ -6,8 +6,8 @@ file(REMOVE_RECURSE
   "../src/rubbing_hand/msg"
   "../src/rubbing_hand/srv"
   "CMakeFiles/ROSBUILD_gensrv_cpp"
-  "../srv_gen/cpp/include/rubbing_hand/SetFloat64.h"
   "../srv_gen/cpp/include/rubbing_hand/Set2Float64.h"
+  "../srv_gen/cpp/include/rubbing_hand/SetFloat64.h"
 )
 
 # Per-language clean rules from dependency scanning.

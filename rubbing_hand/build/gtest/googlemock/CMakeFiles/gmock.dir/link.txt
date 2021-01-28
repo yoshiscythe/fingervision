@@ -1,0 +1,1 @@
+/usr/bin/c++ -fPIC -O2 -g -DNDEBUG  -shared -Wl,-soname,libgmock.so -o /home/suzuki/ros_ws/ay_tools/fingervision/suzuki/rubbing_hand/lib/libgmock.so CMakeFiles/gmock.dir/__/googletest/src/gtest-all.cc.o CMakeFiles/gmock.dir/src/gmock-all.cc.o -lpthread 

@@ -26,7 +26,7 @@ import yaml
 from subscribe import Subscribe
 from inhand_util import Inhand
 
-file_name = "/home/suzuki/prg/DynamixelSDK/python/src/ay_Dynamixel/robots/dynamixel/init_pos.yaml"
+file_name = "/home/suzuki/ros_ws/ay_tools/fingervision/suzuki/rubbing_hand/scripts/init_pos.yaml"
 
 #ROSのpublisher設定
 data_pub = rospy.Publisher("dynamixel_data", dynamixel_msg)
