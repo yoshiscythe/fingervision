@@ -11,4 +11,4 @@ export CMAKE_PREFIX_PATH="/home/suzuki/ros_ws/ay_tools/fingervision/suzuki/rubbi
 export LD_LIBRARY_PATH="/home/suzuki/ros_ws/ay_tools/fingervision/suzuki/rubbing_hand/build/devel/lib:$LD_LIBRARY_PATH"
 export PYTHONPATH="/home/suzuki/ros_ws/ay_tools/fingervision/suzuki/rubbing_hand/build/devel/lib/python2.7/dist-packages:$PYTHONPATH"
 export ROSLISP_PACKAGE_DIRECTORIES="/home/suzuki/ros_ws/ay_tools/fingervision/suzuki/rubbing_hand/build/devel/share/common-lisp:$ROSLISP_PACKAGE_DIRECTORIES"
-export ROS_PACKAGE_PATH="/home/suzuki/ros_ws/ay_tools/fingervision/suzuki/rubbing_hand:/home/suzuki/catkin_ws/src:/opt/ros/kinetic/share"
+export ROS_PACKAGE_PATH='/home/suzuki/ros_ws/ay_tools/fingervision/suzuki/rubbing_hand:/home/suzuki/catkin_ws/src:/opt/ros/melodic/share'

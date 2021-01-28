@@ -8,8 +8,8 @@ file(REMOVE_RECURSE
   "CMakeFiles/ROSBUILD_genmsg_py"
   "../src/rubbing_hand/msg/__init__.py"
   "../src/rubbing_hand/msg/_Float64.py"
-  "../src/rubbing_hand/msg/_dynamixel_msg.py"
   "../src/rubbing_hand/msg/_Float64Array.py"
+  "../src/rubbing_hand/msg/_dynamixel_msg.py"
   "../src/rubbing_hand/msg/_dynamixel_param_msg.py"
 )
 

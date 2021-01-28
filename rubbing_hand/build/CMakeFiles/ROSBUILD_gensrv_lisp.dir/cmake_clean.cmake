@@ -6,12 +6,12 @@ file(REMOVE_RECURSE
   "../src/rubbing_hand/msg"
   "../src/rubbing_hand/srv"
   "CMakeFiles/ROSBUILD_gensrv_lisp"
-  "../srv_gen/lisp/SetFloat64.lisp"
-  "../srv_gen/lisp/_package.lisp"
-  "../srv_gen/lisp/_package_SetFloat64.lisp"
   "../srv_gen/lisp/Set2Float64.lisp"
   "../srv_gen/lisp/_package.lisp"
   "../srv_gen/lisp/_package_Set2Float64.lisp"
+  "../srv_gen/lisp/SetFloat64.lisp"
+  "../srv_gen/lisp/_package.lisp"
+  "../srv_gen/lisp/_package_SetFloat64.lisp"
 )
 
 # Per-language clean rules from dependency scanning.

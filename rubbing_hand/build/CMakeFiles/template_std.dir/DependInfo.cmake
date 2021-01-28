@@ -21,7 +21,7 @@ set(CMAKE_CXX_TARGET_INCLUDE_PATH
   "/home/suzuki/ros_ws/ay_tools/fingervision/fingervision/../3rdparty"
   "/home/suzuki/ros_ws/ay_tools/fingervision/fingervision_msgs/msg_gen/cpp/include"
   "/home/suzuki/ros_ws/ay_tools/fingervision/fingervision_msgs/srv_gen/cpp/include"
-  "/opt/ros/kinetic/include"
+  "/opt/ros/melodic/include"
   "../msg_gen/cpp/include"
   "../srv_gen/cpp/include"
   "/usr/local/include/opencv"
