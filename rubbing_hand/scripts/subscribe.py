@@ -14,7 +14,7 @@ from std_srvs.srv import Empty
 class Subscribe:
     def __init__(self, topic):
         if topic == "ProxVision":
-            self.topic_name = "/fingervision/rh_l/prox_vision"
+            self.topic_name = "/fingervision/fv_1/prox_vision"
             self.topic_type = ProxVision 
         elif topic == "Filter1ObjInfo":
             self.topic_name = "/fingervision/fv_filter1_objinfo"
