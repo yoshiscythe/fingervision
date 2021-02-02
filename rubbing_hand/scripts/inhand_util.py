@@ -48,7 +48,7 @@ class Inhand:
         thread_cond = lambda: self.is_running and not rospy.is_shutdown()
         r = rospy.Rate(self.hz)
 
-        print("start inhand manipulation")
+        # print("start inhand manipulation")
 
         #Open gripper until slip is detected
         self.rubbing.Go2itv(50, 0.01)
