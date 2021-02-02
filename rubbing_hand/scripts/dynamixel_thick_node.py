@@ -29,12 +29,13 @@ from inhand_util import Inhand
 file_name = "/home/suzuki/ros_ws/ay_tools/fingervision/suzuki/rubbing_hand/scripts/init_pos.yaml"
 
 #ROSのpublisher設定
-data_pub = rospy.Publisher("dynamixel_data", dynamixel_msg)
-param_pub = rospy.Publisher("dynamixel_param", dynamixel_param_msg)
+data_pub = rospy.Publisher("dynamixel_data", dynamixel_msg, queue_size=1)
+param_pub = rospy.Publisher("dynamixel_param", dynamixel_param_msg, queue_size=1)
 
 #subscribe設定
 sub_fv_prox = Subscribe("ProxVision")
 sub_fv_filtered1_objinfo = Subscribe("Filter1ObjInfo")
+sub_fv_lkf = Subscribe("fv_lkf")
 
 #Setup the device
 DXL_ID= [1,2,3,4]   #Note: value and 
@@ -274,9 +275,9 @@ class TDxlHolding(object):
       
       #スティックY軸は指缶距離調整
       if self.DIRECTIONS[1] == 1:
-        rubbing.interval = rubbing.interval - self.p*0.1
+        rubbing.Set_interval(rubbing.interval - self.p*0.1)
       elif self.DIRECTIONS[1] == -1:
-        rubbing.interval = rubbing.interval + self.p*0.1
+        rubbing.Set_interval(rubbing.interval + self.p*0.1)
 
       #ボタン左右は仮想面の傾き
       if self.DIRECTIONS[3] == 1:
@@ -388,7 +389,7 @@ def sync_observer():
 rubbing = Rubbing()
 rubbing.filename = file_name
 rubbing.read_initial_position()
-inhand = Inhand(rubbing, sub_fv_filtered1_objinfo)
+inhand = Inhand(rubbing, sub_fv_filtered1_objinfo, sub_fv_lkf)
 rospy.Service('Set_interval', SetFloat64, lambda srv:rubbing.Set_interval(srv.data))
 rospy.Service('Go2itv', Set2Float64, lambda srv:rubbing.Go2itv(srv.data1, srv.data2))
 holding= TDxlHolding()

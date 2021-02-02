@@ -103,8 +103,16 @@ class Rubbing():
     # インターバルが変更されると操作済みフラグを立てる。
     # Update()で毎ステップの終わりに折る
     def Set_interval(self, data):
+        max_itv = 60
+        min_itv = 10
+        
+        if data > max_itv:
+            data = max_itv
+        if data < min_itv:
+            data = min_itv
         self.interval = data
         self.control_f = True
+        self.go2itv_f = False
 
         return True
 
@@ -121,14 +129,14 @@ class Rubbing():
                 self.go2itv_f = 0
                 return
 
-            self.Set_interval(set_data)
+            self.interval = set_data
 
     def update_degfinger(self):
         # --------------------------------------------------
         # CAVS
-        min_deg = 0.0
+        min_deg = 1.6
         max_deg = 6.0
-        self.degree_of_finger = self.interval*(-0.48) + 13.8
+        self.degree_of_finger = self.interval*(-0.44) + 10.2
         # --------------------------------------------------
 
         # # -----------------------------------------------------
