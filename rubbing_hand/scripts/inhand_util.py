@@ -25,9 +25,9 @@ class Inhand:
         self.get_slip = lambda: sum(self.sub_fv_filtered1_objinfo.req.mv_s)
 
         self.target_angle = np.deg2rad(40)
-        self.min_gstep = 0.1
-        self.th_slip = 0.001
-        self.target_omega = -0.05
+        self.min_gstep = 0.01
+        self.th_slip = 0.0001
+        self.target_omega = -0.2
 
         self.hz = 60
 
@@ -48,12 +48,12 @@ class Inhand:
         thread_cond = lambda: self.is_running and not rospy.is_shutdown()
         r = rospy.Rate(self.hz)
 
-        # print("start inhand manipulation")
+        print("start inhand manipulation")
 
         #Open gripper until slip is detected
-        self.rubbing.Go2itv(50, 0.01)
+        self.rubbing.Go2itv(50, 0.005)
         while thread_cond():
-            # print(self.get_slip())
+            print(self.get_slip())
             if self.get_slip() > self.th_slip:
                 print("open", self.get_theta(), self.get_slip())
                 break
@@ -61,16 +61,14 @@ class Inhand:
 
         #Control the velocity angle of obj
         g_pos= self.rubbing.interval
-        omega_pid = PID(0.1, 0, 0.2)
-        omega_pid.setTargetPosition(self.target_omega)
-        omega_pid.delta_time = 1.0/self.hz
+        # self.rubbing.Set_interval(g_pos-1)
         while thread_cond():
             if abs(theta0-self.get_theta())>self.target_angle:
                 print("Done!")
                 break
             omega = self.get_omega()
-            omega_pid.update(omega)
-            g_pos -= omega_pid.output
+            omega_d = self.target_omega - omega
+            g_pos -= omega_d
             print(g_pos)
             self.rubbing.Set_interval(g_pos)
             r.sleep()
