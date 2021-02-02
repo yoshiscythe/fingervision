@@ -177,10 +177,10 @@ def callback(msg, func):
 if __name__=='__main__':
     rospy.init_node('filter_node')
 
-    obj_orientation_lkf_pub1 = rospy.Publisher(rospy.get_namespace()+"obj_orientation_lkf1", Float64Array, queue_size=10)
+    obj_orientation_lkf_pub1 = rospy.Publisher(rospy.get_namespace()+"obj_orientation_lkf1", Float64Array, queue_size=1)
     # obj_orientation_lkf_pub2 = rospy.Publisher("obj_orientation_lkf2", Float64Array, queue_size=10)
     # obj_orientation_sgf_pub = rospy.Publisher("obj_orientation_sgf", Float64Array, queue_size=10)
-    # obj_orientation_smaf_pub = rospy.Publisher("obj_orientation_smaf", Float64Array, queue_size=10)
+    obj_orientation_smaf_pub = rospy.Publisher("obj_orientation_smaf", Float64Array, queue_size=10)
     my_LKF1 = LKF(obj_orientation_lkf_pub1, 20)
     # my_LKF2 = LKF(obj_orientation_lkf_pub2, 100)
     # my_LKF1.A = np.mat([[1,0.033], [0,1]])
@@ -191,9 +191,9 @@ if __name__=='__main__':
     # my_LKF2.R = np.mat([[0.2]])
 
     # my_SGF = SGF(obj_orientation_sgf_pub)
-    # my_SMAF = SMAF(obj_orientation_smaf_pub)
+    my_SMAF = SMAF(obj_orientation_smaf_pub)
 
-    rospy.Subscriber("/fingervision/fv_filter1_objinfo", Filter1ObjInfo, lambda msg: callback(msg,[my_LKF1]), queue_size=1)
+    rospy.Subscriber("/fingervision/fv_filter1_objinfo", Filter1ObjInfo, lambda msg: callback(msg,[my_LKF1, my_SMAF]), queue_size=1)
     # rospy.Subscriber("/fingervision/fv_filter1_objinfo", Filter1ObjInfo, my_LKF1.callback)
 
     print("start kalman_filter")
