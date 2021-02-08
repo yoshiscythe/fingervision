@@ -55,7 +55,7 @@ class Inhand:
 
     def sgn_(self, d_omega):
         max_=0.005
-        min_=-0.001
+        min_=-0.0001
         d_pos = -d_omega*0.001
         if d_pos>max_:
             d_pos = max_
@@ -97,7 +97,7 @@ class Inhand:
             omega = self.get_omega()
             omega_d = omega_trg - omega
             d_pos = self.sgn_(omega_d)
-            g_pos += 0.005 if omega_d<0 else -0.001
+            g_pos += d_pos
             print(omega_trg, omega, d_pos, g_pos)
             # data = Float64()
             # data.data = omega_trg
@@ -107,7 +107,7 @@ class Inhand:
 
         
         print("angle=", self.get_theta(), ", target=", self.target_angle, ", diff=", theta0-self.get_theta())
-        self.rubbing.Set_interval(20)
+        self.rubbing.Set_interval(18)
 
         self.Stop()
 
