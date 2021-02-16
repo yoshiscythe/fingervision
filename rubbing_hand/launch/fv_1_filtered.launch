@@ -2,10 +2,10 @@
 <launch>
   <include file="$(find rubbing_hand)/launch/fv_1.launch"/>
 
-  <node type="fv_filter1.py" pkg="fingervision" name="fv_filter1" ns="fingervision" output="screen">
+  <node type="fv_filter1.py" pkg="rubbing_hand" name="fv_filter1" ns="fingervision" output="screen">
     <param name="fv" value="fv_1" />
     <param name="side" value="l" />
     <param name="filter_len" value="10" />
   </node>
-  <node type="filter_node.py" pkg="rubbing_hand" name="kalman_filter" ns="fingervision" output="screen" />
+  <!-- <node type="filter_node.py" pkg="rubbing_hand" name="kalman_filter" ns="fingervision" output="screen" /> -->
 </launch>
