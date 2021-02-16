@@ -36,7 +36,7 @@ param_pub = rospy.Publisher("dynamixel_param", dynamixel_param_msg, queue_size=1
 #subscribe設定
 sub_fv_prox = Subscribe("ProxVision")
 sub_fv_filtered1_objinfo = Subscribe("Filter1ObjInfo")
-sub_fv_lkf = Subscribe("fv_lkf")
+sub_fv_smaf = Subscribe("fv_smaf")
 
 #Setup the device
 DXL_ID= [1,2,3,4]   #Note: value and 
@@ -391,7 +391,7 @@ def sync_observer():
 rubbing = Rubbing()
 rubbing.filename = file_name
 rubbing.read_initial_position()
-inhand = Inhand(rubbing, sub_fv_filtered1_objinfo, sub_fv_lkf)
+inhand = Inhand(rubbing, sub_fv_filtered1_objinfo, sub_fv_smaf)
 rospy.Service('Set_interval', SetFloat64, lambda srv:rubbing.Set_interval(srv.data))
 rospy.Service('Go2itv', Set2Float64, lambda srv:rubbing.Go2itv(srv.data1, srv.data2))
 holding= TDxlHolding()

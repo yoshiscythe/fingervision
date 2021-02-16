@@ -12,23 +12,23 @@ from rubbing_hand.srv import *
 from rubbing_hand.msg import *
 
 class Inhand:
-    def __init__(self, rubbing, sub_fv_filtered1_objinfo, sub_fv_lkf):
+    def __init__(self, rubbing, sub_fv_filtered1_objinfo, sub_fv_smaf):
         self.is_running= False
         self.rubbing = rubbing
         self.sub_fv_filtered1_objinfo = sub_fv_filtered1_objinfo
-        self.sub_fv_lkf = sub_fv_lkf
+        self.sub_fv_smaf = sub_fv_smaf
 
         #get the angle of object
-        self.get_theta = lambda: np.degrees(self.sub_fv_filtered1_objinfo.req.obj_orientation)
+        self.get_theta = lambda: self.sub_fv_smaf.req.data[0]
         #get the angle velocity of object
-        self.get_omega = lambda: -np.degrees(self.sub_fv_filtered1_objinfo.req.d_obj_orientation_filtered)
+        self.get_omega = lambda: self.sub_fv_smaf.req.data[1]
         #get the slip of object
         self.get_slip = lambda: sum(self.sub_fv_filtered1_objinfo.req.mv_s)
 
-        self.target_angle = 40.
+        self.target_angle = -40.
         self.min_gstep = 0.01
-        self.th_slip = 0.0005
-        self.target_omega = -5
+        self.th_slip = 0.0001
+        self.target_omega = -10
 
         self.hz = 60
         # self.tmp_pub = rospy.Publisher(rospy.get_namespace()+"tmp", Float64, queue_size=1)
@@ -64,10 +64,17 @@ class Inhand:
         return d_pos
 
     def Maniloop(self):
-        #get the initial angle
-        theta0 = self.get_theta()
-        thread_cond = lambda: self.is_running and not rospy.is_shutdown()
         r = rospy.Rate(self.hz)
+        
+        #get the initial angle
+        avg_angle = 0
+        for i in range(60):
+            avg_angle += self.get_theta()
+            r.sleep()
+        avg_angle /= 60
+        theta0 = avg_angle
+
+        thread_cond = lambda: self.is_running and not rospy.is_shutdown()
 
         print("start inhand manipulation")
 
@@ -85,13 +92,13 @@ class Inhand:
         # self.rubbing.Set_interval(g_pos-1)
 
         while thread_cond():
-            if abs(theta0-self.get_theta())>self.target_angle:
+            if self.get_theta()<self.target_angle:
                 print("Done!")
                 break
             omega_trg = self.target_omega
             omega = self.get_omega()
             omega_d = omega_trg - omega
-            d_pos = -0.05 if omega_d>10 else -0.01 if omega_d>0 else 0.001
+            d_pos = -0.05 if omega<-15 else -0.01 if omega_d>0 else 0.001
             g_pos = self.rubbing.interval + d_pos
             print(omega_trg, omega, omega_d,  d_pos, g_pos)
             # data = Float64()
@@ -100,9 +107,14 @@ class Inhand:
             self.rubbing.Set_interval(g_pos)
             r.sleep()
 
-        self.rubbing.Set_interval(22)
+        self.rubbing.Set_interval(24)
         rospy.sleep(0.5)
-        print("angle=", self.get_theta(), ", target=", self.target_angle, ", diff=", theta0-self.get_theta())
+        avg_angle = 0
+        for i in range(60):
+            avg_angle += self.get_theta()
+            r.sleep()
+        avg_angle /= 60
+        print("initial angle=", theta0, ", last angle=", avg_angle, ", target=", self.target_angle, ", diff=", self.target_angle-avg_angle)
         
 
         self.Stop()
