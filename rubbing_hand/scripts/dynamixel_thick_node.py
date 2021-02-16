@@ -221,6 +221,7 @@ class TDxlHolding(object):
         rubbing.init_pos_l_dist = clb_init_pos_l_dist
         for id in range(len(dxl)):
           dxl[id].EnableTorque()
+        rubbing.Go2itv(30, 0.001)
         break
 
   def Loop(self):
