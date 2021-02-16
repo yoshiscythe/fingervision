@@ -19,16 +19,16 @@ class Inhand:
         self.sub_fv_lkf = sub_fv_lkf
 
         #get the angle of object
-        self.get_theta = lambda: self.sub_fv_lkf.req.data[0]
+        self.get_theta = lambda: np.degrees(self.sub_fv_filtered1_objinfo.req.obj_orientation)
         #get the angle velocity of object
-        self.get_omega = lambda: self.sub_fv_lkf.req.data[1]
+        self.get_omega = lambda: -np.degrees(self.sub_fv_filtered1_objinfo.req.d_obj_orientation_filtered)
         #get the slip of object
         self.get_slip = lambda: sum(self.sub_fv_filtered1_objinfo.req.mv_s)
 
         self.target_angle = 40.
         self.min_gstep = 0.01
         self.th_slip = 0.0001
-        self.target_omega = -2
+        self.target_omega = -5
 
         self.hz = 60
         # self.tmp_pub = rospy.Publisher(rospy.get_namespace()+"tmp", Float64, queue_size=1)
@@ -54,9 +54,9 @@ class Inhand:
         return array
 
     def sgn_(self, d_omega):
-        max_=0.005
-        min_=-0.0001
-        d_pos = -d_omega*0.001
+        max_=0.001
+        min_=-0.5
+        d_pos = -d_omega*0.01
         if d_pos>max_:
             d_pos = max_
         elif d_pos<min_:
@@ -72,7 +72,7 @@ class Inhand:
         print("start inhand manipulation")
 
         #Open gripper until slip is detected
-        self.rubbing.Go2itv(50, 0.01)
+        self.rubbing.Go2itv(50, 0.001)
         while thread_cond():
             print(self.get_slip())
             if self.get_slip() > self.th_slip:
@@ -84,21 +84,16 @@ class Inhand:
         g_pos= self.rubbing.interval
         # self.rubbing.Set_interval(g_pos-1)
 
-        # v_array = self.Create_trapezoidal_array(self.target_omega, 120)
         while thread_cond():
             if abs(theta0-self.get_theta())>self.target_angle:
                 print("Done!")
                 break
-            # if v_array:
-            #     omega_trg = v_array.pop(0)
-            # else:
-            #     omega_trg = self.target_omega
             omega_trg = self.target_omega
             omega = self.get_omega()
             omega_d = omega_trg - omega
-            d_pos = self.sgn_(omega_d)
-            g_pos += d_pos
-            print(omega_trg, omega, d_pos, g_pos)
+            d_pos = -0.1 if omega_d>5 else -0.05 if omega_d>0 else 0.001
+            g_pos = self.rubbing.interval + d_pos
+            print(omega_trg, omega, omega_d,  d_pos, g_pos)
             # data = Float64()
             # data.data = omega_trg
             # self.tmp_pub.publish(data)
@@ -107,13 +102,13 @@ class Inhand:
 
         
         print("angle=", self.get_theta(), ", target=", self.target_angle, ", diff=", theta0-self.get_theta())
-        self.rubbing.Set_interval(18)
+        self.rubbing.Set_interval(20)
 
         self.Stop()
 
 def modify_rad_curve(theta):
-    k = 0.7
-    return np.arctan(k*np.tan(theta))
+    k = 0.7267534839
+    return np.degrees(np.arctan(k*np.tan(theta)))
 
 def Go2itv_client(data1, data2):
   rospy.wait_for_service('/Go2itv')

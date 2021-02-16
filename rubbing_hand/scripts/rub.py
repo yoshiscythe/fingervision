@@ -74,6 +74,13 @@ class Rubbing():
         elif self.surface_pos < -range_max:
             self.surface_pos = -range_max
 
+        itv_max = 50
+        itv_min = 20
+        if self.interval > itv_max:
+            self.interval = itv_max
+        elif self.interval < itv_min:
+            self.interval = itv_min
+
     def calculation_pos_dist(self):
         theta = self.degree_of_surface
         phi = self.degree_of_finger
@@ -141,9 +148,9 @@ class Rubbing():
 
         # -----------------------------------------------------
         # FLAT
-        min_deg = -1.7
-        max_deg = 3.0
-        self.degree_of_finger = self.interval*(-0.65) + 12.7
+        min_deg = 0
+        max_deg = 6
+        self.degree_of_finger = self.interval*(-0.585) + 14.7
         # -----------------------------------------------------
 
         if self.degree_of_finger > max_deg:
