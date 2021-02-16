@@ -28,7 +28,7 @@ class Inhand:
         self.target_angle = 40.
         self.min_gstep = 0.01
         self.th_slip = 0.0001
-        self.target_omega = -5
+        self.target_omega = -3
 
         self.hz = 60
         # self.tmp_pub = rospy.Publisher(rospy.get_namespace()+"tmp", Float64, queue_size=1)
@@ -91,7 +91,7 @@ class Inhand:
             omega_trg = self.target_omega
             omega = self.get_omega()
             omega_d = omega_trg - omega
-            d_pos = -0.1 if omega_d>5 else -0.05 if omega_d>0 else 0.001
+            d_pos = -0.05 if omega_d>10 else -0.01 if omega_d>0 else 0.001
             g_pos = self.rubbing.interval + d_pos
             print(omega_trg, omega, omega_d,  d_pos, g_pos)
             # data = Float64()

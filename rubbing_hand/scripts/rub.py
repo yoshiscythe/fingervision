@@ -74,7 +74,7 @@ class Rubbing():
         elif self.surface_pos < -range_max:
             self.surface_pos = -range_max
 
-        itv_max = 50
+        itv_max = 180
         itv_min = 20
         if self.interval > itv_max:
             self.interval = itv_max
@@ -110,13 +110,13 @@ class Rubbing():
     # インターバルが変更されると操作済みフラグを立てる。
     # Update()で毎ステップの終わりに折る
     def Set_interval(self, data):
-        max_itv = 60
-        min_itv = 10
+        # max_itv = 100
+        # min_itv = 20
         
-        if data > max_itv:
-            data = max_itv
-        if data < min_itv:
-            data = min_itv
+        # if data > max_itv:
+        #     data = max_itv
+        # if data < min_itv:
+        #     data = min_itv
         self.interval = data
         self.control_f = True
         self.go2itv_f = False
