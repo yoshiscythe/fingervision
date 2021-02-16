@@ -150,7 +150,7 @@ class Rubbing():
         # FLAT
         min_deg = 0
         max_deg = 6
-        self.degree_of_finger = self.interval*(-0.585) + 16.7
+        self.degree_of_finger = self.interval*(-0.585) + 15.7
         # -----------------------------------------------------
 
         if self.degree_of_finger > max_deg:
