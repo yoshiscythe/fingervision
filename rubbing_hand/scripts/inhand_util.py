@@ -5,6 +5,7 @@ import numpy as np
 import threading
 import rospy
 from rub import PID
+import time
 
 import roslib
 roslib.load_manifest('rubbing_hand')
@@ -64,8 +65,9 @@ class Inhand:
         return d_pos
 
     def Maniloop(self):
+        time_start = time.time()
         r = rospy.Rate(self.hz)
-        
+
         #get the initial angle
         avg_angle = 0
         for i in range(60):
@@ -76,12 +78,12 @@ class Inhand:
 
         thread_cond = lambda: self.is_running and not rospy.is_shutdown()
 
-        print("start inhand manipulation")
+        print("start inhand manipulation! initial angle=", theta0)
 
         #Open gripper until slip is detected
         self.rubbing.Go2itv(50, 0.01)
         while thread_cond():
-            print(self.get_slip())
+            # print(self.get_slip())
             if self.get_slip() > self.th_slip:
                 print("open", self.get_theta(), self.get_slip())
                 break
@@ -100,21 +102,22 @@ class Inhand:
             omega_d = omega_trg - omega
             d_pos = -0.05 if omega<-15 else -0.01 if omega_d>0 else 0.001
             g_pos = self.rubbing.interval + d_pos
-            print(omega_trg, omega, omega_d,  d_pos, g_pos)
+            # print(omega_trg, omega, omega_d,  d_pos, g_pos)
             # data = Float64()
             # data.data = omega_trg
             # self.tmp_pub.publish(data)
             self.rubbing.Set_interval(g_pos)
             r.sleep()
 
-        self.rubbing.Set_interval(24)
+        self.rubbing.Set_interval(20)
         rospy.sleep(0.5)
         avg_angle = 0
         for i in range(60):
             avg_angle += self.get_theta()
             r.sleep()
         avg_angle /= 60
-        print("initial angle=", theta0, ", last angle=", avg_angle, ", target=", self.target_angle, ", diff=", self.target_angle-avg_angle)
+        elapsed_time = time.time() - time_start
+        print("elapsed time=", elapsed_time, ", last angle=", avg_angle, ", target=", self.target_angle, ", diff=", self.target_angle-avg_angle)
         
 
         self.Stop()
