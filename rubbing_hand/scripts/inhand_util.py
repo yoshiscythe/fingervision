@@ -27,8 +27,8 @@ class Inhand:
 
         self.target_angle = 40.
         self.min_gstep = 0.01
-        self.th_slip = 0.0001
-        self.target_omega = -3
+        self.th_slip = 0.0005
+        self.target_omega = -5
 
         self.hz = 60
         # self.tmp_pub = rospy.Publisher(rospy.get_namespace()+"tmp", Float64, queue_size=1)
@@ -100,7 +100,7 @@ class Inhand:
             self.rubbing.Set_interval(g_pos)
             r.sleep()
 
-        self.rubbing.Set_interval(24)
+        self.rubbing.Set_interval(22)
         rospy.sleep(0.5)
         print("angle=", self.get_theta(), ", target=", self.target_angle, ", diff=", theta0-self.get_theta())
         
