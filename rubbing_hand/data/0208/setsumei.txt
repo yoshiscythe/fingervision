@@ -1,7 +1,0 @@
-CAVS1-3 コード間違えた（コード：jikkenyou）
-CAVS4-6,FLAT1-3 git コミット　ittansaveのコード
-bagは対応している以下のコマンドでcsv出力可能
-$ rostopic echo -b bagファイル.bag -p /トピック名 > csvファイル.csv
-プロットもplotjugglerからbagファイル開けば行ける
-$ rosrun plotjuggler plotjuggler
-
