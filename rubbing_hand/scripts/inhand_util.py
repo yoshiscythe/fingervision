@@ -100,7 +100,7 @@ class Inhand:
             omega_trg = self.target_omega
             omega = self.get_omega()
             omega_d = omega_trg - omega
-            d_pos = -0.05 if omega<-15 else -0.01 if omega_d>0 else 0.001
+            d_pos = -0.05 if omega<-15 else -0.01 if omega_d>0 else 0.0005
             g_pos = self.rubbing.interval + d_pos
             # print(omega_trg, omega, omega_d,  d_pos, g_pos)
             # data = Float64()
