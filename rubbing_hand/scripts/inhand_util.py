@@ -72,7 +72,7 @@ class Inhand:
         print("start inhand manipulation")
 
         #Open gripper until slip is detected
-        self.rubbing.Go2itv(50, 0.001)
+        self.rubbing.Go2itv(50, 0.01)
         while thread_cond():
             print(self.get_slip())
             if self.get_slip() > self.th_slip:
@@ -100,9 +100,10 @@ class Inhand:
             self.rubbing.Set_interval(g_pos)
             r.sleep()
 
-        
+        self.rubbing.Set_interval(24)
+        rospy.sleep(0.5)
         print("angle=", self.get_theta(), ", target=", self.target_angle, ", diff=", theta0-self.get_theta())
-        self.rubbing.Set_interval(20)
+        
 
         self.Stop()
 
