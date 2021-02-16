@@ -1,0 +1,6 @@
+# 特定のファイルを無視する場合は先頭に/をつける
+# /path/to/file
+
+# 特定のディレクトリを無視する場合は先頭と末尾に/をつける
+# /path/to/directory
+/rubbing_hand/data/
