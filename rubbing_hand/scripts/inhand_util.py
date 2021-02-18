@@ -40,7 +40,7 @@ class Inhand:
         # self.tmp_pub = rospy.Publisher(rospy.get_namespace()+"tmp", Float64, queue_size=1)
 
         # publisher設定
-        self.inhand_pub = rospy.Publisher("inhand", dynamixel_msg, queue_size=1)
+        self.inhand_pub = rospy.Publisher("inhand", inhand, queue_size=1)
 
     def Start(self):
         self.Stop()
@@ -136,7 +136,7 @@ class Inhand:
             omega = self.get_omega()
             omega_d = omega_trg - omega
             self.MV = -0.05 if omega<-15 else -0.01 if omega_d>0 else 0.01
-            g_pos = self.rubbing.interval + self.MV
+            g_pos = self.rubbing.interval - self.MV
             # print(omega_trg, omega, omega_d,  d_pos, g_pos)
             # data = Float64()
             # data.data = omega_trg
