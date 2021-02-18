@@ -75,7 +75,7 @@ class Rubbing():
             self.surface_pos = -range_max
 
         itv_max = 180
-        itv_min = 20
+        itv_min = 15
         if self.interval > itv_max:
             self.interval = itv_max
         elif self.interval < itv_min:

@@ -34,7 +34,7 @@ class Inhand:
         # ex. MV_input  = [neutral_min, neutral_max , drop]
         self.MV_i = [-3, 0, 15]
         # ex. MV_output = [open, close, quick_close]
-        self.MV_o = [0.001, -0.01, 0.05]
+        self.MV_o = [0.0005, -0.01, -0.05]
 
         self.hz = 60
         # self.tmp_pub = rospy.Publisher(rospy.get_namespace()+"tmp", Float64, queue_size=1)
@@ -45,7 +45,7 @@ class Inhand:
         self.Start_pub()
 
     def Start(self):
-        self.Stop()
+        # self.Stop()
         self.thread= threading.Thread(name='inhand', target=self.Maniloop)
         self.is_running= True
         self.thread.start()
@@ -105,6 +105,21 @@ class Inhand:
 
         return inhand_msg
 
+
+    def change_MV(self, d_omega, omega):
+        if omega > self.MV_i[2]:
+            MV = self.MV_o[2]
+        elif d_omega <= self.MV_i[0]:
+            MV = self.MV_o[0]
+        elif self.MV_i[0] < d_omega <= self.MV_i[1]:
+            MV = 0
+        elif self.MV_i[1] < d_omega:
+            MV = self.MV_o[1]
+        else:
+            MV = 0
+        
+        return MV
+
     def Maniloop(self):
         time_start = time.time()
         r = rospy.Rate(self.hz)
@@ -121,17 +136,17 @@ class Inhand:
 
         print("start inhand manipulation! initial angle=", theta0)
 
-        #Open gripper until slip is detected
-        self.rubbing.Go2itv(50, 0.01)
-        self.MV = 0.01
-        while thread_cond():
-            # print(self.get_slip())
-            if self.get_slip() > self.th_slip:
-                # self.publish_inhand_data()
-                print("open", self.get_theta(), self.get_slip())
-                break
-            # self.publish_inhand_data()
-            r.sleep()
+        # #Open gripper until slip is detected
+        # self.rubbing.Go2itv(50, 0.01)
+        # self.MV = 0.01
+        # while thread_cond():
+        #     # print(self.get_slip())
+        #     if self.get_slip() > self.th_slip:
+        #         # self.publish_inhand_data()
+        #         print("open", self.get_theta(), self.get_slip())
+        #         break
+        #     # self.publish_inhand_data()
+        #     r.sleep()
 
         #Control the velocity angle of obj
         # g_pos= self.rubbing.interval
@@ -145,9 +160,9 @@ class Inhand:
                 break
             omega_trg = self.target_omega
             omega = self.get_omega()
-            omega_d = omega_trg - omega
-            self.MV = -0.05 if omega<-15 else -0.01 if omega_d>0 else 0.01
-            g_pos = self.rubbing.interval - self.MV
+            omega_d = omega - omega_trg
+            self.MV = self.change_MV(omega_d, omega)
+            g_pos = self.rubbing.interval + self.MV
             # print(omega_trg, omega, omega_d,  d_pos, g_pos)
             # data = Float64()
             # data.data = omega_trg
@@ -164,10 +179,10 @@ class Inhand:
             r.sleep()
         avg_angle /= 60
         elapsed_time = time.time() - time_start
-        print("elapsed time=", elapsed_time, ", last angle=", avg_angle, ", target=", self.target_angle, ", diff=", self.target_angle-avg_angle)
+        print("elapsed time=", elapsed_time, ", last angle=", avg_angle, ", target=", self.target_angle, ", diff=", avg_angle-self.target_angle)
         
 
-        self.Stop()
+        self.is_running = False
 
 def modify_rad_curve(theta):
     k = 0.7267534839
