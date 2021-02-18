@@ -26,8 +26,9 @@ class Inhand:
         #get the slip of object
         self.get_slip = lambda: sum(self.sub_fv_filtered1_objinfo.req.mv_s)
         self.MV = 0
+        self.omega_d = 0
 
-        self.target_angle = 40.
+        self.target_angle = 60.
         # self.min_gstep = 0.01
         self.th_slip = 0.0001
         self.target_omega = 10.
@@ -38,6 +39,8 @@ class Inhand:
 
         self.hz = 60
         # self.tmp_pub = rospy.Publisher(rospy.get_namespace()+"tmp", Float64, queue_size=1)
+
+        self.debug_array = []
 
         # publisher設定
         self.inhand_pub = rospy.Publisher("inhand", inhand, queue_size=1)
@@ -99,9 +102,11 @@ class Inhand:
         inhand_msg.d_obj_orientation_filtered = -self.sub_fv_smaf.req.data[1]
         inhand_msg.target_obj_orientation = self.target_angle
         inhand_msg.target_d_obj_orientation = self.target_omega
+        inhand_msg.omega_d = self.omega_d
         inhand_msg.th_slip = self.th_slip
         inhand_msg.MV_i = self.MV_i
         inhand_msg.MV_o = self.MV_o
+        inhand_msg.debag = self.debug_array
 
         return inhand_msg
 
@@ -152,6 +157,12 @@ class Inhand:
         # g_pos= self.rubbing.interval
         # self.rubbing.Set_interval(g_pos-1)
 
+        inhand_pid = PID(0.0001, 0., 0.0001)
+        inhand_pid.setTargetPosition(self.target_omega)
+        inhand_pid.delta_time = 1./self.hz
+        inhand_pid.last_error = self.target_omega
+        last_omega_d = 0
+
         while thread_cond():
             if self.get_theta()>self.target_angle:
                 self.MV = 0
@@ -161,7 +172,11 @@ class Inhand:
             omega_trg = self.target_omega
             omega = self.get_omega()
             omega_d = omega - omega_trg
-            self.MV = self.change_MV(omega_d, omega)
+            self.omega_d = omega_d
+            if last_omega_d != omega_d:
+                self.MV = inhand_pid.update(omega)
+            self.debug_array = [inhand_pid.PTerm, inhand_pid.ITerm, inhand_pid.DTerm]
+            last_omega_d = omega_d
             g_pos = self.rubbing.interval + self.MV
             # print(omega_trg, omega, omega_d,  d_pos, g_pos)
             # data = Float64()

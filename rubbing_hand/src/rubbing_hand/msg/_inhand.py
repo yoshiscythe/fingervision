@@ -9,7 +9,7 @@ import struct
 import std_msgs.msg
 
 class inhand(genpy.Message):
-  _md5sum = "12a8e82cc1fe644647c3326b5fb1d74e"
+  _md5sum = "a2d1a8e0bef86be5420a343697b29d8b"
   _type = "rubbing_hand/inhand"
   _has_header = True  # flag to mark the presence of a Header object
   _full_text = """Header header
@@ -51,20 +51,27 @@ float64 target_obj_orientation
 # 目標角速度
 float64 target_d_obj_orientation
 
+# 目標角速度と取得した角速度の差
+# d_obj_orientation_filtered - target_d_obj_orientation
+float64 omega_d
+
 # mv_sの和からすべり判定をする際のしきい値
 float64 th_slip
 
 # 取得した角速度d_obj_orientation_filteredと目標角速度target_d_obj_orientationとの差から操作量MVを決めるパラメータ
 # MV_input  = [neutral_min, neutral_max , drop]
 # MV_output = [open, close, quick_close]
+# drop < d_obj_orientation_filtered : quick_close
 # d_omega <= neutral_min : open
 # neutral_min < d_omega <= neutral_max : 0
-# neutral_max < d_omega <= drop : close
-# drop < d_omega : quick_close
+# neutral_max < d_omega : close
 float64[] MV_i
 float64[] MV_o
 
 # -------------------------
+
+# なんでも入れていいよ
+float64[] debag
 ================================================================================
 MSG: std_msgs/Header
 # Standard metadata for higher-level stamped data types.
@@ -81,8 +88,8 @@ time stamp
 #Frame this data is associated with
 string frame_id
 """
-  __slots__ = ['header','interval','MV','mv_s','obj_orientation','obj_orientation_filtered','d_obj_orientation_filtered','target_obj_orientation','target_d_obj_orientation','th_slip','MV_i','MV_o']
-  _slot_types = ['std_msgs/Header','float64','float64','float32[]','float64','float64','float64','float64','float64','float64','float64[]','float64[]']
+  __slots__ = ['header','interval','MV','mv_s','obj_orientation','obj_orientation_filtered','d_obj_orientation_filtered','target_obj_orientation','target_d_obj_orientation','omega_d','th_slip','MV_i','MV_o','debag']
+  _slot_types = ['std_msgs/Header','float64','float64','float32[]','float64','float64','float64','float64','float64','float64','float64','float64[]','float64[]','float64[]']
 
   def __init__(self, *args, **kwds):
     """
@@ -92,7 +99,7 @@ string frame_id
     changes.  You cannot mix in-order arguments and keyword arguments.
 
     The available fields are:
-       header,interval,MV,mv_s,obj_orientation,obj_orientation_filtered,d_obj_orientation_filtered,target_obj_orientation,target_d_obj_orientation,th_slip,MV_i,MV_o
+       header,interval,MV,mv_s,obj_orientation,obj_orientation_filtered,d_obj_orientation_filtered,target_obj_orientation,target_d_obj_orientation,omega_d,th_slip,MV_i,MV_o,debag
 
     :param args: complete set of field values, in .msg order
     :param kwds: use keyword arguments corresponding to message field names
@@ -119,12 +126,16 @@ string frame_id
         self.target_obj_orientation = 0.
       if self.target_d_obj_orientation is None:
         self.target_d_obj_orientation = 0.
+      if self.omega_d is None:
+        self.omega_d = 0.
       if self.th_slip is None:
         self.th_slip = 0.
       if self.MV_i is None:
         self.MV_i = []
       if self.MV_o is None:
         self.MV_o = []
+      if self.debag is None:
+        self.debag = []
     else:
       self.header = std_msgs.msg.Header()
       self.interval = 0.
@@ -135,9 +146,11 @@ string frame_id
       self.d_obj_orientation_filtered = 0.
       self.target_obj_orientation = 0.
       self.target_d_obj_orientation = 0.
+      self.omega_d = 0.
       self.th_slip = 0.
       self.MV_i = []
       self.MV_o = []
+      self.debag = []
 
   def _get_types(self):
     """
@@ -166,7 +179,7 @@ string frame_id
       pattern = '<%sf'%length
       buff.write(struct.Struct(pattern).pack(*self.mv_s))
       _x = self
-      buff.write(_get_struct_6d().pack(_x.obj_orientation, _x.obj_orientation_filtered, _x.d_obj_orientation_filtered, _x.target_obj_orientation, _x.target_d_obj_orientation, _x.th_slip))
+      buff.write(_get_struct_7d().pack(_x.obj_orientation, _x.obj_orientation_filtered, _x.d_obj_orientation_filtered, _x.target_obj_orientation, _x.target_d_obj_orientation, _x.omega_d, _x.th_slip))
       length = len(self.MV_i)
       buff.write(_struct_I.pack(length))
       pattern = '<%sd'%length
@@ -175,6 +188,10 @@ string frame_id
       buff.write(_struct_I.pack(length))
       pattern = '<%sd'%length
       buff.write(struct.Struct(pattern).pack(*self.MV_o))
+      length = len(self.debag)
+      buff.write(_struct_I.pack(length))
+      pattern = '<%sd'%length
+      buff.write(struct.Struct(pattern).pack(*self.debag))
     except struct.error as se: self._check_types(struct.error("%s: '%s' when writing '%s'" % (type(se), str(se), str(locals().get('_x', self)))))
     except TypeError as te: self._check_types(ValueError("%s: '%s' when writing '%s'" % (type(te), str(te), str(locals().get('_x', self)))))
 
@@ -215,8 +232,8 @@ string frame_id
       self.mv_s = s.unpack(str[start:end])
       _x = self
       start = end
-      end += 48
-      (_x.obj_orientation, _x.obj_orientation_filtered, _x.d_obj_orientation_filtered, _x.target_obj_orientation, _x.target_d_obj_orientation, _x.th_slip,) = _get_struct_6d().unpack(str[start:end])
+      end += 56
+      (_x.obj_orientation, _x.obj_orientation_filtered, _x.d_obj_orientation_filtered, _x.target_obj_orientation, _x.target_d_obj_orientation, _x.omega_d, _x.th_slip,) = _get_struct_7d().unpack(str[start:end])
       start = end
       end += 4
       (length,) = _struct_I.unpack(str[start:end])
@@ -233,6 +250,14 @@ string frame_id
       s = struct.Struct(pattern)
       end += s.size
       self.MV_o = s.unpack(str[start:end])
+      start = end
+      end += 4
+      (length,) = _struct_I.unpack(str[start:end])
+      pattern = '<%sd'%length
+      start = end
+      s = struct.Struct(pattern)
+      end += s.size
+      self.debag = s.unpack(str[start:end])
       return self
     except struct.error as e:
       raise genpy.DeserializationError(e)  # most likely buffer underfill
@@ -260,7 +285,7 @@ string frame_id
       pattern = '<%sf'%length
       buff.write(self.mv_s.tostring())
       _x = self
-      buff.write(_get_struct_6d().pack(_x.obj_orientation, _x.obj_orientation_filtered, _x.d_obj_orientation_filtered, _x.target_obj_orientation, _x.target_d_obj_orientation, _x.th_slip))
+      buff.write(_get_struct_7d().pack(_x.obj_orientation, _x.obj_orientation_filtered, _x.d_obj_orientation_filtered, _x.target_obj_orientation, _x.target_d_obj_orientation, _x.omega_d, _x.th_slip))
       length = len(self.MV_i)
       buff.write(_struct_I.pack(length))
       pattern = '<%sd'%length
@@ -269,6 +294,10 @@ string frame_id
       buff.write(_struct_I.pack(length))
       pattern = '<%sd'%length
       buff.write(self.MV_o.tostring())
+      length = len(self.debag)
+      buff.write(_struct_I.pack(length))
+      pattern = '<%sd'%length
+      buff.write(self.debag.tostring())
     except struct.error as se: self._check_types(struct.error("%s: '%s' when writing '%s'" % (type(se), str(se), str(locals().get('_x', self)))))
     except TypeError as te: self._check_types(ValueError("%s: '%s' when writing '%s'" % (type(te), str(te), str(locals().get('_x', self)))))
 
@@ -310,8 +339,8 @@ string frame_id
       self.mv_s = numpy.frombuffer(str[start:end], dtype=numpy.float32, count=length)
       _x = self
       start = end
-      end += 48
-      (_x.obj_orientation, _x.obj_orientation_filtered, _x.d_obj_orientation_filtered, _x.target_obj_orientation, _x.target_d_obj_orientation, _x.th_slip,) = _get_struct_6d().unpack(str[start:end])
+      end += 56
+      (_x.obj_orientation, _x.obj_orientation_filtered, _x.d_obj_orientation_filtered, _x.target_obj_orientation, _x.target_d_obj_orientation, _x.omega_d, _x.th_slip,) = _get_struct_7d().unpack(str[start:end])
       start = end
       end += 4
       (length,) = _struct_I.unpack(str[start:end])
@@ -328,6 +357,14 @@ string frame_id
       s = struct.Struct(pattern)
       end += s.size
       self.MV_o = numpy.frombuffer(str[start:end], dtype=numpy.float64, count=length)
+      start = end
+      end += 4
+      (length,) = _struct_I.unpack(str[start:end])
+      pattern = '<%sd'%length
+      start = end
+      s = struct.Struct(pattern)
+      end += s.size
+      self.debag = numpy.frombuffer(str[start:end], dtype=numpy.float64, count=length)
       return self
     except struct.error as e:
       raise genpy.DeserializationError(e)  # most likely buffer underfill
@@ -348,9 +385,9 @@ def _get_struct_3I():
     if _struct_3I is None:
         _struct_3I = struct.Struct("<3I")
     return _struct_3I
-_struct_6d = None
-def _get_struct_6d():
-    global _struct_6d
-    if _struct_6d is None:
-        _struct_6d = struct.Struct("<6d")
-    return _struct_6d
+_struct_7d = None
+def _get_struct_7d():
+    global _struct_7d
+    if _struct_7d is None:
+        _struct_7d = struct.Struct("<7d")
+    return _struct_7d

@@ -17,10 +17,14 @@
           TARGET_OBJ_ORIENTATION
           TARGET_D_OBJ_ORIENTATION-VAL
           TARGET_D_OBJ_ORIENTATION
+          OMEGA_D-VAL
+          OMEGA_D
           TH_SLIP-VAL
           TH_SLIP
           MV_I-VAL
           MV_I
           MV_O-VAL
           MV_O
+          DEBAG-VAL
+          DEBAG
 ))

@@ -32,9 +32,11 @@ struct inhand_ {
   , d_obj_orientation_filtered(0.0)
   , target_obj_orientation(0.0)
   , target_d_obj_orientation(0.0)
+  , omega_d(0.0)
   , th_slip(0.0)
   , MV_i()
   , MV_o()
+  , debag()
   {
   }
 
@@ -48,9 +50,11 @@ struct inhand_ {
   , d_obj_orientation_filtered(0.0)
   , target_obj_orientation(0.0)
   , target_d_obj_orientation(0.0)
+  , omega_d(0.0)
   , th_slip(0.0)
   , MV_i(_alloc)
   , MV_o(_alloc)
+  , debag(_alloc)
   {
   }
 
@@ -81,6 +85,9 @@ struct inhand_ {
   typedef double _target_d_obj_orientation_type;
   double target_d_obj_orientation;
 
+  typedef double _omega_d_type;
+  double omega_d;
+
   typedef double _th_slip_type;
   double th_slip;
 
@@ -89,6 +96,9 @@ struct inhand_ {
 
   typedef std::vector<double, typename ContainerAllocator::template rebind<double>::other >  _MV_o_type;
   std::vector<double, typename ContainerAllocator::template rebind<double>::other >  MV_o;
+
+  typedef std::vector<double, typename ContainerAllocator::template rebind<double>::other >  _debag_type;
+  std::vector<double, typename ContainerAllocator::template rebind<double>::other >  debag;
 
 
   typedef boost::shared_ptr< ::rubbing_hand::inhand_<ContainerAllocator> > Ptr;
@@ -118,12 +128,12 @@ template<class ContainerAllocator>
 struct MD5Sum< ::rubbing_hand::inhand_<ContainerAllocator> > {
   static const char* value() 
   {
-    return "12a8e82cc1fe644647c3326b5fb1d74e";
+    return "a2d1a8e0bef86be5420a343697b29d8b";
   }
 
   static const char* value(const  ::rubbing_hand::inhand_<ContainerAllocator> &) { return value(); } 
-  static const uint64_t static_value1 = 0x12a8e82cc1fe6446ULL;
-  static const uint64_t static_value2 = 0x47c3326b5fb1d74eULL;
+  static const uint64_t static_value1 = 0xa2d1a8e0bef86be5ULL;
+  static const uint64_t static_value2 = 0x420a343697b29d8bULL;
 };
 
 template<class ContainerAllocator>
@@ -179,20 +189,27 @@ float64 target_obj_orientation\n\
 # 目標角速度\n\
 float64 target_d_obj_orientation\n\
 \n\
+# 目標角速度と取得した角速度の差\n\
+# d_obj_orientation_filtered - target_d_obj_orientation\n\
+float64 omega_d\n\
+\n\
 # mv_sの和からすべり判定をする際のしきい値\n\
 float64 th_slip\n\
 \n\
 # 取得した角速度d_obj_orientation_filteredと目標角速度target_d_obj_orientationとの差から操作量MVを決めるパラメータ\n\
 # MV_input  = [neutral_min, neutral_max , drop]\n\
 # MV_output = [open, close, quick_close]\n\
+# drop < d_obj_orientation_filtered : quick_close\n\
 # d_omega <= neutral_min : open\n\
 # neutral_min < d_omega <= neutral_max : 0\n\
-# neutral_max < d_omega <= drop : close\n\
-# drop < d_omega : quick_close\n\
+# neutral_max < d_omega : close\n\
 float64[] MV_i\n\
 float64[] MV_o\n\
 \n\
 # -------------------------\n\
+\n\
+# なんでも入れていいよ\n\
+float64[] debag\n\
 ================================================================================\n\
 MSG: std_msgs/Header\n\
 # Standard metadata for higher-level stamped data types.\n\
@@ -238,9 +255,11 @@ template<class ContainerAllocator> struct Serializer< ::rubbing_hand::inhand_<Co
     stream.next(m.d_obj_orientation_filtered);
     stream.next(m.target_obj_orientation);
     stream.next(m.target_d_obj_orientation);
+    stream.next(m.omega_d);
     stream.next(m.th_slip);
     stream.next(m.MV_i);
     stream.next(m.MV_o);
+    stream.next(m.debag);
   }
 
   ROS_DECLARE_ALLINONE_SERIALIZER
@@ -281,6 +300,8 @@ s << std::endl;
     Printer<double>::stream(s, indent + "  ", v.target_obj_orientation);
     s << indent << "target_d_obj_orientation: ";
     Printer<double>::stream(s, indent + "  ", v.target_d_obj_orientation);
+    s << indent << "omega_d: ";
+    Printer<double>::stream(s, indent + "  ", v.omega_d);
     s << indent << "th_slip: ";
     Printer<double>::stream(s, indent + "  ", v.th_slip);
     s << indent << "MV_i[]" << std::endl;
@@ -294,6 +315,12 @@ s << std::endl;
     {
       s << indent << "  MV_o[" << i << "]: ";
       Printer<double>::stream(s, indent + "  ", v.MV_o[i]);
+    }
+    s << indent << "debag[]" << std::endl;
+    for (size_t i = 0; i < v.debag.size(); ++i)
+    {
+      s << indent << "  debag[" << i << "]: ";
+      Printer<double>::stream(s, indent + "  ", v.debag[i]);
     }
   }
 };

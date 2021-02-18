@@ -52,6 +52,11 @@
     :initarg :target_d_obj_orientation
     :type cl:float
     :initform 0.0)
+   (omega_d
+    :reader omega_d
+    :initarg :omega_d
+    :type cl:float
+    :initform 0.0)
    (th_slip
     :reader th_slip
     :initarg :th_slip
@@ -65,6 +70,11 @@
    (MV_o
     :reader MV_o
     :initarg :MV_o
+    :type (cl:vector cl:float)
+   :initform (cl:make-array 0 :element-type 'cl:float :initial-element 0.0))
+   (debag
+    :reader debag
+    :initarg :debag
     :type (cl:vector cl:float)
    :initform (cl:make-array 0 :element-type 'cl:float :initial-element 0.0)))
 )
@@ -122,6 +132,11 @@
   (roslisp-msg-protocol:msg-deprecation-warning "Using old-style slot reader rubbing_hand-msg:target_d_obj_orientation-val is deprecated.  Use rubbing_hand-msg:target_d_obj_orientation instead.")
   (target_d_obj_orientation m))
 
+(cl:ensure-generic-function 'omega_d-val :lambda-list '(m))
+(cl:defmethod omega_d-val ((m <inhand>))
+  (roslisp-msg-protocol:msg-deprecation-warning "Using old-style slot reader rubbing_hand-msg:omega_d-val is deprecated.  Use rubbing_hand-msg:omega_d instead.")
+  (omega_d m))
+
 (cl:ensure-generic-function 'th_slip-val :lambda-list '(m))
 (cl:defmethod th_slip-val ((m <inhand>))
   (roslisp-msg-protocol:msg-deprecation-warning "Using old-style slot reader rubbing_hand-msg:th_slip-val is deprecated.  Use rubbing_hand-msg:th_slip instead.")
@@ -136,6 +151,11 @@
 (cl:defmethod MV_o-val ((m <inhand>))
   (roslisp-msg-protocol:msg-deprecation-warning "Using old-style slot reader rubbing_hand-msg:MV_o-val is deprecated.  Use rubbing_hand-msg:MV_o instead.")
   (MV_o m))
+
+(cl:ensure-generic-function 'debag-val :lambda-list '(m))
+(cl:defmethod debag-val ((m <inhand>))
+  (roslisp-msg-protocol:msg-deprecation-warning "Using old-style slot reader rubbing_hand-msg:debag-val is deprecated.  Use rubbing_hand-msg:debag instead.")
+  (debag m))
 (cl:defmethod roslisp-msg-protocol:serialize ((msg <inhand>) ostream)
   "Serializes a message object of type '<inhand>"
   (roslisp-msg-protocol:serialize (cl:slot-value msg 'header) ostream)
@@ -213,6 +233,15 @@
     (cl:write-byte (cl:ldb (cl:byte 8 40) bits) ostream)
     (cl:write-byte (cl:ldb (cl:byte 8 48) bits) ostream)
     (cl:write-byte (cl:ldb (cl:byte 8 56) bits) ostream))
+  (cl:let ((bits (roslisp-utils:encode-double-float-bits (cl:slot-value msg 'omega_d))))
+    (cl:write-byte (cl:ldb (cl:byte 8 0) bits) ostream)
+    (cl:write-byte (cl:ldb (cl:byte 8 8) bits) ostream)
+    (cl:write-byte (cl:ldb (cl:byte 8 16) bits) ostream)
+    (cl:write-byte (cl:ldb (cl:byte 8 24) bits) ostream)
+    (cl:write-byte (cl:ldb (cl:byte 8 32) bits) ostream)
+    (cl:write-byte (cl:ldb (cl:byte 8 40) bits) ostream)
+    (cl:write-byte (cl:ldb (cl:byte 8 48) bits) ostream)
+    (cl:write-byte (cl:ldb (cl:byte 8 56) bits) ostream))
   (cl:let ((bits (roslisp-utils:encode-double-float-bits (cl:slot-value msg 'th_slip))))
     (cl:write-byte (cl:ldb (cl:byte 8 0) bits) ostream)
     (cl:write-byte (cl:ldb (cl:byte 8 8) bits) ostream)
@@ -252,6 +281,21 @@
     (cl:write-byte (cl:ldb (cl:byte 8 48) bits) ostream)
     (cl:write-byte (cl:ldb (cl:byte 8 56) bits) ostream)))
    (cl:slot-value msg 'MV_o))
+  (cl:let ((__ros_arr_len (cl:length (cl:slot-value msg 'debag))))
+    (cl:write-byte (cl:ldb (cl:byte 8 0) __ros_arr_len) ostream)
+    (cl:write-byte (cl:ldb (cl:byte 8 8) __ros_arr_len) ostream)
+    (cl:write-byte (cl:ldb (cl:byte 8 16) __ros_arr_len) ostream)
+    (cl:write-byte (cl:ldb (cl:byte 8 24) __ros_arr_len) ostream))
+  (cl:map cl:nil #'(cl:lambda (ele) (cl:let ((bits (roslisp-utils:encode-double-float-bits ele)))
+    (cl:write-byte (cl:ldb (cl:byte 8 0) bits) ostream)
+    (cl:write-byte (cl:ldb (cl:byte 8 8) bits) ostream)
+    (cl:write-byte (cl:ldb (cl:byte 8 16) bits) ostream)
+    (cl:write-byte (cl:ldb (cl:byte 8 24) bits) ostream)
+    (cl:write-byte (cl:ldb (cl:byte 8 32) bits) ostream)
+    (cl:write-byte (cl:ldb (cl:byte 8 40) bits) ostream)
+    (cl:write-byte (cl:ldb (cl:byte 8 48) bits) ostream)
+    (cl:write-byte (cl:ldb (cl:byte 8 56) bits) ostream)))
+   (cl:slot-value msg 'debag))
 )
 (cl:defmethod roslisp-msg-protocol:deserialize ((msg <inhand>) istream)
   "Deserializes a message object of type '<inhand>"
@@ -349,6 +393,16 @@
       (cl:setf (cl:ldb (cl:byte 8 40) bits) (cl:read-byte istream))
       (cl:setf (cl:ldb (cl:byte 8 48) bits) (cl:read-byte istream))
       (cl:setf (cl:ldb (cl:byte 8 56) bits) (cl:read-byte istream))
+    (cl:setf (cl:slot-value msg 'omega_d) (roslisp-utils:decode-double-float-bits bits)))
+    (cl:let ((bits 0))
+      (cl:setf (cl:ldb (cl:byte 8 0) bits) (cl:read-byte istream))
+      (cl:setf (cl:ldb (cl:byte 8 8) bits) (cl:read-byte istream))
+      (cl:setf (cl:ldb (cl:byte 8 16) bits) (cl:read-byte istream))
+      (cl:setf (cl:ldb (cl:byte 8 24) bits) (cl:read-byte istream))
+      (cl:setf (cl:ldb (cl:byte 8 32) bits) (cl:read-byte istream))
+      (cl:setf (cl:ldb (cl:byte 8 40) bits) (cl:read-byte istream))
+      (cl:setf (cl:ldb (cl:byte 8 48) bits) (cl:read-byte istream))
+      (cl:setf (cl:ldb (cl:byte 8 56) bits) (cl:read-byte istream))
     (cl:setf (cl:slot-value msg 'th_slip) (roslisp-utils:decode-double-float-bits bits)))
   (cl:let ((__ros_arr_len 0))
     (cl:setf (cl:ldb (cl:byte 8 0) __ros_arr_len) (cl:read-byte istream))
@@ -386,6 +440,24 @@
       (cl:setf (cl:ldb (cl:byte 8 48) bits) (cl:read-byte istream))
       (cl:setf (cl:ldb (cl:byte 8 56) bits) (cl:read-byte istream))
     (cl:setf (cl:aref vals i) (roslisp-utils:decode-double-float-bits bits))))))
+  (cl:let ((__ros_arr_len 0))
+    (cl:setf (cl:ldb (cl:byte 8 0) __ros_arr_len) (cl:read-byte istream))
+    (cl:setf (cl:ldb (cl:byte 8 8) __ros_arr_len) (cl:read-byte istream))
+    (cl:setf (cl:ldb (cl:byte 8 16) __ros_arr_len) (cl:read-byte istream))
+    (cl:setf (cl:ldb (cl:byte 8 24) __ros_arr_len) (cl:read-byte istream))
+  (cl:setf (cl:slot-value msg 'debag) (cl:make-array __ros_arr_len))
+  (cl:let ((vals (cl:slot-value msg 'debag)))
+    (cl:dotimes (i __ros_arr_len)
+    (cl:let ((bits 0))
+      (cl:setf (cl:ldb (cl:byte 8 0) bits) (cl:read-byte istream))
+      (cl:setf (cl:ldb (cl:byte 8 8) bits) (cl:read-byte istream))
+      (cl:setf (cl:ldb (cl:byte 8 16) bits) (cl:read-byte istream))
+      (cl:setf (cl:ldb (cl:byte 8 24) bits) (cl:read-byte istream))
+      (cl:setf (cl:ldb (cl:byte 8 32) bits) (cl:read-byte istream))
+      (cl:setf (cl:ldb (cl:byte 8 40) bits) (cl:read-byte istream))
+      (cl:setf (cl:ldb (cl:byte 8 48) bits) (cl:read-byte istream))
+      (cl:setf (cl:ldb (cl:byte 8 56) bits) (cl:read-byte istream))
+    (cl:setf (cl:aref vals i) (roslisp-utils:decode-double-float-bits bits))))))
   msg
 )
 (cl:defmethod roslisp-msg-protocol:ros-datatype ((msg (cl:eql '<inhand>)))
@@ -396,16 +468,16 @@
   "rubbing_hand/inhand")
 (cl:defmethod roslisp-msg-protocol:md5sum ((type (cl:eql '<inhand>)))
   "Returns md5sum for a message object of type '<inhand>"
-  "12a8e82cc1fe644647c3326b5fb1d74e")
+  "a2d1a8e0bef86be5420a343697b29d8b")
 (cl:defmethod roslisp-msg-protocol:md5sum ((type (cl:eql 'inhand)))
   "Returns md5sum for a message object of type 'inhand"
-  "12a8e82cc1fe644647c3326b5fb1d74e")
+  "a2d1a8e0bef86be5420a343697b29d8b")
 (cl:defmethod roslisp-msg-protocol:message-definition ((type (cl:eql '<inhand>)))
   "Returns full string definition for message of type '<inhand>"
-  (cl:format cl:nil "Header header~%~%# --------dynamixel--------~%~%# ダイナミクセルへ渡した目標指間距離~%# 取得した指間距離へ操作量を加えている~%# interval = got_interval + MV~%float64 interval~%~%# 指間距離へ加える操作量(Manipulated Variable)~%float64 MV~%~%# -------------------------~%~%# --------fingervision-----~%~%# Array of slips (slip distribution), which is a serialized list of 3x3 matrix.~%# Each cell in the 3x3 matrix is the sum of moving pixels in the cell.~%float32[] mv_s~%~%# objectの角度 [deg]~%float64 obj_orientation~%~%# objectの角度 [deg]  obj_orientationをsmaでフィルターしてる（filter_node参照）~%float64 obj_orientation_filtered~%~%# objectの角速度 [deg/s]　obj_orientation_filteredの差分をとったものをsmaでフィルターしてる（filter_node参照）~%float64 d_obj_orientation_filtered~%~%# -------------------------~%~%# ---------inhand----------~%~%# 目標角度~%float64 target_obj_orientation~%~%# 目標角速度~%float64 target_d_obj_orientation~%~%# mv_sの和からすべり判定をする際のしきい値~%float64 th_slip~%~%# 取得した角速度d_obj_orientation_filteredと目標角速度target_d_obj_orientationとの差から操作量MVを決めるパラメータ~%# MV_input  = [neutral_min, neutral_max , drop]~%# MV_output = [open, close, quick_close]~%# d_omega <= neutral_min : open~%# neutral_min < d_omega <= neutral_max : 0~%# neutral_max < d_omega <= drop : close~%# drop < d_omega : quick_close~%float64[] MV_i~%float64[] MV_o~%~%# -------------------------~%================================================================================~%MSG: std_msgs/Header~%# Standard metadata for higher-level stamped data types.~%# This is generally used to communicate timestamped data ~%# in a particular coordinate frame.~%# ~%# sequence ID: consecutively increasing ID ~%uint32 seq~%#Two-integer timestamp that is expressed as:~%# * stamp.sec: seconds (stamp_secs) since epoch (in Python the variable is called 'secs')~%# * stamp.nsec: nanoseconds since stamp_secs (in Python the variable is called 'nsecs')~%# time-handling sugar is provided by the client library~%time stamp~%#Frame this data is associated with~%string frame_id~%~%~%"))
+  (cl:format cl:nil "Header header~%~%# --------dynamixel--------~%~%# ダイナミクセルへ渡した目標指間距離~%# 取得した指間距離へ操作量を加えている~%# interval = got_interval + MV~%float64 interval~%~%# 指間距離へ加える操作量(Manipulated Variable)~%float64 MV~%~%# -------------------------~%~%# --------fingervision-----~%~%# Array of slips (slip distribution), which is a serialized list of 3x3 matrix.~%# Each cell in the 3x3 matrix is the sum of moving pixels in the cell.~%float32[] mv_s~%~%# objectの角度 [deg]~%float64 obj_orientation~%~%# objectの角度 [deg]  obj_orientationをsmaでフィルターしてる（filter_node参照）~%float64 obj_orientation_filtered~%~%# objectの角速度 [deg/s]　obj_orientation_filteredの差分をとったものをsmaでフィルターしてる（filter_node参照）~%float64 d_obj_orientation_filtered~%~%# -------------------------~%~%# ---------inhand----------~%~%# 目標角度~%float64 target_obj_orientation~%~%# 目標角速度~%float64 target_d_obj_orientation~%~%# 目標角速度と取得した角速度の差~%# d_obj_orientation_filtered - target_d_obj_orientation~%float64 omega_d~%~%# mv_sの和からすべり判定をする際のしきい値~%float64 th_slip~%~%# 取得した角速度d_obj_orientation_filteredと目標角速度target_d_obj_orientationとの差から操作量MVを決めるパラメータ~%# MV_input  = [neutral_min, neutral_max , drop]~%# MV_output = [open, close, quick_close]~%# drop < d_obj_orientation_filtered : quick_close~%# d_omega <= neutral_min : open~%# neutral_min < d_omega <= neutral_max : 0~%# neutral_max < d_omega : close~%float64[] MV_i~%float64[] MV_o~%~%# -------------------------~%~%# なんでも入れていいよ~%float64[] debag~%================================================================================~%MSG: std_msgs/Header~%# Standard metadata for higher-level stamped data types.~%# This is generally used to communicate timestamped data ~%# in a particular coordinate frame.~%# ~%# sequence ID: consecutively increasing ID ~%uint32 seq~%#Two-integer timestamp that is expressed as:~%# * stamp.sec: seconds (stamp_secs) since epoch (in Python the variable is called 'secs')~%# * stamp.nsec: nanoseconds since stamp_secs (in Python the variable is called 'nsecs')~%# time-handling sugar is provided by the client library~%time stamp~%#Frame this data is associated with~%string frame_id~%~%~%"))
 (cl:defmethod roslisp-msg-protocol:message-definition ((type (cl:eql 'inhand)))
   "Returns full string definition for message of type 'inhand"
-  (cl:format cl:nil "Header header~%~%# --------dynamixel--------~%~%# ダイナミクセルへ渡した目標指間距離~%# 取得した指間距離へ操作量を加えている~%# interval = got_interval + MV~%float64 interval~%~%# 指間距離へ加える操作量(Manipulated Variable)~%float64 MV~%~%# -------------------------~%~%# --------fingervision-----~%~%# Array of slips (slip distribution), which is a serialized list of 3x3 matrix.~%# Each cell in the 3x3 matrix is the sum of moving pixels in the cell.~%float32[] mv_s~%~%# objectの角度 [deg]~%float64 obj_orientation~%~%# objectの角度 [deg]  obj_orientationをsmaでフィルターしてる（filter_node参照）~%float64 obj_orientation_filtered~%~%# objectの角速度 [deg/s]　obj_orientation_filteredの差分をとったものをsmaでフィルターしてる（filter_node参照）~%float64 d_obj_orientation_filtered~%~%# -------------------------~%~%# ---------inhand----------~%~%# 目標角度~%float64 target_obj_orientation~%~%# 目標角速度~%float64 target_d_obj_orientation~%~%# mv_sの和からすべり判定をする際のしきい値~%float64 th_slip~%~%# 取得した角速度d_obj_orientation_filteredと目標角速度target_d_obj_orientationとの差から操作量MVを決めるパラメータ~%# MV_input  = [neutral_min, neutral_max , drop]~%# MV_output = [open, close, quick_close]~%# d_omega <= neutral_min : open~%# neutral_min < d_omega <= neutral_max : 0~%# neutral_max < d_omega <= drop : close~%# drop < d_omega : quick_close~%float64[] MV_i~%float64[] MV_o~%~%# -------------------------~%================================================================================~%MSG: std_msgs/Header~%# Standard metadata for higher-level stamped data types.~%# This is generally used to communicate timestamped data ~%# in a particular coordinate frame.~%# ~%# sequence ID: consecutively increasing ID ~%uint32 seq~%#Two-integer timestamp that is expressed as:~%# * stamp.sec: seconds (stamp_secs) since epoch (in Python the variable is called 'secs')~%# * stamp.nsec: nanoseconds since stamp_secs (in Python the variable is called 'nsecs')~%# time-handling sugar is provided by the client library~%time stamp~%#Frame this data is associated with~%string frame_id~%~%~%"))
+  (cl:format cl:nil "Header header~%~%# --------dynamixel--------~%~%# ダイナミクセルへ渡した目標指間距離~%# 取得した指間距離へ操作量を加えている~%# interval = got_interval + MV~%float64 interval~%~%# 指間距離へ加える操作量(Manipulated Variable)~%float64 MV~%~%# -------------------------~%~%# --------fingervision-----~%~%# Array of slips (slip distribution), which is a serialized list of 3x3 matrix.~%# Each cell in the 3x3 matrix is the sum of moving pixels in the cell.~%float32[] mv_s~%~%# objectの角度 [deg]~%float64 obj_orientation~%~%# objectの角度 [deg]  obj_orientationをsmaでフィルターしてる（filter_node参照）~%float64 obj_orientation_filtered~%~%# objectの角速度 [deg/s]　obj_orientation_filteredの差分をとったものをsmaでフィルターしてる（filter_node参照）~%float64 d_obj_orientation_filtered~%~%# -------------------------~%~%# ---------inhand----------~%~%# 目標角度~%float64 target_obj_orientation~%~%# 目標角速度~%float64 target_d_obj_orientation~%~%# 目標角速度と取得した角速度の差~%# d_obj_orientation_filtered - target_d_obj_orientation~%float64 omega_d~%~%# mv_sの和からすべり判定をする際のしきい値~%float64 th_slip~%~%# 取得した角速度d_obj_orientation_filteredと目標角速度target_d_obj_orientationとの差から操作量MVを決めるパラメータ~%# MV_input  = [neutral_min, neutral_max , drop]~%# MV_output = [open, close, quick_close]~%# drop < d_obj_orientation_filtered : quick_close~%# d_omega <= neutral_min : open~%# neutral_min < d_omega <= neutral_max : 0~%# neutral_max < d_omega : close~%float64[] MV_i~%float64[] MV_o~%~%# -------------------------~%~%# なんでも入れていいよ~%float64[] debag~%================================================================================~%MSG: std_msgs/Header~%# Standard metadata for higher-level stamped data types.~%# This is generally used to communicate timestamped data ~%# in a particular coordinate frame.~%# ~%# sequence ID: consecutively increasing ID ~%uint32 seq~%#Two-integer timestamp that is expressed as:~%# * stamp.sec: seconds (stamp_secs) since epoch (in Python the variable is called 'secs')~%# * stamp.nsec: nanoseconds since stamp_secs (in Python the variable is called 'nsecs')~%# time-handling sugar is provided by the client library~%time stamp~%#Frame this data is associated with~%string frame_id~%~%~%"))
 (cl:defmethod roslisp-msg-protocol:serialization-length ((msg <inhand>))
   (cl:+ 0
      (roslisp-msg-protocol:serialization-length (cl:slot-value msg 'header))
@@ -418,8 +490,10 @@
      8
      8
      8
+     8
      4 (cl:reduce #'cl:+ (cl:slot-value msg 'MV_i) :key #'(cl:lambda (ele) (cl:declare (cl:ignorable ele)) (cl:+ 8)))
      4 (cl:reduce #'cl:+ (cl:slot-value msg 'MV_o) :key #'(cl:lambda (ele) (cl:declare (cl:ignorable ele)) (cl:+ 8)))
+     4 (cl:reduce #'cl:+ (cl:slot-value msg 'debag) :key #'(cl:lambda (ele) (cl:declare (cl:ignorable ele)) (cl:+ 8)))
 ))
 (cl:defmethod roslisp-msg-protocol:ros-message-to-list ((msg <inhand>))
   "Converts a ROS message object to a list"
@@ -433,7 +507,9 @@
     (cl:cons ':d_obj_orientation_filtered (d_obj_orientation_filtered msg))
     (cl:cons ':target_obj_orientation (target_obj_orientation msg))
     (cl:cons ':target_d_obj_orientation (target_d_obj_orientation msg))
+    (cl:cons ':omega_d (omega_d msg))
     (cl:cons ':th_slip (th_slip msg))
     (cl:cons ':MV_i (MV_i msg))
     (cl:cons ':MV_o (MV_o msg))
+    (cl:cons ':debag (debag msg))
 ))

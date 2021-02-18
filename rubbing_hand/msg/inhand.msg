@@ -37,6 +37,10 @@ float64 target_obj_orientation
 # 目標角速度
 float64 target_d_obj_orientation
 
+# 目標角速度と取得した角速度の差
+# d_obj_orientation_filtered - target_d_obj_orientation
+float64 omega_d
+
 # mv_sの和からすべり判定をする際のしきい値
 float64 th_slip
 
@@ -51,3 +55,6 @@ float64[] MV_i
 float64[] MV_o
 
 # -------------------------
+
+# なんでも入れていいよ
+float64[] debag

@@ -75,7 +75,7 @@ class Rubbing():
             self.surface_pos = -range_max
 
         itv_max = 180
-        itv_min = 15
+        itv_min = 20
         if self.interval > itv_max:
             self.interval = itv_max
         elif self.interval < itv_min:
@@ -200,7 +200,8 @@ class PID:
 
     def update(self, feedback_value):
         error = self.targetPos - feedback_value
-        delta_error = error - self.last_error  
+        delta_error = error - self.last_error
+        # if abs(delta_error) < 0.5: delta_error = 0
         self.PTerm = self.Kp * error  #PTermを計算
         self.ITerm += error * self.delta_time  #ITermを計算
 
@@ -210,8 +211,13 @@ class PID:
            self.ITerm = -self.windup_guard
            
         self.DTerm = delta_error / self.delta_time  #DTermを計算
+
+        if self.DTerm>0: self.DTerm /= 10
+
         self.last_error = error
         self.output = self.PTerm + (self.Ki * self.ITerm) + (self.Kd * self.DTerm)
+
+        return self.output
     
     def setTargetPosition(self, targetPos):
         self.targetPos = targetPos
