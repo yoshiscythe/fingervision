@@ -20,19 +20,27 @@ class Inhand:
         self.sub_fv_smaf = sub_fv_smaf
 
         #get the angle of object
-        self.get_theta = lambda: self.sub_fv_smaf.req.data[0]
+        self.get_theta = lambda: -self.sub_fv_smaf.req.data[0]
         #get the angle velocity of object
-        self.get_omega = lambda: self.sub_fv_smaf.req.data[1]
+        self.get_omega = lambda: -self.sub_fv_smaf.req.data[1]
         #get the slip of object
         self.get_slip = lambda: sum(self.sub_fv_filtered1_objinfo.req.mv_s)
+        self.MV = 0
 
-        self.target_angle = -60.
-        self.min_gstep = 0.01
+        self.target_angle = 40.
+        # self.min_gstep = 0.01
         self.th_slip = 0.0001
-        self.target_omega = -10
+        self.target_omega = 10.
+        # ex. MV_input  = [neutral_min, neutral_max , drop]
+        self.MV_i = [-3, 0, 15]
+        # ex. MV_output = [open, close, quick_close]
+        self.MV_o = [0.001, -0.01, 0.05]
 
         self.hz = 60
         # self.tmp_pub = rospy.Publisher(rospy.get_namespace()+"tmp", Float64, queue_size=1)
+
+        # publisher設定
+        self.inhand_pub = rospy.Publisher("inhand", dynamixel_msg, queue_size=1)
 
     def Start(self):
         self.Stop()
@@ -64,6 +72,28 @@ class Inhand:
             d_pos = min_
         return d_pos
 
+    def publish_inhand_data(self):
+        inhand_msg = self.generate_inhand_msg()
+        self.inhand_pub.publish(inhand_msg)
+
+    def generate_inhand_msg(self):
+        inhand_msg = inhand()
+
+        inhand_msg.header.stamp = rospy.Time.now()
+        inhand_msg.interval = self.rubbing.interval
+        inhand_msg.MV = self.MV
+        inhand_msg.mv_s = self.sub_fv_filtered1_objinfo.req.mv_s
+        inhand_msg.obj_orientation = self.sub_fv_filtered1_objinfo.req.obj_orientation
+        inhand_msg.obj_orientation_filtered = self.sub_fv_smaf.req.data[0]
+        inhand_msg.d_obj_orientation_filtered = self.sub_fv_smaf.req.data[1]
+        inhand_msg.target_obj_orientation = self.target_angle
+        inhand_msg.target_d_obj_orientation = self.target_omega
+        inhand_msg.th_slip = self.th_slip
+        inhand_msg.MV_i = self.MV_i
+        inhand_msg.MV_o = self.MV_o
+
+        return inhand_msg
+
     def Maniloop(self):
         time_start = time.time()
         r = rospy.Rate(self.hz)
@@ -82,31 +112,37 @@ class Inhand:
 
         #Open gripper until slip is detected
         self.rubbing.Go2itv(50, 0.01)
+        self.MV = 0.01
         while thread_cond():
             # print(self.get_slip())
             if self.get_slip() > self.th_slip:
+                self.publish_inhand_data()
                 print("open", self.get_theta(), self.get_slip())
                 break
+            self.publish_inhand_data()
             r.sleep()
 
         #Control the velocity angle of obj
-        g_pos= self.rubbing.interval
+        # g_pos= self.rubbing.interval
         # self.rubbing.Set_interval(g_pos-1)
 
         while thread_cond():
-            if self.get_theta()<self.target_angle:
+            if self.get_theta()>self.target_angle:
+                self.MV = 0
+                self.publish_inhand_data()
                 print("Done!")
                 break
             omega_trg = self.target_omega
             omega = self.get_omega()
             omega_d = omega_trg - omega
-            d_pos = -0.05 if omega<-15 else -0.01 if omega_d>0 else 0.01
-            g_pos = self.rubbing.interval + d_pos
+            self.MV = -0.05 if omega<-15 else -0.01 if omega_d>0 else 0.01
+            g_pos = self.rubbing.interval + self.MV
             # print(omega_trg, omega, omega_d,  d_pos, g_pos)
             # data = Float64()
             # data.data = omega_trg
             # self.tmp_pub.publish(data)
             self.rubbing.Set_interval(g_pos)
+            self.publish_inhand_data()
             r.sleep()
 
         self.rubbing.Set_interval(20)

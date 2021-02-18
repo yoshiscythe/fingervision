@@ -10,6 +10,7 @@ set(CMAKE_MULTIPLE_OUTPUT_PAIRS
   "/home/suzuki/ros_ws/ay_tools/fingervision/suzuki/rubbing_hand/msg_gen/lisp/_package_Float64Array.lisp" "/home/suzuki/ros_ws/ay_tools/fingervision/suzuki/rubbing_hand/msg_gen/lisp/Float64Array.lisp"
   "/home/suzuki/ros_ws/ay_tools/fingervision/suzuki/rubbing_hand/msg_gen/lisp/_package_dynamixel_msg.lisp" "/home/suzuki/ros_ws/ay_tools/fingervision/suzuki/rubbing_hand/msg_gen/lisp/dynamixel_msg.lisp"
   "/home/suzuki/ros_ws/ay_tools/fingervision/suzuki/rubbing_hand/msg_gen/lisp/_package_dynamixel_param_msg.lisp" "/home/suzuki/ros_ws/ay_tools/fingervision/suzuki/rubbing_hand/msg_gen/lisp/dynamixel_param_msg.lisp"
+  "/home/suzuki/ros_ws/ay_tools/fingervision/suzuki/rubbing_hand/msg_gen/lisp/_package_inhand.lisp" "/home/suzuki/ros_ws/ay_tools/fingervision/suzuki/rubbing_hand/msg_gen/lisp/inhand.lisp"
   )
 
 

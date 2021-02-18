@@ -9,5 +9,7 @@
    "DYNAMIXEL_MSG"
    "<FLOAT64ARRAY>"
    "FLOAT64ARRAY"
+   "<INHAND>"
+   "INHAND"
   ))
 
