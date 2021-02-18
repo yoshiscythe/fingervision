@@ -41,6 +41,7 @@ class Inhand:
 
         # publisher設定
         self.inhand_pub = rospy.Publisher("inhand", inhand, queue_size=1)
+        self.pub_is_running = True
         self.Start_pub()
 
     def Start(self):
@@ -53,6 +54,8 @@ class Inhand:
         if self.is_running:
             self.is_running= False
             # self.thread.join()
+        if self.pub_is_running:
+            self.pub_is_running = False
 
     def Start_pub(self):
         pub_thread = threading.Thread(name='inhand_msg', target=self.publish_inhand_data)
@@ -79,7 +82,7 @@ class Inhand:
 
     def publish_inhand_data(self):
         r = rospy.Rate(self.hz)
-        while not rospy.is_shutdown():
+        while self.pub_is_running and not rospy.is_shutdown():
             inhand_msg = self.generate_inhand_msg()
             self.inhand_pub.publish(inhand_msg)
             r.sleep()
