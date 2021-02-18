@@ -41,6 +41,7 @@ class Inhand:
 
         # publisher設定
         self.inhand_pub = rospy.Publisher("inhand", inhand, queue_size=1)
+        self.Start_pub()
 
     def Start(self):
         self.Stop()
@@ -52,6 +53,10 @@ class Inhand:
         if self.is_running:
             self.is_running= False
             # self.thread.join()
+
+    def Start_pub(self):
+        pub_thread = threading.Thread(name='inhand_msg', target=self.publish_inhand_data)
+        pub_thread.start()
 
     # 初速度vel_0から最高速度vel_tまで時間timeで一定加速度で変化する速度軌跡を生成,末尾−1
     def Create_trapezoidal_array(self, vel_t, time, vel_0 = 0):
@@ -73,8 +78,11 @@ class Inhand:
         return d_pos
 
     def publish_inhand_data(self):
-        inhand_msg = self.generate_inhand_msg()
-        self.inhand_pub.publish(inhand_msg)
+        r = rospy.Rate(self.hz)
+        while not rospy.is_shutdown():
+            inhand_msg = self.generate_inhand_msg()
+            self.inhand_pub.publish(inhand_msg)
+            r.sleep()
 
     def generate_inhand_msg(self):
         inhand_msg = inhand()
@@ -83,9 +91,9 @@ class Inhand:
         inhand_msg.interval = self.rubbing.interval
         inhand_msg.MV = self.MV
         inhand_msg.mv_s = self.sub_fv_filtered1_objinfo.req.mv_s
-        inhand_msg.obj_orientation = self.sub_fv_filtered1_objinfo.req.obj_orientation
-        inhand_msg.obj_orientation_filtered = self.sub_fv_smaf.req.data[0]
-        inhand_msg.d_obj_orientation_filtered = self.sub_fv_smaf.req.data[1]
+        inhand_msg.obj_orientation = -self.sub_fv_filtered1_objinfo.req.obj_orientation
+        inhand_msg.obj_orientation_filtered = -self.sub_fv_smaf.req.data[0]
+        inhand_msg.d_obj_orientation_filtered = -self.sub_fv_smaf.req.data[1]
         inhand_msg.target_obj_orientation = self.target_angle
         inhand_msg.target_d_obj_orientation = self.target_omega
         inhand_msg.th_slip = self.th_slip
@@ -116,10 +124,10 @@ class Inhand:
         while thread_cond():
             # print(self.get_slip())
             if self.get_slip() > self.th_slip:
-                self.publish_inhand_data()
+                # self.publish_inhand_data()
                 print("open", self.get_theta(), self.get_slip())
                 break
-            self.publish_inhand_data()
+            # self.publish_inhand_data()
             r.sleep()
 
         #Control the velocity angle of obj
@@ -129,7 +137,7 @@ class Inhand:
         while thread_cond():
             if self.get_theta()>self.target_angle:
                 self.MV = 0
-                self.publish_inhand_data()
+                # self.publish_inhand_data()
                 print("Done!")
                 break
             omega_trg = self.target_omega
@@ -142,7 +150,7 @@ class Inhand:
             # data.data = omega_trg
             # self.tmp_pub.publish(data)
             self.rubbing.Set_interval(g_pos)
-            self.publish_inhand_data()
+            # self.publish_inhand_data()
             r.sleep()
 
         self.rubbing.Set_interval(20)
