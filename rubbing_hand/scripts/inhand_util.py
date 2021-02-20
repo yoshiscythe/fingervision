@@ -20,9 +20,10 @@ class Inhand:
         self.sub_fv_smaf = sub_fv_smaf
 
         #get the angle of object
-        self.get_theta = lambda: -self.sub_fv_smaf.req.data[0]
+        self.get_theta = lambda: -np.degrees(self.sub_fv_filtered1_objinfo.req.obj_orientation)
         #get the angle velocity of object
         self.get_omega = lambda: -self.sub_fv_smaf.req.data[1]
+        # self.get_omega = lambda: np.degrees(self.sub_fv_filtered1_objinfo.req.d_obj_orientation)
         #get the slip of object
         self.get_slip = lambda: sum(self.sub_fv_filtered1_objinfo.req.mv_s)
         self.MV = 0
@@ -31,16 +32,18 @@ class Inhand:
         self.target_angle = 60.
         # self.min_gstep = 0.01
         self.th_slip = 0.0001
-        self.target_omega = 10.
+        self.target_omega = 5.
         # ex. MV_input  = [neutral_min, neutral_max , drop]
-        self.MV_i = [-3, 0, 15]
+        self.MV_i = [-2, 2, 50]
         # ex. MV_output = [open, close, quick_close]
-        self.MV_o = [0.0005, -0.01, -0.05]
+        self.MV_o = [0.01, -0.01, -0.05]
 
         self.hz = 60
         # self.tmp_pub = rospy.Publisher(rospy.get_namespace()+"tmp", Float64, queue_size=1)
 
         self.debug_array = []
+
+        self.rubbing.itv_min=10
 
         # publisher設定
         self.inhand_pub = rospy.Publisher("inhand", inhand, queue_size=1)
@@ -98,8 +101,8 @@ class Inhand:
         inhand_msg.MV = self.MV
         inhand_msg.mv_s = self.sub_fv_filtered1_objinfo.req.mv_s
         inhand_msg.obj_orientation = -self.sub_fv_filtered1_objinfo.req.obj_orientation
-        inhand_msg.obj_orientation_filtered = -self.sub_fv_smaf.req.data[0]
-        inhand_msg.d_obj_orientation_filtered = -self.sub_fv_smaf.req.data[1]
+        inhand_msg.obj_orientation_filtered = self.get_theta()
+        inhand_msg.d_obj_orientation_filtered = self.get_omega()
         inhand_msg.target_obj_orientation = self.target_angle
         inhand_msg.target_d_obj_orientation = self.target_omega
         inhand_msg.omega_d = self.omega_d
@@ -157,14 +160,21 @@ class Inhand:
         # g_pos= self.rubbing.interval
         # self.rubbing.Set_interval(g_pos-1)
 
-        inhand_pid = PID(0.0001, 0., 0.0001)
-        inhand_pid.setTargetPosition(self.target_omega)
-        inhand_pid.delta_time = 1./self.hz
-        inhand_pid.last_error = self.target_omega
+        # inhand_pid = PID(0.0001, 0., 0.0001)
+        # inhand_pid.setTargetPosition(self.target_omega)
+        # inhand_pid.delta_time = 1./self.hz
+        # inhand_pid.last_error = self.target_omega
         last_omega_d = 0
+        rotation_f = False
+        omega_d_i = 0
 
         while thread_cond():
-            if self.get_theta()>self.target_angle:
+            theta = self.get_theta()
+            if not rotation_f:
+                if theta > 5:
+                    rotation_f = True
+                    rotation_start = time.time()
+            if theta>self.target_angle:
                 self.MV = 0
                 # self.publish_inhand_data()
                 print("Done!")
@@ -174,9 +184,11 @@ class Inhand:
             omega_d = omega - omega_trg
             self.omega_d = omega_d
             if last_omega_d != omega_d:
-                self.MV = inhand_pid.update(omega)
-            self.debug_array = [inhand_pid.PTerm, inhand_pid.ITerm, inhand_pid.DTerm]
+                self.MV = self.change_MV(omega_d, omega)
+            # self.debug_array = [inhand_pid.PTerm, inhand_pid.ITerm, inhand_pid.DTerm]
             last_omega_d = omega_d
+            if rotation_f:
+                omega_d_i += abs(omega_d)
             g_pos = self.rubbing.interval + self.MV
             # print(omega_trg, omega, omega_d,  d_pos, g_pos)
             # data = Float64()
@@ -186,7 +198,7 @@ class Inhand:
             # self.publish_inhand_data()
             r.sleep()
 
-        self.rubbing.Set_interval(20)
+        self.rubbing.Set_interval(13)
         rospy.sleep(0.5)
         avg_angle = 0
         for i in range(60):
@@ -194,7 +206,8 @@ class Inhand:
             r.sleep()
         avg_angle /= 60
         elapsed_time = time.time() - time_start
-        print("elapsed time=", elapsed_time, ", last angle=", avg_angle, ", target=", self.target_angle, ", diff=", avg_angle-self.target_angle)
+        hyoka = omega_d_i/(time.time()-rotation_start)
+        print("elapsed time=", elapsed_time, ", last angle=", avg_angle, ", target=", self.target_angle, ", diff=", avg_angle-self.target_angle, ", hyoka=", hyoka)
         
 
         self.is_running = False

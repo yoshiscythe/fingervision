@@ -412,6 +412,34 @@ class SMAF:
         data.data = [theta, theta_dot]
         self.pub.publish(data)
 
+class SMAF2:
+    log = {}
+    def __init__(self, pub):
+        self.log["obj_orientation"] = Log()
+        self.log["obj_orientation"].need_modify = False
+        self.log["d_obj_orientation"] = Log(10)
+        self.pub = pub
+        self.length_window = 5
+        self.last_theta = 0
+
+    def callback(self, msg):
+        self.log["obj_orientation"].storing(np.degrees(msg.obj_orientation))
+
+        len_window = self.length_window
+        y = self.log["obj_orientation"].get_log()
+
+        if len(y) < len_window+1:
+            return
+
+        theta = np.mean(y[-len_window:])
+        
+        theta_dot = (theta - self.last_theta)/0.033
+        self.last_theta = theta
+
+        data = Float64Array()
+        data.data = [theta, theta_dot]
+        self.pub.publish(data)
+
 def callback(msg, func):
     times = []
     times.append(time.time())
@@ -430,7 +458,7 @@ if __name__=='__main__':
     # obj_orientation_lkf_pub1 = rospy.Publisher(rospy.get_namespace()+"obj_orientation_lkf1", Float64Array, queue_size=1)
     # obj_orientation_lkf_pub2 = rospy.Publisher(rospy.get_namespace()+"obj_orientation_lkf2", Float64Array, queue_size=1)
     # obj_orientation_sgf_pub = rospy.Publisher("obj_orientation_sgf", Float64Array, queue_size=10)
-    obj_orientation_smaf_pub = rospy.Publisher("obj_orientation_smaf", Float64Array, queue_size=10)
+    obj_orientation_smaf_pub = rospy.Publisher("obj_orientation_smaf", Float64Array, queue_size=1)
     # my_LKF1 = LKF4(obj_orientation_lkf_pub1)
     # my_LKF2 = LKF3(obj_orientation_lkf_pub2)
     # my_LKF1.A = np.mat([[1,0.033], [0,1]])
@@ -445,7 +473,8 @@ if __name__=='__main__':
     # my_LKF1.A = np.mat([[1,0.00333], [0,1]])
 
     # my_SGF = SGF(obj_orientation_sgf_pub)
-    my_SMAF = SMAF(obj_orientation_smaf_pub)
+    my_SMAF = SMAF2(obj_orientation_smaf_pub)
+    my_SMAF.length_window = 10
 
     rospy.Subscriber("/fingervision/fv_filter1_objinfo", Filter1ObjInfo, lambda msg: callback(msg,[my_SMAF]), queue_size=1)
     # rospy.Subscriber("/fingervision/fv_filter1_objinfo", Filter1ObjInfo, my_LKF1.callback)
