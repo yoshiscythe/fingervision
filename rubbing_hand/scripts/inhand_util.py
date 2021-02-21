@@ -36,7 +36,7 @@ class Inhand:
         # ex. MV_input  = [neutral_min, neutral_max , drop]
         self.MV_i = [-8, 0, 50]
         # ex. MV_output = [open, close, quick_close]
-        self.MV_o = [0.00316, -0.01, -0.05]
+        self.MV_o = [0.00562, -0.01, -0.05]
 
         self.hz = 60
         # self.tmp_pub = rospy.Publisher(rospy.get_namespace()+"tmp", Float64, queue_size=1)
