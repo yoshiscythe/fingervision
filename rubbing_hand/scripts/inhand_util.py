@@ -32,9 +32,9 @@ class Inhand:
         self.target_angle = 60.
         # self.min_gstep = 0.01
         self.th_slip = 0.0001
-        self.target_omega = 5.
+        self.target_omega = 10.
         # ex. MV_input  = [neutral_min, neutral_max , drop]
-        self.MV_i = [-2, 2, 50]
+        self.MV_i = [-8, 0, 50]
         # ex. MV_output = [open, close, quick_close]
         self.MV_o = [0.00316, -0.01, -0.05]
 
@@ -43,7 +43,7 @@ class Inhand:
 
         self.debug_array = []
 
-        self.rubbing.itv_min=10
+        self.rubbing.itv_min=5
 
         # publisher設定
         self.inhand_pub = rospy.Publisher("inhand", inhand, queue_size=1)
@@ -132,6 +132,8 @@ class Inhand:
         time_start = time.time()
         r = rospy.Rate(self.hz)
 
+        grasp_itv = self.rubbing.interval
+
         #get the initial angle
         avg_angle = 0
         for i in range(60):
@@ -198,7 +200,7 @@ class Inhand:
             # self.publish_inhand_data()
             r.sleep()
 
-        self.rubbing.Set_interval(13)
+        self.rubbing.Set_interval(grasp_itv)
         rospy.sleep(0.5)
         avg_angle = 0
         for i in range(60):
