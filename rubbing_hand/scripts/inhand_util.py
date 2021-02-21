@@ -43,7 +43,7 @@ class Inhand:
 
         self.debug_array = []
 
-        self.rubbing.itv_min=10
+        self.rubbing.itv_min=5
 
         # publisher設定
         self.inhand_pub = rospy.Publisher("inhand", inhand, queue_size=1)
