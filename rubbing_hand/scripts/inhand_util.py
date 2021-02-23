@@ -33,10 +33,10 @@ class Inhand:
         # self.min_gstep = 0.01
         self.th_slip = 0.0001
         self.target_omega = 10.
-        # ex. MV_input  = [neutral_min, neutral_max , drop]
-        self.MV_i = [-8, 0, 50]
-        # ex. MV_output = [open, close, quick_close]
-        self.MV_o = [0.00562, -0.01, -0.05]
+        # ex. MV_input  = [neutral_min, neutral_max]
+        self.MV_i = [-8, 0]
+        # ex. MV_output = [open, close]
+        self.MV_o = [0.008, -0.01]
 
         self.hz = 60
         # self.tmp_pub = rospy.Publisher(rospy.get_namespace()+"tmp", Float64, queue_size=1)
@@ -115,9 +115,7 @@ class Inhand:
 
 
     def change_MV(self, d_omega, omega):
-        if omega > self.MV_i[2]:
-            MV = self.MV_o[2]
-        elif d_omega <= self.MV_i[0]:
+        if d_omega <= self.MV_i[0]:
             MV = self.MV_o[0]
         elif self.MV_i[0] < d_omega <= self.MV_i[1]:
             MV = 0
@@ -128,7 +126,17 @@ class Inhand:
         
         return MV
 
+    def Set_open_step(self):
+        input_data = raw_input("input open step: ")
+        
+        self.MV_o[0] = float(input_data)
+        print("set: ", self.MV_o[0])
+
+
     def Maniloop(self):
+        self.Set_open_step()
+
+
         time_start = time.time()
         r = rospy.Rate(self.hz)
 
@@ -168,18 +176,25 @@ class Inhand:
         # inhand_pid.last_error = self.target_omega
         last_omega_d = 0
         rotation_f = False
-        omega_d_i = 0
+        error2 = 0
+        error = 0
 
         while thread_cond():
             theta = self.get_theta()
-            if not rotation_f:
-                if theta > 5:
-                    rotation_f = True
-                    rotation_start = time.time()
+            # if not rotation_f:
+            #     if theta > 5:
+            #         rotation_f = True
+            #         rotation_start = time.time()
             if theta>self.target_angle:
                 self.MV = 0
                 # self.publish_inhand_data()
                 print("Done!")
+                for i in range(60):
+                    omega_d = self.get_omega() - self.target_omega
+                    if omega_d>0:
+                        error2 += omega_d**2
+                        error += omega_d
+                    r.sleep()
                 break
             omega_trg = self.target_omega
             omega = self.get_omega()
@@ -187,10 +202,11 @@ class Inhand:
             self.omega_d = omega_d
             if last_omega_d != omega_d:
                 self.MV = self.change_MV(omega_d, omega)
-            # self.debug_array = [inhand_pid.PTerm, inhand_pid.ITerm, inhand_pid.DTerm]
+            self.debug_array = [self.rubbing.degree_of_finger]
             last_omega_d = omega_d
-            if rotation_f:
-                omega_d_i += abs(omega_d)
+            if omega_d>0:
+                error2 += omega_d**2
+                error += omega_d
             g_pos = self.rubbing.interval + self.MV
             # print(omega_trg, omega, omega_d,  d_pos, g_pos)
             # data = Float64()
@@ -208,8 +224,8 @@ class Inhand:
             r.sleep()
         avg_angle /= 60
         elapsed_time = time.time() - time_start
-        hyoka = omega_d_i/(time.time()-rotation_start)
-        print("elapsed time=", elapsed_time, ", last angle=", avg_angle, ", target=", self.target_angle, ", diff=", avg_angle-self.target_angle, ", hyoka=", hyoka)
+        # hyoka = omega_d_i/(time.time()-rotation_start)
+        print("elapsed time=", elapsed_time, ", last angle=", avg_angle, ", target=", self.target_angle, ", diff=", avg_angle-self.target_angle, ", error=", error/60, ", error2=", error2/60)
         
 
         self.is_running = False
