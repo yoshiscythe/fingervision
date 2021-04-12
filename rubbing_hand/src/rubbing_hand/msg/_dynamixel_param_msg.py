@@ -9,7 +9,7 @@ import struct
 import std_msgs.msg
 
 class dynamixel_param_msg(genpy.Message):
-  _md5sum = "341740f27b57027720d1dbaf35286c72"
+  _md5sum = "703b4f968dd9341d6e667a6ac1375019"
   _type = "rubbing_hand/dynamixel_param_msg"
   _has_header = True  # flag to mark the presence of a Header object
   _full_text = """Header header
@@ -17,6 +17,8 @@ int32 surface_pos
 float64 interval
 float64 fps
 int32[] trg_pos
+float64 degree_of_finger
+float64[] debug
 
 ================================================================================
 MSG: std_msgs/Header
@@ -34,8 +36,8 @@ time stamp
 #Frame this data is associated with
 string frame_id
 """
-  __slots__ = ['header','surface_pos','interval','fps','trg_pos']
-  _slot_types = ['std_msgs/Header','int32','float64','float64','int32[]']
+  __slots__ = ['header','surface_pos','interval','fps','trg_pos','degree_of_finger','debug']
+  _slot_types = ['std_msgs/Header','int32','float64','float64','int32[]','float64','float64[]']
 
   def __init__(self, *args, **kwds):
     """
@@ -45,7 +47,7 @@ string frame_id
     changes.  You cannot mix in-order arguments and keyword arguments.
 
     The available fields are:
-       header,surface_pos,interval,fps,trg_pos
+       header,surface_pos,interval,fps,trg_pos,degree_of_finger,debug
 
     :param args: complete set of field values, in .msg order
     :param kwds: use keyword arguments corresponding to message field names
@@ -64,12 +66,18 @@ string frame_id
         self.fps = 0.
       if self.trg_pos is None:
         self.trg_pos = []
+      if self.degree_of_finger is None:
+        self.degree_of_finger = 0.
+      if self.debug is None:
+        self.debug = []
     else:
       self.header = std_msgs.msg.Header()
       self.surface_pos = 0
       self.interval = 0.
       self.fps = 0.
       self.trg_pos = []
+      self.degree_of_finger = 0.
+      self.debug = []
 
   def _get_types(self):
     """
@@ -97,6 +105,12 @@ string frame_id
       buff.write(_struct_I.pack(length))
       pattern = '<%si'%length
       buff.write(struct.Struct(pattern).pack(*self.trg_pos))
+      _x = self.degree_of_finger
+      buff.write(_get_struct_d().pack(_x))
+      length = len(self.debug)
+      buff.write(_struct_I.pack(length))
+      pattern = '<%sd'%length
+      buff.write(struct.Struct(pattern).pack(*self.debug))
     except struct.error as se: self._check_types(struct.error("%s: '%s' when writing '%s'" % (type(se), str(se), str(locals().get('_x', self)))))
     except TypeError as te: self._check_types(ValueError("%s: '%s' when writing '%s'" % (type(te), str(te), str(locals().get('_x', self)))))
 
@@ -135,6 +149,17 @@ string frame_id
       s = struct.Struct(pattern)
       end += s.size
       self.trg_pos = s.unpack(str[start:end])
+      start = end
+      end += 8
+      (self.degree_of_finger,) = _get_struct_d().unpack(str[start:end])
+      start = end
+      end += 4
+      (length,) = _struct_I.unpack(str[start:end])
+      pattern = '<%sd'%length
+      start = end
+      s = struct.Struct(pattern)
+      end += s.size
+      self.debug = s.unpack(str[start:end])
       return self
     except struct.error as e:
       raise genpy.DeserializationError(e)  # most likely buffer underfill
@@ -161,6 +186,12 @@ string frame_id
       buff.write(_struct_I.pack(length))
       pattern = '<%si'%length
       buff.write(self.trg_pos.tostring())
+      _x = self.degree_of_finger
+      buff.write(_get_struct_d().pack(_x))
+      length = len(self.debug)
+      buff.write(_struct_I.pack(length))
+      pattern = '<%sd'%length
+      buff.write(self.debug.tostring())
     except struct.error as se: self._check_types(struct.error("%s: '%s' when writing '%s'" % (type(se), str(se), str(locals().get('_x', self)))))
     except TypeError as te: self._check_types(ValueError("%s: '%s' when writing '%s'" % (type(te), str(te), str(locals().get('_x', self)))))
 
@@ -200,6 +231,17 @@ string frame_id
       s = struct.Struct(pattern)
       end += s.size
       self.trg_pos = numpy.frombuffer(str[start:end], dtype=numpy.int32, count=length)
+      start = end
+      end += 8
+      (self.degree_of_finger,) = _get_struct_d().unpack(str[start:end])
+      start = end
+      end += 4
+      (length,) = _struct_I.unpack(str[start:end])
+      pattern = '<%sd'%length
+      start = end
+      s = struct.Struct(pattern)
+      end += s.size
+      self.debug = numpy.frombuffer(str[start:end], dtype=numpy.float64, count=length)
       return self
     except struct.error as e:
       raise genpy.DeserializationError(e)  # most likely buffer underfill
@@ -214,6 +256,12 @@ def _get_struct_3I():
     if _struct_3I is None:
         _struct_3I = struct.Struct("<3I")
     return _struct_3I
+_struct_d = None
+def _get_struct_d():
+    global _struct_d
+    if _struct_d is None:
+        _struct_d = struct.Struct("<d")
+    return _struct_d
 _struct_i2d = None
 def _get_struct_i2d():
     global _struct_i2d

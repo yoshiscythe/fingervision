@@ -28,6 +28,8 @@ struct dynamixel_param_msg_ {
   , interval(0.0)
   , fps(0.0)
   , trg_pos()
+  , degree_of_finger(0.0)
+  , debug()
   {
   }
 
@@ -37,6 +39,8 @@ struct dynamixel_param_msg_ {
   , interval(0.0)
   , fps(0.0)
   , trg_pos(_alloc)
+  , degree_of_finger(0.0)
+  , debug(_alloc)
   {
   }
 
@@ -54,6 +58,12 @@ struct dynamixel_param_msg_ {
 
   typedef std::vector<int32_t, typename ContainerAllocator::template rebind<int32_t>::other >  _trg_pos_type;
   std::vector<int32_t, typename ContainerAllocator::template rebind<int32_t>::other >  trg_pos;
+
+  typedef double _degree_of_finger_type;
+  double degree_of_finger;
+
+  typedef std::vector<double, typename ContainerAllocator::template rebind<double>::other >  _debug_type;
+  std::vector<double, typename ContainerAllocator::template rebind<double>::other >  debug;
 
 
   typedef boost::shared_ptr< ::rubbing_hand::dynamixel_param_msg_<ContainerAllocator> > Ptr;
@@ -83,12 +93,12 @@ template<class ContainerAllocator>
 struct MD5Sum< ::rubbing_hand::dynamixel_param_msg_<ContainerAllocator> > {
   static const char* value() 
   {
-    return "341740f27b57027720d1dbaf35286c72";
+    return "703b4f968dd9341d6e667a6ac1375019";
   }
 
   static const char* value(const  ::rubbing_hand::dynamixel_param_msg_<ContainerAllocator> &) { return value(); } 
-  static const uint64_t static_value1 = 0x341740f27b570277ULL;
-  static const uint64_t static_value2 = 0x20d1dbaf35286c72ULL;
+  static const uint64_t static_value1 = 0x703b4f968dd9341dULL;
+  static const uint64_t static_value2 = 0x6e667a6ac1375019ULL;
 };
 
 template<class ContainerAllocator>
@@ -110,6 +120,8 @@ int32 surface_pos\n\
 float64 interval\n\
 float64 fps\n\
 int32[] trg_pos\n\
+float64 degree_of_finger\n\
+float64[] debug\n\
 \n\
 ================================================================================\n\
 MSG: std_msgs/Header\n\
@@ -152,6 +164,8 @@ template<class ContainerAllocator> struct Serializer< ::rubbing_hand::dynamixel_
     stream.next(m.interval);
     stream.next(m.fps);
     stream.next(m.trg_pos);
+    stream.next(m.degree_of_finger);
+    stream.next(m.debug);
   }
 
   ROS_DECLARE_ALLINONE_SERIALIZER
@@ -183,6 +197,14 @@ s << std::endl;
     {
       s << indent << "  trg_pos[" << i << "]: ";
       Printer<int32_t>::stream(s, indent + "  ", v.trg_pos[i]);
+    }
+    s << indent << "degree_of_finger: ";
+    Printer<double>::stream(s, indent + "  ", v.degree_of_finger);
+    s << indent << "debug[]" << std::endl;
+    for (size_t i = 0; i < v.debug.size(); ++i)
+    {
+      s << indent << "  debug[" << i << "]: ";
+      Printer<double>::stream(s, indent + "  ", v.debug[i]);
     }
   }
 };

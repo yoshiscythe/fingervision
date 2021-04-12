@@ -16,7 +16,7 @@ class Rubbing():
         #二指の中間面の中心からの移動
         self.surface_pos = 0
         #二指間の距離
-        self.interval = 30.0
+        self.interval = 20.
         #仮想面の傾き(degree)
         self.degree_of_surface = 0.0
         #指先の傾き
@@ -33,6 +33,9 @@ class Rubbing():
         self.offset_r_dist = 0
         self.offset_l_dist = 0
         self.go2itv_f = 0
+
+        self.itv_max = 180
+        self.itv_min = 16
 
         self.running = 0
         self.control_f = False
@@ -74,8 +77,8 @@ class Rubbing():
         elif self.surface_pos < -range_max:
             self.surface_pos = -range_max
 
-        itv_max = 180
-        itv_min = 20
+        itv_max = self.itv_max
+        itv_min = self.itv_min
         if self.interval > itv_max:
             self.interval = itv_max
         elif self.interval < itv_min:
@@ -110,13 +113,13 @@ class Rubbing():
     # インターバルが変更されると操作済みフラグを立てる。
     # Update()で毎ステップの終わりに折る
     def Set_interval(self, data):
-        # max_itv = 100
-        # min_itv = 20
+        max_itv = self.itv_max
+        min_itv = self.itv_min
         
-        # if data > max_itv:
-        #     data = max_itv
-        # if data < min_itv:
-        #     data = min_itv
+        if data > max_itv:
+            data = max_itv
+        if data < min_itv:
+            data = min_itv
         self.interval = data
         self.control_f = True
         self.go2itv_f = False
@@ -139,19 +142,19 @@ class Rubbing():
             self.interval = set_data
 
     def update_degfinger(self):
-        # --------------------------------------------------
-        # CAVS
-        min_deg = 1.6
-        max_deg = 6.0
-        self.degree_of_finger = self.interval*(-0.44) + 10.2
-        # --------------------------------------------------
+        # # --------------------------------------------------
+        # # CAVS
+        # min_deg = 1.
+        # max_deg = 8.0
+        # self.degree_of_finger = self.interval*(-0.44) + 13.2
+        # # --------------------------------------------------
 
-        # # -----------------------------------------------------
-        # # FLAT
-        # min_deg = 0
-        # max_deg = 6
-        # self.degree_of_finger = self.interval*(-0.585) + 14.7
-        # # -----------------------------------------------------
+        # -----------------------------------------------------
+        # FLAT
+        min_deg = 0
+        max_deg = 8
+        self.degree_of_finger = self.interval*(-0.585) + 15.7
+        # -----------------------------------------------------
 
         if self.degree_of_finger > max_deg:
             self.degree_of_finger = max_deg
@@ -200,7 +203,8 @@ class PID:
 
     def update(self, feedback_value):
         error = self.targetPos - feedback_value
-        delta_error = error - self.last_error  
+        delta_error = error - self.last_error
+        # if abs(delta_error) < 1.: delta_error = 0
         self.PTerm = self.Kp * error  #PTermを計算
         self.ITerm += error * self.delta_time  #ITermを計算
 
@@ -210,8 +214,13 @@ class PID:
            self.ITerm = -self.windup_guard
            
         self.DTerm = delta_error / self.delta_time  #DTermを計算
+
+        # if self.DTerm>0: self.DTerm /= 10
+
         self.last_error = error
         self.output = self.PTerm + (self.Ki * self.ITerm) + (self.Kd * self.DTerm)
+
+        return self.output
     
     def setTargetPosition(self, targetPos):
         self.targetPos = targetPos

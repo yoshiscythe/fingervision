@@ -9,4 +9,8 @@
           FPS
           TRG_POS-VAL
           TRG_POS
+          DEGREE_OF_FINGER-VAL
+          DEGREE_OF_FINGER
+          DEBUG-VAL
+          DEBUG
 ))

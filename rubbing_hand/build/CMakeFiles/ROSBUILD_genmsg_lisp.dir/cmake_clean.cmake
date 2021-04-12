@@ -18,6 +18,9 @@ file(REMOVE_RECURSE
   "../msg_gen/lisp/dynamixel_param_msg.lisp"
   "../msg_gen/lisp/_package.lisp"
   "../msg_gen/lisp/_package_dynamixel_param_msg.lisp"
+  "../msg_gen/lisp/inhand.lisp"
+  "../msg_gen/lisp/_package.lisp"
+  "../msg_gen/lisp/_package_inhand.lisp"
 )
 
 # Per-language clean rules from dependency scanning.

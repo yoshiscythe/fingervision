@@ -13,4 +13,6 @@
     (:file "_package_dynamixel_msg" :depends-on ("_package"))
     (:file "Float64Array" :depends-on ("_package_Float64Array"))
     (:file "_package_Float64Array" :depends-on ("_package"))
+    (:file "inhand" :depends-on ("_package_inhand"))
+    (:file "_package_inhand" :depends-on ("_package"))
   ))
