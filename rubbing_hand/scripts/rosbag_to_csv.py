@@ -9,33 +9,104 @@ import rosbag
 from rubbing_hand.msg import inhand
 import pandas as pd
 from datetime import datetime
+import matplotlib.pyplot as plt
+import numpy as np
+import glob
+import os
 
-# The bag file should be in the same directory as your terminal
-bag = rosbag.Bag('/home/suzuki/ros_ws/ay_tools/fingervision/suzuki/rubbing_hand/data/0221/CAVS/rosbag/CAVS34_2021-02-22-00-58-55.bag')
-topic = '/inhand'
-column_names = ['time', 'angle', "angular velocity", "gripper position", "manipulated variable"]
-df = pd.DataFrame(columns=column_names)
-rotation_f=False
+def create_df(ID):
+    global base, ext
+    directory_path = "/home/suzuki/ros_ws/ay_tools/fingervision/suzuki/rubbing_hand/data/0223/*/rosbag/"
+    file_name = directory_path+ID+"*.bag"
+    l = glob.glob(file_name)[-1]
 
-for topic, msg, t in bag.read_messages(topics=topic):
-    time = msg.header.stamp.to_sec()
-    angle = msg.obj_orientation_filtered
-    angular_velocity = msg.d_obj_orientation_filtered
-    gripper_position = msg.interval
-    manipulated_variable = msg.MV
+    base, ext = os.path.splitext(l)
 
-    if (not rotation_f) and angle>5:
-        rotation_f=True
-        start_time = time
+    # The bag file should be in the same directory as your terminal
+    bag = rosbag.Bag(l)
+    topic = '/inhand'
+    column_names = ['time', 'angle', "angular velocity", "gripper position", "gripper velocity"]
+    df = pd.DataFrame(columns=column_names)
 
-    if rotation_f:
+    first_f=False
+    for topic, msg, t in bag.read_messages(topics=topic):
+        time = msg.header.stamp.to_sec()
+        angle = msg.obj_orientation_filtered
+        angular_velocity = msg.d_obj_orientation_filtered
+        gripper_position = msg.interval
+        manipulated_variable = msg.MV
+
+        if not first_f:
+            start_time = time
+            first_f=True
+
         df = df.append(
             {'time': time-start_time,
             'angle': angle,
             'angular velocity': angular_velocity,
             "gripper position": gripper_position,
-            "manipulated variable": manipulated_variable},
+            "gripper velocity": manipulated_variable*50},
             ignore_index=True
         )
+    return df
 
-df.to_csv('/home/suzuki/ros_ws/ay_tools/fingervision/suzuki/rubbing_hand/data/0221/CAVS/rosbag/CAVS34_2021-02-22-00-58-55.csv')
+global base, ext
+
+fs = 30
+ls = 20
+lgs = 20
+
+ID = "FLAT18"
+df = create_df(ID)
+
+# df = df[df["time"]>6]
+
+# df["time"] = df["time"] - 6
+
+
+fig, axes = plt.subplots(nrows=4, ncols=1, figsize=(16, 12))
+df.plot(x="time", subplots=True, ax=axes, xlim=[0,8])
+
+x_min=0
+x_max=df["time"].tail(1)
+
+axes[0].legend(bbox_to_anchor=(0, 1), loc='upper left', borderaxespad=0, fontsize=lgs)
+axes[0].hlines(60, x_min, x_max, linestyles='dashed')
+axes[0].yaxis.set_ticks([0, 30, 60, 90]) 
+axes[0].set_ylabel("[deg]", fontsize=fs)
+axes[0].set_xlabel('')
+axes[0].tick_params(labelbottom=False)
+axes[0].set_ylim(-5, 90)
+axes[0].tick_params(labelsize=ls) 
+
+axes[1].legend(bbox_to_anchor=(0, 1), loc='upper left', borderaxespad=0, fontsize=lgs)
+axes[1].hlines(10, x_min, x_max, linestyles='dashed')
+axes[1].hlines(0, x_min, x_max, linestyles='dashed')
+# axes[1].yaxis.set_ticks([0, 10, 30, 50]) 
+axes[1].set_ylabel("[deg/s]", fontsize=fs)
+axes[1].set_xlabel('')
+axes[1].set_ylim(-5, 200)
+axes[1].tick_params(labelsize=ls) 
+axes[1].tick_params(labelbottom=False)
+
+axes[2].legend(bbox_to_anchor=(0, 1), loc='upper left', borderaxespad=0, fontsize=lgs)
+axes[2].yaxis.set_ticks([15, 20, 25, 30])
+axes[2].set_ylabel("[mm]", fontsize=fs)
+axes[2].set_xlabel('')
+axes[2].set_ylim(20, 30)
+axes[2].tick_params(labelsize=ls)
+axes[2].tick_params(labelbottom=False)
+
+axes[3].legend(bbox_to_anchor=(0, 1), loc='upper left', borderaxespad=0, fontsize=lgs)
+axes[3].hlines(0, x_min, x_max, linestyles='dashed')
+MV_open=df["gripper velocity"].max()
+MV_ticks=[-0.5, 0, MV_open]
+axes[3].yaxis.set_ticks(MV_ticks)
+axes[3].set_ylabel("[mm/s]", fontsize=fs)
+axes[3].set_ylim(-0.55, MV_open+1)
+axes[3].tick_params(labelsize=ls)
+axes[3].set_xlabel('time [s]', fontsize=fs)
+
+plt.savefig(base+"4.eps")
+plt.savefig(base+"4.png")
+plt.show()

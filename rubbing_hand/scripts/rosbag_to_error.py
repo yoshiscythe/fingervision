@@ -72,15 +72,16 @@ def calcurate_error(df):
     #     if omega_d > 0:
     #         error+= omega_d**2
     last_angle = sum(df['angle'].tail(60))/60
+    max_vel = max(df['angular velocity'])
     df = df["angular velocity"]-10
     df = df[df>0]
     df = df**2
     error = sum(df)
 
-    return error, last_angle
+    return error, last_angle, max_vel
 
 
-id_file_name = "/home/suzuki/ros_ws/ay_tools/fingervision/suzuki/rubbing_hand/data/0223/data.csv"
+id_file_name = "/home/suzuki/ros_ws/ay_tools/fingervision/suzuki/rubbing_hand/data/0221/matome_data_include_id.csv"
 df_id = pd.read_csv(id_file_name)
 df_id_FLAT = df_id.loc[:, ["FLAT id", "FLAT step"]]
 df_id_FLAT = df_id_FLAT.set_index("FLAT id")
@@ -90,10 +91,10 @@ df_id_CAVS = df_id_CAVS.set_index("CAVS id")
 df_id_CAVS = df_id_CAVS.dropna()
 print("read csv")
 
-# print(df_id)
+# print(df_id_FLAT)
 
-rosbag_CAVS = create_rosbag_dict("/home/suzuki/ros_ws/ay_tools/fingervision/suzuki/rubbing_hand/data/0223/CAVS/rosbag")
-rosbag_FLAT = create_rosbag_dict("/home/suzuki/ros_ws/ay_tools/fingervision/suzuki/rubbing_hand/data/0223/FLAT/rosbag")
+rosbag_CAVS = create_rosbag_dict("/home/suzuki/ros_ws/ay_tools/fingervision/suzuki/rubbing_hand/data/0221/CAVS/rosbag")
+rosbag_FLAT = create_rosbag_dict("/home/suzuki/ros_ws/ay_tools/fingervision/suzuki/rubbing_hand/data/0221/FLAT/rosbag")
 print("created rosbag_dict")
 
 column_names = ["id", "step", "error", "last angle"]
@@ -103,13 +104,14 @@ df_error_FLAT = pd.DataFrame(columns=column_names)
 progress = 0
 for id in df_id_FLAT.index.values.tolist():
     id = str(int(id)).rjust(2, "0")
-    error, last_angle = calcurate_error(create_pd_from_rosbag(rosbag_FLAT[id]))
+    error, last_angle, max_vel = calcurate_error(create_pd_from_rosbag(rosbag_FLAT[id]))
     step = df_id_FLAT["FLAT step"][int(id)]
     df_error_FLAT = df_error_FLAT.append(
                         {'id': id,
                         'step': step,
                         'error': error,
-                        'last angle': last_angle},
+                        'last angle': last_angle,
+                        'max angular velocity': max_vel},
                         ignore_index=True
                     )
     progress += 1
@@ -118,20 +120,21 @@ for id in df_id_FLAT.index.values.tolist():
 progress = 0
 for id in df_id_CAVS.index.values.tolist():
     id = str(int(id)).rjust(2, "0")
-    error, last_angle = calcurate_error(create_pd_from_rosbag(rosbag_CAVS[id]))
+    error, last_angle, max_vel = calcurate_error(create_pd_from_rosbag(rosbag_CAVS[id]))
     step = df_id_CAVS["CAVS step"][int(id)]
     df_error_CAVS = df_error_CAVS.append(
                         {'id': id,
                         'step': step,
                         'error': error,
-                        'last angle': last_angle},
+                        'last angle': last_angle,
+                        'max angular velocity': max_vel},
                         ignore_index=True
                     )
     progress += 1
     print("CAVS: ", progress, "/", len(df_id_CAVS.index.values.tolist()), ", error: ", error)
 
-df_error_CAVS.to_csv("/home/suzuki/ros_ws/ay_tools/fingervision/suzuki/rubbing_hand/data/0223/CAVS_error.csv")
-df_error_FLAT.to_csv("/home/suzuki/ros_ws/ay_tools/fingervision/suzuki/rubbing_hand/data/0223/FLAT_error.csv")
+df_error_CAVS.to_csv("/home/suzuki/ros_ws/ay_tools/fingervision/suzuki/rubbing_hand/data/0221/CAVS_error.csv")
+df_error_FLAT.to_csv("/home/suzuki/ros_ws/ay_tools/fingervision/suzuki/rubbing_hand/data/0221/FLAT_error.csv")
 
 df_error_CAVS.plot.scatter(x="step", y="error")
 df_error_FLAT.plot.scatter(x="step", y="error")
