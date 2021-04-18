@@ -218,18 +218,18 @@ class Inhand:
             'wait': [
             ('entry',lambda:(self.Substitution_MV(0), GetStartTime())),
             (lambda: self.get_theta()>self.target_angle,'finish',lambda: Print('over target theta!')),
-            (lambda: self.calculate_omega_d() >= self.MV_i[0],'judge', lambda: Print('debug1')),
-            (lambda: (int(time.time())-start_time)>=2,'judge'),
+            (lambda: self.calculate_omega_d() >= self.MV_i[1],'judge', lambda: Print('debug1')),
+            (lambda: (int(time.time())-start_time)>=5,'judge'),
             ('else','wait'),
             ],
             'stay': [
             ('entry',lambda: self.Substitution_MV(0)),
             (lambda: self.get_theta()>self.target_angle,'finish',lambda: Print('over target theta!')),
-            (lambda: not self.MV_i[0] < self.calculate_omega_d() <= self.MV_i[1],'judge', lambda: Print('debug1')),
+            (lambda: not self.MV_i[0] < self.calculate_omega_d() <= self.MV_i[1],'judge', lambda: Print('debug2')),
             ('else','stay'),
             ],
             'finish': [
-            ('entry',lambda: Print('Finishing state machine')),
+            ('entry',lambda: (self.Substitution_MV(0), Print('Finishing state machine'))),
             ('else','.exit'),
             ],
         }
@@ -237,7 +237,7 @@ class Inhand:
         sm= TStateMachine(states,'start', debug=False)
         sm.Run()
 
-        self.rubbing.Set_interval(grasp_itv)
+        self.rubbing.Set_interval(25)
         rospy.sleep(0.5)
         avg_angle = 0
         for i in range(60):

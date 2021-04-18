@@ -8,6 +8,6 @@
     <param name="objdettrack_config" value="config/fv_1_suzuki.yaml" />
     <param name="blob_calib_prefix" value="data_gen/blob_" />
     <param name="frame_skip" value="0" />
-    <!--<param name="target_fps" value="30" />-->
+    <!-- <param name="target_fps" value="60" /> -->
   </node>
 </launch>

@@ -25,7 +25,7 @@ from rub import Rubbing, PID
 import yaml
 from subscribe import Subscribe
 from inhand_statemachine_util import Inhand
-
+# from inhand_util import Inhand
 
 file_name = "/home/suzuki/ros_ws/ay_tools/fingervision/suzuki/rubbing_hand/scripts/init_pos.yaml"
 

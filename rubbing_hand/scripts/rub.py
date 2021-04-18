@@ -142,19 +142,19 @@ class Rubbing():
             self.interval = set_data
 
     def update_degfinger(self):
-        # # --------------------------------------------------
-        # # CAVS
-        # min_deg = 1.
-        # max_deg = 8.0
-        # self.degree_of_finger = self.interval*(-0.44) + 13.2
-        # # --------------------------------------------------
+        # --------------------------------------------------
+        # CAVS
+        min_deg = 1.
+        max_deg = 8.0
+        self.degree_of_finger = self.interval*(-0.44) + 13.2
+        # --------------------------------------------------
 
-        # -----------------------------------------------------
-        # FLAT
-        min_deg = 0
-        max_deg = 8
-        self.degree_of_finger = self.interval*(-0.585) + 15.7
-        # -----------------------------------------------------
+        # # -----------------------------------------------------
+        # # FLAT
+        # min_deg = 0
+        # max_deg = 8
+        # self.degree_of_finger = self.interval*(-0.585) + 15.7
+        # # -----------------------------------------------------
 
         if self.degree_of_finger > max_deg:
             self.degree_of_finger = max_deg
