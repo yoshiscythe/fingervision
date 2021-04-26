@@ -421,6 +421,8 @@ class SMAF2:
         self.pub = pub
         self.length_window = 5
         self.last_theta = 0
+        self.last_theta_dot = 0
+        self.first_f = True
 
     def callback(self, msg):
         self.log["obj_orientation"].storing(np.degrees(msg.obj_orientation))
@@ -433,11 +435,19 @@ class SMAF2:
 
         theta = np.mean(y[-len_window:])
         
-        theta_dot = (theta - self.last_theta)/0.033
+        if self.first_f:
+            self.last_tm = msg.header.stamp
+            self.first_f = False
+
+        dt= (msg.header.stamp-self.last_tm).to_sec()
+        theta_dot = (theta - self.last_theta)/dt
+        theta_dot_dot = (theta_dot - self.last_theta_dot)/dt
         self.last_theta = theta
+        self.last_theta_dot = theta_dot
+        self.last_tm = msg.header.stamp
 
         data = Float64Array()
-        data.data = [theta, theta_dot]
+        data.data = [theta, theta_dot, theta_dot_dot]
         self.pub.publish(data)
 
 def callback(msg, func):

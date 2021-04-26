@@ -3,6 +3,8 @@
 # 参考
 # https://answers.ros.org/question/55037/is-there-a-way-to-save-all-rosbag-data-into-a-csv-or-text-file/
 
+# 回転が起きた瞬間を切り取って比較する画像を作る
+
 import sys
 sys.path.append("/home/suzuki/ros_ws/ay_tools/fingervision/suzuki/rubbing_hand/src")
 import rosbag
@@ -16,7 +18,7 @@ import os
 
 def create_df(ID):
     global base, ext
-    directory_path = "/home/suzuki/ros_ws/ay_tools/fingervision/suzuki/rubbing_hand/data/0223/*/rosbag/"
+    directory_path = "/home/suzuki/ros_ws/ay_tools/fingervision/suzuki/rubbing_hand/data/0419/*/rosbag/"
     file_name = directory_path+ID+"*.bag"
     l = glob.glob(file_name)[-1]
 
@@ -48,10 +50,12 @@ def create_df(ID):
             "gripper velocity": manipulated_variable*50},
             ignore_index=True
         )
+    print(ID, ":ok")
     return df
 
-def Shift_time(df, time):
-    df = df[:500]
+# 一番角速度が大きいとこで時間軸合わせる
+def Shift_time(df):
+    # df = df[:500]
     index = df['angular velocity'].idxmax()
     time = df["time"].iloc[index] - 0.5
     df = df[df["time"]>time]
@@ -64,32 +68,42 @@ fs = 30
 ls = 20
 lgs = 20
 
-c=[0,0,0]
-f=[0,0,0]
-tc=[6.5, 4.4, 3.3]
-tf=[5.5, 6.5, 5.]
+c=[0 for i in range(6)]
+f=[0 for i in range(6)]
 
-ID = "CAVS33"
+ID = "CAVS00"
 c[0] = create_df(ID)
-ID = "CAVS34"
+ID = "CAVS01"
 c[1] = create_df(ID)
-ID = "CAVS07"
+ID = "CAVS02"
 c[2] = create_df(ID)
+ID = "CAVS03"
+c[3] = create_df(ID)
+ID = "CAVS04"
+c[4] = create_df(ID)
+ID = "CAVS05"
+c[5] = create_df(ID)
 
-ID = "FLAT18"
+ID = "CAVSst00"
 f[0] = create_df(ID)
-ID = "FLAT17"
+ID = "CAVSst01"
 f[1] = create_df(ID)
-ID = "FLAT20"
+ID = "CAVSst02"
 f[2] = create_df(ID)
+ID = "CAVSst03"
+f[3] = create_df(ID)
+ID = "CAVSst04"
+f[4] = create_df(ID)
+ID = "CAVSst05"
+f[5] = create_df(ID)
 
 # df = df[df["time"]>6]
 # df["time"] = df["time"] - 6
 
 for i in range(len(f)):
-    f[i] = Shift_time(f[i],tf[i])
+    f[i] = Shift_time(f[i])
 for i in range(len(c)):
-    c[i] = Shift_time(c[i], tc[i])
+    c[i] = Shift_time(c[i])
 
 # fig, axes = plt.subplots(nrows=4, ncols=1, figsize=(16, 12))
 fig, ax = plt.subplots(figsize=(16, 12))

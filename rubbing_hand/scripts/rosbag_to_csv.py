@@ -56,7 +56,7 @@ fs = 30
 ls = 20
 lgs = 20
 
-ID = "FLAT18"
+ID = "CAVS36"
 df = create_df(ID)
 
 # df = df[df["time"]>6]
@@ -65,7 +65,7 @@ df = create_df(ID)
 
 
 fig, axes = plt.subplots(nrows=4, ncols=1, figsize=(16, 12))
-df.plot(x="time", subplots=True, ax=axes, xlim=[0,8])
+df.plot(x="time", subplots=True, ax=axes, xlim=[0, 20])
 
 x_min=0
 x_max=df["time"].tail(1)
@@ -107,6 +107,6 @@ axes[3].set_ylim(-0.55, MV_open+1)
 axes[3].tick_params(labelsize=ls)
 axes[3].set_xlabel('time [s]', fontsize=fs)
 
-plt.savefig(base+"4.eps")
-plt.savefig(base+"4.png")
+plt.savefig(base+".eps")
+plt.savefig(base+".png")
 plt.show()
