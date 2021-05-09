@@ -418,6 +418,7 @@ class SMAF2:
         self.log["obj_orientation"] = Log()
         self.log["obj_orientation"].need_modify = False
         self.log["d_obj_orientation"] = Log(10)
+        self.log["obj_orientation_filtered"] = Log(120)
         self.pub = pub
         self.length_window = 5
         self.last_theta = 0
@@ -434,6 +435,8 @@ class SMAF2:
             return
 
         theta = np.mean(y[-len_window:])
+
+        self.log["obj_orientation_filtered"].storing(theta)
         
         if self.first_f:
             self.last_tm = msg.header.stamp
@@ -446,9 +449,40 @@ class SMAF2:
         self.last_theta_dot = theta_dot
         self.last_tm = msg.header.stamp
 
+        theta_log = self.log["obj_orientation_filtered"].get_log()
+        theta_dot_s = three_points_katagawa_koutai_sabunshiki(theta_log, dt, 5)
+        theta_dot_dot_s = four_points_katagawa_koutai_sabunshiki(theta_log, dt, 5)
+
         data = Float64Array()
-        data.data = [theta, theta_dot, theta_dot_dot]
+        data.data = [theta, theta_dot, theta_dot_dot, theta_dot_s, theta_dot_dot_s]
         self.pub.publish(data)
+
+def three_points_katagawa_koutai_sabunshiki(log, h, step=1):
+    # https://takun-physics.net/9346/
+    # f'=(f_i-2 -4f_i-1 +3f_i)/h
+
+    if len(log)<3*step:
+        return 0
+
+    f=log[-1:-(step*2+2):-step]
+    h=h*step
+
+    res = (f[2] - 4*f[1] + 3*f[0])/h
+
+    return res
+
+def four_points_katagawa_koutai_sabunshiki(log, h, step=1):
+    # https://takun-physics.net/9346/
+    # f''=(-f_t-3 +4f_i-2 -5f_i-1 +2f_i)/(h^2)
+
+    if len(log)<4*step:
+        return 0
+
+    f=log[-1:-(step*3+2):-step]
+    h=h*step
+    res = (-f[3] + 4*f[2] - 5*f[1] + 2*f[0])/(h*h)
+
+    return res
 
 def callback(msg, func):
     times = []

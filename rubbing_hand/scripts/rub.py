@@ -177,9 +177,26 @@ class Rubbing():
             runvel = -abs(runvel)
         self.go2itv_array = np.arange(itv_start, itv_goal, runvel)
         self.go2itv_array = np.append(self.go2itv_array, [itv_goal, -1])
+        self.go2itv_array = self.go2itv_array[1:]
         self.go2itv_f = 1
 
         return True
+
+    def Go2itv_sin(self, itv_goal, runvel = 0.01, A = 0.1, f = 5)
+        itv_start = self.interval
+        hz = 50 # モータへの送信周波数，実測値だいたい50くらい
+        rad_per_step=2*np.pi/(hz/f)
+        t = f*(itv_start-itv_goal)/(runvel*hz)
+        
+        if itv_start > itv_goal:
+            runvel = -abs(runvel)
+        traj_linear = np.arange(itv_start, itv_goal, runvel)
+        traj_sin = np.arange(0, t*f*2*np.pi+np.pi, rad_per_step)
+        traj_sin = np.sin(traj_sin)
+        self.go2itv_array = traj_linear + traj_sin
+        self.go2itv_array= np.append(go2itv_array, [itv_goal, -1])
+        self.go2itv_array = self.go2itv_array[1:]
+        self.go2itv_f = 1
 
 class PID:
     def __init__(self, P=0.2, I=0.0, D=0.0):

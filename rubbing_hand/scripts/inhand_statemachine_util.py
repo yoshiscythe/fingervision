@@ -25,6 +25,7 @@ class Inhand:
         #get the angle velocity of object
         self.get_omega = lambda: -self.sub_fv_smaf.req.data[1]
         # self.get_omega = lambda: np.degrees(self.sub_fv_filtered1_objinfo.req.d_obj_orientation)
+        self.get_alpha = lambda: -self.sub_fv_smaf.req.data[4]
         #get the slip of object
         self.get_slip = lambda: sum(self.sub_fv_filtered1_objinfo.req.mv_s)
         self.MV = 0
@@ -158,6 +159,18 @@ class Inhand:
     def Substitution_MV(self, MV):
         self.MV = MV
 
+    def Action_close(self):
+        MV = self.MV_o[1]
+        print("close")
+
+        if self.get_alpha() > 500:
+            MV += -0.1
+            print("too fast")
+
+        self.MV = MV
+        self.rubbing.Go2itv(self.rubbing.interval-0.2, self.MV)
+        
+
     def Maniloop(self):
         self.Set_open_step()
 
@@ -213,7 +226,7 @@ class Inhand:
             (lambda: self.get_theta()>self.target_angle,'finish',lambda: Print('over target theta!')),
             (lambda: not self.MV_i[1] < self.calculate_omega_d(),'judge'),
             (lambda: not self.rubbing.go2itv_f,'wait'),
-            ('else','close'),
+            ('else','close', lambda: self.Action_close()),
             ],
             'wait': [
             ('entry',lambda:(self.Substitution_MV(0), GetStartTime())),
