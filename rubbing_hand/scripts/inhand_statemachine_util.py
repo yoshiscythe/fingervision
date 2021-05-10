@@ -34,9 +34,9 @@ class Inhand:
         self.target_angle = 60.
         # self.min_gstep = 0.01
         self.th_slip = 0.0001
-        self.target_omega = 20.
+        self.target_omega = 15.
         # ex. MV_input  = [neutral_min, neutral_max]
-        self.MV_i = [-10, 0]
+        self.MV_i = [-5, 0]
         # ex. MV_output = [open, close]
         self.MV_o = [0.008, -0.05]
 
@@ -305,12 +305,12 @@ class Inhand:
             ('else','judge',lambda: Print('judge failed, omega_d:'+str(self.omega_d))),
             ],
             'open': [
-            ('entry',lambda: (self.Substitution_MV(self.MV_o[0]), self.rubbing.Pulse(self.MV, 1.0, 5., 1.))),
+            ('entry',lambda: (self.Substitution_MV(self.MV_o[0]), self.rubbing.Pulse(self.MV, 1.5, 5., 1.))),
             (lambda: not self.rubbing.go2itv_f,'judge'),
             ('else','open'),
             ],
             'close': [
-            ('entry',lambda: (self.Substitution_MV(self.MV_o[1]),self.rubbing.Set_interval(self.rubbing.interval-2), self.rubbing.Go2itv(self.rubbing.interval-10, self.MV))),
+            ('entry',lambda: (self.Substitution_MV(self.MV_o[1]),self.rubbing.Set_interval(self.rubbing.interval), self.rubbing.Go2itv(self.rubbing.interval-10, self.MV))),
             (lambda: self.get_theta()>self.target_angle,'finish',lambda: Print('over target theta!')),
             (lambda: not self.MV_i[1] < self.calculate_omega_d(),'judge'),
             (lambda: not self.rubbing.go2itv_f,'wait'),
