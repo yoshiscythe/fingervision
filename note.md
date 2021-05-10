@@ -39,6 +39,35 @@
     $ rosrun plotjuggler plotjuggler
     ~~~
 
+# データ採集
+- rosbag   
+  Sample
+  ~~~sh
+  $ rosbag record -a -o CAVS00
+  ~~~
+  Ctrl+Cで記録終了
+
+  - rosbag record -a  
+    すべてのtopicを取得します。後々に欲しいROSトピックが記録漏れをしていると悲しいので、基本的にこれを使えば良いと思います。ただ画像のROSトピックは情報量が膨大になてしまいます。
+  - rosbag record /topic1 /topic2  
+    名前を指定して特定のROSトピックを取得できます。
+  - rosbag record -o [pre file name]  
+    [pre file name]_YYYY-MM-DD-hh-mm-ss.bagに保存
+  - rosbag record -O [file name]  
+    [file name].bagに保存
+
+# データプロット
+## rosbag -> csv,png,eps
+**rosbag_to_csv_multi.py**  
+rosbagを読み取り，['time', 'angle', "angular velocity", "gripper position", "gripper velocity"]をcsvへ保存  
+4つのグラフの画像も作ってくれる．
+
+## csv -> error計算,png
+**csv_to_error.py**  
+rosbag_to_csv_multi.pyで作成したcsvを使ってerror計算
+目標角速度超過量の2乗和を出す
+グラフもつくる
+
 #  2021-04-26
 物体の角度の2階微分値（角加速度）を扱いたい。   
 時系列データ微分法を考える。    
@@ -56,10 +85,15 @@ word：数値微分、後退差分
 - ほしいパラメータ  
   sin 振幅，周波数
 
+１周期ごとにjudgeステートへ遷移  
+下端の包絡線が線形open  
+
 # 2021-05-10
 振幅を大きくするとちょっとずつ回転するようになった  
 振幅1.5mm（下端から上端は3mm，5Hz）から露骨にちょっとずつ回転するような挙動が見られる  
 掴んで離して，，，を高速で繰り返しているだけだから回転速度の制御につながるかはまだわからない→周波数もっとあげてみるか  
+周波数上げても良さげ  
+CAVS/FLAT 5/10Hz で比較してみる  
 
 # 以下テンプレ
 

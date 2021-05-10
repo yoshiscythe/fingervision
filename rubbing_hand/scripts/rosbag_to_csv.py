@@ -16,7 +16,7 @@ import os
 
 def create_df(ID):
     global base, ext
-    directory_path = "/home/suzuki/ros_ws/ay_tools/fingervision/suzuki/rubbing_hand/data/0223/*/rosbag/"
+    directory_path = "/home/suzuki/ros_ws/ay_tools/fingervision/suzuki/rubbing_hand/data/0510/*/rosbag/"
     file_name = directory_path+ID+"*.bag"
     l = glob.glob(file_name)[-1]
 
@@ -56,7 +56,7 @@ fs = 30
 ls = 20
 lgs = 20
 
-ID = "CAVS36"
+ID = "CAVS00"
 df = create_df(ID)
 
 # df = df[df["time"]>6]
@@ -65,7 +65,7 @@ df = create_df(ID)
 
 
 fig, axes = plt.subplots(nrows=4, ncols=1, figsize=(16, 12))
-df.plot(x="time", subplots=True, ax=axes, xlim=[0, 20])
+df.plot(x="time", subplots=True, ax=axes)
 
 x_min=0
 x_max=df["time"].tail(1)
@@ -80,7 +80,7 @@ axes[0].set_ylim(-5, 90)
 axes[0].tick_params(labelsize=ls) 
 
 axes[1].legend(bbox_to_anchor=(0, 1), loc='upper left', borderaxespad=0, fontsize=lgs)
-axes[1].hlines(10, x_min, x_max, linestyles='dashed')
+axes[1].hlines(15, x_min, x_max, linestyles='dashed')
 axes[1].hlines(0, x_min, x_max, linestyles='dashed')
 # axes[1].yaxis.set_ticks([0, 10, 30, 50]) 
 axes[1].set_ylabel("[deg/s]", fontsize=fs)
@@ -100,10 +100,10 @@ axes[2].tick_params(labelbottom=False)
 axes[3].legend(bbox_to_anchor=(0, 1), loc='upper left', borderaxespad=0, fontsize=lgs)
 axes[3].hlines(0, x_min, x_max, linestyles='dashed')
 MV_open=df["gripper velocity"].max()
-MV_ticks=[-0.5, 0, MV_open]
+MV_ticks=[-2.5, 0, MV_open]
 axes[3].yaxis.set_ticks(MV_ticks)
 axes[3].set_ylabel("[mm/s]", fontsize=fs)
-axes[3].set_ylim(-0.55, MV_open+1)
+axes[3].set_ylim(-2.55, MV_open+1)
 axes[3].tick_params(labelsize=ls)
 axes[3].set_xlabel('time [s]', fontsize=fs)
 

@@ -146,14 +146,14 @@ class Rubbing():
         # CAVS
         min_deg = 1.
         max_deg = 8.0
-        self.degree_of_finger = self.interval*(-0.44) + 13.2
+        self.degree_of_finger = self.interval*(-0.44) + 15.2
         # --------------------------------------------------
 
         # # -----------------------------------------------------
         # # FLAT
         # min_deg = 0
         # max_deg = 8
-        # self.degree_of_finger = self.interval*(-0.585) + 15.7
+        # self.degree_of_finger = self.interval*(-0.585) + 16.7
         # # -----------------------------------------------------
 
         if self.degree_of_finger > max_deg:
