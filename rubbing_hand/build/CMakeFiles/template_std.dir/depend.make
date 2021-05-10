@@ -61,18 +61,4 @@ CMakeFiles/template_std.dir/src/template_std.cpp.o: /opt/ros/melodic/include/ros
 CMakeFiles/template_std.dir/src/template_std.cpp.o: /opt/ros/melodic/include/rosconsole/macros_generated.h
 CMakeFiles/template_std.dir/src/template_std.cpp.o: /opt/ros/melodic/include/xmlrpcpp/XmlRpcDecl.h
 CMakeFiles/template_std.dir/src/template_std.cpp.o: /opt/ros/melodic/include/xmlrpcpp/XmlRpcValue.h
-CMakeFiles/template_std.dir/src/template_std.cpp.o: /usr/local/include/opencv2/core/core.hpp
-CMakeFiles/template_std.dir/src/template_std.cpp.o: /usr/local/include/opencv2/core/core_c.h
-CMakeFiles/template_std.dir/src/template_std.cpp.o: /usr/local/include/opencv2/core/mat.hpp
-CMakeFiles/template_std.dir/src/template_std.cpp.o: /usr/local/include/opencv2/core/operations.hpp
-CMakeFiles/template_std.dir/src/template_std.cpp.o: /usr/local/include/opencv2/core/types_c.h
-CMakeFiles/template_std.dir/src/template_std.cpp.o: /usr/local/include/opencv2/core/version.hpp
-CMakeFiles/template_std.dir/src/template_std.cpp.o: /usr/local/include/opencv2/features2d/features2d.hpp
-CMakeFiles/template_std.dir/src/template_std.cpp.o: /usr/local/include/opencv2/flann/config.h
-CMakeFiles/template_std.dir/src/template_std.cpp.o: /usr/local/include/opencv2/flann/defines.h
-CMakeFiles/template_std.dir/src/template_std.cpp.o: /usr/local/include/opencv2/flann/miniflann.hpp
-CMakeFiles/template_std.dir/src/template_std.cpp.o: /usr/local/include/opencv2/highgui/highgui.hpp
-CMakeFiles/template_std.dir/src/template_std.cpp.o: /usr/local/include/opencv2/highgui/highgui_c.h
-CMakeFiles/template_std.dir/src/template_std.cpp.o: /usr/local/include/opencv2/imgproc/imgproc.hpp
-CMakeFiles/template_std.dir/src/template_std.cpp.o: /usr/local/include/opencv2/imgproc/types_c.h
 

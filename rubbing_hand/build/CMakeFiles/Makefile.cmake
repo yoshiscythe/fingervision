@@ -7,6 +7,10 @@ set(CMAKE_DEPENDS_GENERATOR "Unix Makefiles")
 # The top level Makefile was generated from the following files:
 set(CMAKE_MAKEFILE_DEPENDS
   "CMakeCache.txt"
+  "/home/suzuki/.local/share/OpenCV/OpenCVConfig-version.cmake"
+  "/home/suzuki/.local/share/OpenCV/OpenCVConfig.cmake"
+  "/home/suzuki/.local/share/OpenCV/OpenCVModules-release.cmake"
+  "/home/suzuki/.local/share/OpenCV/OpenCVModules.cmake"
   "../CMakeLists.txt"
   "CMakeFiles/3.10.2/CMakeCCompiler.cmake"
   "CMakeFiles/3.10.2/CMakeCXXCompiler.cmake"
@@ -105,10 +109,6 @@ set(CMAKE_MAKEFILE_DEPENDS
   "/usr/lib/cmake/eigen3/Eigen3Config.cmake"
   "/usr/lib/cmake/eigen3/Eigen3ConfigVersion.cmake"
   "/usr/lib/cmake/eigen3/Eigen3Targets.cmake"
-  "/usr/local/share/OpenCV/OpenCVConfig-version.cmake"
-  "/usr/local/share/OpenCV/OpenCVConfig.cmake"
-  "/usr/local/share/OpenCV/OpenCVModules-release.cmake"
-  "/usr/local/share/OpenCV/OpenCVModules.cmake"
   "/usr/share/cmake-3.10/Modules/AddFileDependencies.cmake"
   "/usr/share/cmake-3.10/Modules/CMakeCInformation.cmake"
   "/usr/share/cmake-3.10/Modules/CMakeCXXInformation.cmake"

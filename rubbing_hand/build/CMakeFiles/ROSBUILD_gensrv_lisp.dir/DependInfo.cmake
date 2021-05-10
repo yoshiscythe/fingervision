@@ -8,6 +8,7 @@ set(CMAKE_MULTIPLE_OUTPUT_PAIRS
   "/home/suzuki/ros_ws/ay_tools/fingervision/suzuki/rubbing_hand/srv_gen/lisp/_package.lisp" "/home/suzuki/ros_ws/ay_tools/fingervision/suzuki/rubbing_hand/srv_gen/lisp/Set2Float64.lisp"
   "/home/suzuki/ros_ws/ay_tools/fingervision/suzuki/rubbing_hand/srv_gen/lisp/_package_Set2Float64.lisp" "/home/suzuki/ros_ws/ay_tools/fingervision/suzuki/rubbing_hand/srv_gen/lisp/Set2Float64.lisp"
   "/home/suzuki/ros_ws/ay_tools/fingervision/suzuki/rubbing_hand/srv_gen/lisp/_package_SetFloat64.lisp" "/home/suzuki/ros_ws/ay_tools/fingervision/suzuki/rubbing_hand/srv_gen/lisp/SetFloat64.lisp"
+  "/home/suzuki/ros_ws/ay_tools/fingervision/suzuki/rubbing_hand/srv_gen/lisp/_package_SetFloat64_array.lisp" "/home/suzuki/ros_ws/ay_tools/fingervision/suzuki/rubbing_hand/srv_gen/lisp/SetFloat64_array.lisp"
   )
 
 

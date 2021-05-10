@@ -182,19 +182,42 @@ class Rubbing():
 
         return True
 
-    def Go2itv_sin(self, itv_goal, runvel = 0.01, A = 0.1, f = 5)
+    # 現在の指間距離から入力した指間距離itv_goalまで振動しながら動かす
+    # 線形関数とsin関数の合成で軌道生成
+    # 線形パラ：runvel 傾き[mm/step]
+    # sinパラ： A 振幅[mm] f 周波数[/s]
+    # 指間距離のアレイを生成してupdate_interval()によって順に動かす
+    # itvはintervalの略のつもり
+    def Go2itv_sin(self, itv_goal, runvel = 0.01, A = 0.1, f = 5):
         itv_start = self.interval
         hz = 50 # モータへの送信周波数，実測値だいたい50くらい
         rad_per_step=2*np.pi/(hz/f)
-        t = f*(itv_start-itv_goal)/(runvel*hz)
-        
+        t = abs(f*(itv_start-itv_goal)/(runvel*hz))
+
         if itv_start > itv_goal:
             runvel = -abs(runvel)
         traj_linear = np.arange(itv_start, itv_goal, runvel)
-        traj_sin = np.arange(0, t*f*2*np.pi+np.pi, rad_per_step)
-        traj_sin = np.sin(traj_sin)
+        traj_sin = [i*rad_per_step for i in range(len(traj_linear))]
+        traj_sin = A*np.sin(traj_sin)
         self.go2itv_array = traj_linear + traj_sin
-        self.go2itv_array= np.append(go2itv_array, [itv_goal, -1])
+        self.go2itv_array= np.append(self.go2itv_array, [itv_goal, -1])
+        self.go2itv_array = self.go2itv_array[1:]
+        self.go2itv_f = 1
+
+    def Pulse(self, runvel = 0.01, A = 0.1, f = 5, num = 1):
+        itv_start = self.interval
+        hz = 50 # モータへの送信周波数，実測値だいたい50くらい
+        itv_goal = itv_start + (hz*runvel/f)*num
+        rad_per_step=2*np.pi/(hz/f)
+        t = abs(f*(itv_start-itv_goal)/(runvel*hz))
+
+        if itv_start > itv_goal:
+            runvel = -abs(runvel)
+        traj_linear = np.arange(itv_start, itv_goal, runvel)
+        traj_sin = [i*rad_per_step for i in range(len(traj_linear))]
+        traj_sin = -A*np.cos(traj_sin) + A
+        self.go2itv_array = traj_linear + traj_sin
+        self.go2itv_array= np.append(self.go2itv_array, [itv_goal, -1])
         self.go2itv_array = self.go2itv_array[1:]
         self.go2itv_f = 1
 

@@ -63,18 +63,4 @@ CMakeFiles/color_detect_node.dir/src/color_detect_node.cpp.o: /opt/ros/melodic/i
 CMakeFiles/color_detect_node.dir/src/color_detect_node.cpp.o: /opt/ros/melodic/include/std_msgs/Float64.h
 CMakeFiles/color_detect_node.dir/src/color_detect_node.cpp.o: /opt/ros/melodic/include/xmlrpcpp/XmlRpcDecl.h
 CMakeFiles/color_detect_node.dir/src/color_detect_node.cpp.o: /opt/ros/melodic/include/xmlrpcpp/XmlRpcValue.h
-CMakeFiles/color_detect_node.dir/src/color_detect_node.cpp.o: /usr/local/include/opencv2/core/core.hpp
-CMakeFiles/color_detect_node.dir/src/color_detect_node.cpp.o: /usr/local/include/opencv2/core/core_c.h
-CMakeFiles/color_detect_node.dir/src/color_detect_node.cpp.o: /usr/local/include/opencv2/core/mat.hpp
-CMakeFiles/color_detect_node.dir/src/color_detect_node.cpp.o: /usr/local/include/opencv2/core/operations.hpp
-CMakeFiles/color_detect_node.dir/src/color_detect_node.cpp.o: /usr/local/include/opencv2/core/types_c.h
-CMakeFiles/color_detect_node.dir/src/color_detect_node.cpp.o: /usr/local/include/opencv2/core/version.hpp
-CMakeFiles/color_detect_node.dir/src/color_detect_node.cpp.o: /usr/local/include/opencv2/features2d/features2d.hpp
-CMakeFiles/color_detect_node.dir/src/color_detect_node.cpp.o: /usr/local/include/opencv2/flann/config.h
-CMakeFiles/color_detect_node.dir/src/color_detect_node.cpp.o: /usr/local/include/opencv2/flann/defines.h
-CMakeFiles/color_detect_node.dir/src/color_detect_node.cpp.o: /usr/local/include/opencv2/flann/miniflann.hpp
-CMakeFiles/color_detect_node.dir/src/color_detect_node.cpp.o: /usr/local/include/opencv2/highgui/highgui.hpp
-CMakeFiles/color_detect_node.dir/src/color_detect_node.cpp.o: /usr/local/include/opencv2/highgui/highgui_c.h
-CMakeFiles/color_detect_node.dir/src/color_detect_node.cpp.o: /usr/local/include/opencv2/imgproc/imgproc.hpp
-CMakeFiles/color_detect_node.dir/src/color_detect_node.cpp.o: /usr/local/include/opencv2/imgproc/types_c.h
 

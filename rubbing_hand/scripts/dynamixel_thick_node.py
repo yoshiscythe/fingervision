@@ -9,7 +9,7 @@ import rospy
 rospy.init_node("dynamixel_node")
 
 from rubbing_hand.msg import dynamixel_msg, dynamixel_param_msg
-from rubbing_hand.srv import SetFloat64, Set2Float64
+from rubbing_hand.srv import SetFloat64, Set2Float64, SetFloat64_array
 
 from dxl_util import *
 from _config import *
@@ -395,6 +395,7 @@ rubbing.read_initial_position()
 inhand = Inhand(rubbing, sub_fv_filtered1_objinfo, sub_fv_smaf)
 rospy.Service('Set_interval', SetFloat64, lambda srv:rubbing.Set_interval(srv.data))
 rospy.Service('Go2itv', Set2Float64, lambda srv:rubbing.Go2itv(srv.data1, srv.data2))
+rospy.Service('Go2itv_sin', SetFloat64_array, lambda srv:rubbing.Go2itv_sin(srv.data[0], srv.data[1], srv.data[2], srv.data[3]))
 holding= TDxlHolding()
 holding.observer= sync_observer
 holding.controller= syncpos_controller
