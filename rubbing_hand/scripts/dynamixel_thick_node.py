@@ -148,6 +148,9 @@ class TDxlHolding(object):
     self.clb_cur_th = 10
     self.calibration_f = 0
 
+    self.test_button_f = False
+    self.first_f = True
+
     
 
   # #Set target velocity.
@@ -281,19 +284,19 @@ class TDxlHolding(object):
       elif self.DIRECTIONS[1] == -1:
         rubbing.Set_interval(rubbing.interval + self.p*0.1)
 
-      #ボタン左右は仮想面の傾き
-      if self.DIRECTIONS[3] == 1:
-        rubbing.degree_of_surface += self.p*0.1
-      elif self.DIRECTIONS[3] == -1:
-        rubbing.degree_of_surface -= self.p*0.1
+      # #ボタン左右は仮想面の傾き
+      # if self.DIRECTIONS[3] == 1:
+      #   rubbing.degree_of_surface += self.p*0.1
+      # elif self.DIRECTIONS[3] == -1:
+      #   rubbing.degree_of_surface -= self.p*0.1
       
-      #ボタン上下は指の傾き
-      if self.DIRECTIONS[2] == 1:
-        rubbing.degree_of_finger += self.p*0.1
-      elif self.DIRECTIONS[2] == -1:
-        rubbing.degree_of_finger -= self.p*0.1
+      # #ボタン上下は指の傾き
+      # if self.DIRECTIONS[2] == 1:
+      #   rubbing.degree_of_finger += self.p*0.1
+      # elif self.DIRECTIONS[2] == -1:
+      #   rubbing.degree_of_finger -= self.p*0.1
 
-      rubbing.control_f = any(self.FLAG_MOVES[:4])
+      rubbing.control_f = any(self.FLAG_MOVES[:2])
 
       # if self.DIRECTIONS[4] == 1:
       #   self.trg_vel[0] = self.v
@@ -326,6 +329,12 @@ class TDxlHolding(object):
         rubbing.surface_pos = 0
         rubbing.degree_of_surface = 0
         rubbing.running = 1
+
+      if self.test_button_f:
+        if self.first_f:
+          rubbing.Pulse_deformed(0.01, 1.5, 5, 10, 0.3)
+          self.first_f = False
+        self.test_button_f = False
 
       # キャリブレーション
       if self.calibration_f:
@@ -397,6 +406,7 @@ inhand = Inhand(rubbing, sub_fv_filtered1_objinfo, sub_fv_smaf)
 rospy.Service('Set_interval', SetFloat64, lambda srv:rubbing.Set_interval(srv.data))
 rospy.Service('Go2itv', Set2Float64, lambda srv:rubbing.Go2itv(srv.data1, srv.data2))
 rospy.Service('Go2itv_sin', SetFloat64_array, lambda srv:rubbing.Go2itv_sin(srv.data[0], srv.data[1], srv.data[2], srv.data[3]))
+rospy.Service('Pulse_deformed', SetFloat64_array, lambda srv:rubbing.Pulse_deformed(srv.data[0], srv.data[1], srv.data[2], srv.data[3], srv.data[4]))
 holding= TDxlHolding()
 holding.observer= sync_observer
 holding.controller= syncpos_controller
@@ -451,6 +461,7 @@ for event in device.read_loop():
       elif event.value == 1:
         holding.FLAG_MOVES[channel]  = True
         holding.DIRECTIONS[channel]  = 1
+        holding.test_button_f = True
 
     elif event.code == 304:         # 左ボタン
       channel = 3                     # 
@@ -460,6 +471,7 @@ for event in device.read_loop():
       elif event.value == 1:
         holding.FLAG_MOVES[channel]  = True
         holding.DIRECTIONS[channel]  = -1
+        holding.first_f = True
 
     elif event.code == 318:         # Lボタン
       if event.value == 0:

@@ -204,6 +204,12 @@ class Rubbing():
         self.go2itv_array = self.go2itv_array[1:]
         self.go2itv_f = 1
 
+    # 指定回数（num）だけ振動しながら開く
+    # 線形関数とsin関数の合成で軌道生成
+    # 線形パラ：runvel 傾き[mm/step]
+    # sinパラ： A 振幅[mm] f 周波数[/s]
+    # 指間距離のアレイを生成してupdate_interval()によって順に動かす
+    # itvはintervalの略のつもり
     def Pulse(self, runvel = 0.01, A = 0.1, f = 5, num = 1):
         itv_start = self.interval
         hz = 50 # モータへの送信周波数，実測値だいたい50くらい
@@ -220,6 +226,43 @@ class Rubbing():
         self.go2itv_array= np.append(self.go2itv_array, [itv_goal, -1])
         self.go2itv_array = self.go2itv_array[1:]
         self.go2itv_f = 1
+
+    # 指定回数(num)だけ振動しながら開く
+    # 振動の，前半（開く）と後半（閉じる）の比を変更可能．
+    # 線形関数とsin関数の合成で軌道生成
+    # 線形パラ：runvel 傾き[mm/step]
+    # sinパラ： A 振幅[mm] f 周波数[/s] d_ratio 全体に対して後半の比(0~1)
+    # d_ratio:
+    # 0.5で普通の振動．f=1[s]の場合，d_ratio=0.3にすると0.7秒で開いて0.3秒で閉じる感じ．
+    # 指間距離のアレイを生成してupdate_interval()によって順に動かす
+    # itvはintervalの略のつもり
+    def Pulse_deformed(self, runvel = 0.01, A = 0.1, f = 5, num = 1, d_ratio = 0.5):
+        itv_start = self.interval
+        hz = 50. # モータへの送信周波数，実測値だいたい50くらい
+        itv_goal = itv_start + (hz*runvel/f)*num
+        rad_from_t = lambda t: np.pi*f*(t%(1./f))/(1-d_ratio) if (t%(1./f))*f < 1- d_ratio else np.pi*f*(t%(1./f))/d_ratio + (2 - 1./d_ratio)*np.pi
+        run_time = float(num)/f
+        print(run_time)
+        time = np.arange(0, run_time, 1/hz)
+
+        if itv_start > itv_goal:
+            linear_sign = -1
+        else:
+            linear_sign = 1
+        traj_linear = [runvel*hz*t for t in time]
+        # len_traj_linear = len(traj_linear)/num
+        # len_second_half = int(len_traj_linear * d_ratio)
+        # len_first_half = int(len_traj_linear - len_second_half)
+        # traj_sin_first = [i*rad_per_step for i in range(len_first_half)]
+        # traj_sin_second = [i*rad_per_step for i in range(len_second_half)]
+        traj_sin_angle = [rad_from_t(t) for t in time]
+        traj_sin = -A*np.cos(traj_sin_angle) + A
+        go2itv_array = traj_linear + traj_sin + itv_start
+        go2itv_array= np.append(go2itv_array, [itv_goal, -1])
+        self.go2itv_array = go2itv_array[1:]
+        self.go2itv_f = 1
+
+        # print(go2itv_array)
 
 class PID:
     def __init__(self, P=0.2, I=0.0, D=0.0):
