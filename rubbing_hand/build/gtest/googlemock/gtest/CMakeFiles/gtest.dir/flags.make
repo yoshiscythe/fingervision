@@ -6,5 +6,5 @@ CXX_FLAGS = -O2 -g -DNDEBUG -fPIC    -Wall -Wshadow -DGTEST_HAS_PTHREAD=1 -fexce
 
 CXX_DEFINES = -DGTEST_CREATE_SHARED_LIBRARY=1 -DROS_PACKAGE_NAME=\"rubbing_hand\" -Dgtest_EXPORTS
 
-CXX_INCLUDES = -I/home/suzuki/ros_ws/ay_tools/fingervision/suzuki/rubbing_hand/include -I/home/suzuki/ros_ws/ay_tools/fingervision/fingervision/include -I/home/suzuki/ros_ws/ay_tools/fingervision/fingervision/../3rdparty -I/home/suzuki/ros_ws/ay_tools/fingervision/fingervision_msgs/msg_gen/cpp/include -I/home/suzuki/ros_ws/ay_tools/fingervision/fingervision_msgs/srv_gen/cpp/include -I/opt/ros/melodic/include -I/usr/src/googletest/googletest/include -I/usr/src/googletest/googletest 
+CXX_INCLUDES = -I/home/suzuki/ros_ws/ay_tools/fingervision/suzuki/rubbing_hand/include -I/usr/src/googletest/googletest/include -I/usr/src/googletest/googletest 
 

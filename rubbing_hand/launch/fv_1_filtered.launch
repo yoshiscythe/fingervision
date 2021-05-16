@@ -7,5 +7,5 @@
     <param name="side" value="l" />
     <param name="filter_len" value="5" />
   </node>
-  <node type="filter_node.py" pkg="rubbing_hand" name="kalman_filter" ns="fingervision" output="screen" />
+  <node type="filter_node.py" pkg="rubbing_hand" name="smaf_filter" ns="fingervision" output="screen" />
 </launch>

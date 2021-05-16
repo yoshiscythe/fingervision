@@ -502,7 +502,7 @@ if __name__=='__main__':
     # obj_orientation_lkf_pub1 = rospy.Publisher(rospy.get_namespace()+"obj_orientation_lkf1", Float64Array, queue_size=1)
     # obj_orientation_lkf_pub2 = rospy.Publisher(rospy.get_namespace()+"obj_orientation_lkf2", Float64Array, queue_size=1)
     # obj_orientation_sgf_pub = rospy.Publisher("obj_orientation_sgf", Float64Array, queue_size=10)
-    obj_orientation_smaf_pub = rospy.Publisher("obj_orientation_smaf", Float64Array, queue_size=1)
+    obj_orientation_smaf_pub = rospy.Publisher(rospy.get_namespace()+"obj_orientation_smaf", Float64Array, queue_size=1)
     # my_LKF1 = LKF4(obj_orientation_lkf_pub1)
     # my_LKF2 = LKF3(obj_orientation_lkf_pub2)
     # my_LKF1.A = np.mat([[1,0.033], [0,1]])

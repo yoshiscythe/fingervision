@@ -348,6 +348,7 @@ class TDxlHolding(object):
       dy_param.fps = update_fps
       dy_param.trg_pos = self.trg_pos
       dy_param.degree_of_finger = rubbing.degree_of_finger
+      # print(dy_param)
       param_pub.publish(dy_param)
       #-------------------------------
 

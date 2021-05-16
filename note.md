@@ -10,6 +10,11 @@
         ダイレクトリンク    
         http://localhost:8080/?action=stream&dummy=file.mjpg
 
+        - カメラのデバイス番号取得  
+          ~~~sh
+          $ v4l2-ctl --list-devices
+          ~~~
+
     2.  FingerVisionのローンチファイル実行  
         ~~~sh
         $ roslaunch rubbing_hand fv_1_filtered.launch 
@@ -94,6 +99,25 @@ word：数値微分、後退差分
 掴んで離して，，，を高速で繰り返しているだけだから回転速度の制御につながるかはまだわからない→周波数もっとあげてみるか  
 周波数上げても良さげ  
 CAVS/FLAT 5/10Hz で比較してみる  
+
+# 2021-05-16
+- 問題発生  
+  fvノードなどを立ち上げても，topicを購読できない．  
+  rostopic list をするとちゃんとトピックは表示されるが，echoできない．  
+  ただしrostopic hz やbwで情報は見れる．  
+  turtle_simを試しに起動してみたら，トピック関連も正常に動いた．  
+  rubbing_handパッケージ内のみで不具合が出ているようだ．  
+  **rosmake rubbing_hand をしてパッケージのビルドをやり直したら治った.**  
+  結局なんだったのか．  
+
+fingervisionのウィンドウ拡大して画面録画したいな．．．  
+画面録画のためにOBSスタジオインストール  
+Ubuntuでのインストール手順（公式サイト）↓  
+https://obsproject.com/wiki/install-instructions#ubuntumint-installation
+
+メモ
+Ubuntuで使える動画編集ソフト
+Kdenlive
 
 # 以下テンプレ
 
