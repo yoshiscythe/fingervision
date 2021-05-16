@@ -52,12 +52,20 @@ class Inhand:
         self.pub_is_running = True
         self.Start_pub()
 
+        self.amp = 1.5
+        self.dec_f = [0, 0]
+
+    def Init(self):
+        self.amp = 1.5
+        self.dec_f = [0, 0]
+
     #インハンドマニピュレーションを開始する関数
     #Maniloop関数をスレッドで実行
     def Start(self):
         # self.Stop()
         self.thread= threading.Thread(name='inhand', target=self.Maniloop)
         self.is_running= True
+        self.Init()
         self.thread.start()
 
     #すべてのスレッドを終了させる関数
@@ -170,6 +178,26 @@ class Inhand:
         self.MV = MV
         self.rubbing.Go2itv(self.rubbing.interval-0.2, self.MV)
         
+    def Decretion_amp(self):
+        d_omega = self.calculate_omega_d()
+
+        if d_omega <= self.MV_i[0]:
+            pass
+        elif self.MV_i[0] < d_omega <= self.MV_i[1]:
+            self.dec_f[0] = 1
+        elif self.MV_i[1] < d_omega:
+            self.dec_f[1] = 1
+
+    def Action_sin_open(self):
+        self.MV = self.MV_o[0]
+        if self.dec_f:
+            if self.dec_f[1]:
+                self.amp = max(self.amp - 0.1, 0)
+            elif self.dec_f[0]:
+                # self.amp -= 0.1
+                pass
+        self.dec_f = [0, 0]
+        self.rubbing.Pulse_deformed(self.MV, self.amp, 5., 1., 0.3)
 
     def Maniloop(self):
         self.Set_open_step()
@@ -305,9 +333,9 @@ class Inhand:
             ('else','judge',lambda: Print('judge failed, omega_d:'+str(self.omega_d))),
             ],
             'open': [
-            ('entry',lambda: (self.Substitution_MV(self.MV_o[0]), self.rubbing.Pulse(self.MV, 1.5, 5., 1.))),
+            ('entry',lambda: self.Action_sin_open()),
             (lambda: not self.rubbing.go2itv_f,'judge'),
-            ('else','open'),
+            ('else','open', lambda: self.Decretion_amp()),
             ],
             'close': [
             ('entry',lambda: (self.Substitution_MV(self.MV_o[1]),self.rubbing.Set_interval(self.rubbing.interval), self.rubbing.Go2itv(self.rubbing.interval-10, self.MV))),
@@ -338,7 +366,7 @@ class Inhand:
         sm= TStateMachine(states,'start', debug=False)
         sm.Run()
 
-        self.rubbing.Set_interval(25)
+        self.rubbing.Set_interval(20)
         rospy.sleep(0.5)
         avg_angle = 0
         for i in range(60):
