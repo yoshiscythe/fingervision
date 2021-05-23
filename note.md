@@ -14,6 +14,14 @@
           ~~~sh
           $ v4l2-ctl --list-devices
           ~~~
+        
+        - シェルスクリプト  
+          ~~~sh
+          $ bash mjpgstreamer.sh [camera device num e.g.4 default=2]
+          ~~~
+          homeとかrubbing_hand/scriptsとかに置いてある  
+          雑に絶対パスで書いてるのでどこから実行しても大丈夫だぁ
+
 
     2.  FingerVisionのローンチファイル実行  
         ~~~sh
@@ -38,12 +46,19 @@
         ~~~sh
         $ rosrun rubbing_hand dynamixel_thick_node.py 
         ~~~
+        USBと電源挿してるか確認
 
 -   トピック確認    
     ~~~sh
     $ rosrun plotjuggler plotjuggler
     ~~~
 
+- 複数USBカメラを使う時のおまじない
+  ~~~sh
+  $ sudo rmmod uvcvideo
+  $ sudo modprobe uvcvideo quirks=128
+  ~~~
+  
 # データ採集
 - rosbag   
   Sample
@@ -130,6 +145,14 @@ https://obsproject.com/wiki/install-instructions#ubuntumint-installation
   - 周期中に目標角速度を超えた場合は，次からの振動の振幅を小さくすることにした．  
     周期中に回転するが，周期の終わりに止まっているということは，振動の上限は滑り出すような指間距離になっているが，下限は回転を完全に止めてしまうほどきつい指間距離だということ．  
     上限はそのままで，下限を上げるには，run_velはそのままで，振幅を小さくすればよいのだ．  
+
+# 2021-05-23
+OBSスタジオと，plotjugglerを一緒に使うとCPUが天元突破する．FV遅延しまくり先生．  
+どちらか片方だけならセーフ．FVに遅延はなさそう．  
+とりあえず録画時にはplotjugglerなしにすればいいかな？
+（rosbag recordは軽いみたいで，マニピュレーション中のデータ保存は問題なさそう）  
+でもそうするとマニピュレーション中のグラフ確認できねえよなぁ．．．  
+rqt_plotも同じくそこそこ重い  
 
 # 以下テンプレ
 
