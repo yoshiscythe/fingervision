@@ -52,10 +52,12 @@ class Inhand:
         self.pub_is_running = True
         self.Start_pub()
 
-        self.amp = 1.5
-        self.amp_first = 1.5
+        self.amp_first = 7.
         self.dec_f = [0, 0]
-        self.amp_dec = 0.1
+        self.amp_dec = 0.
+
+        self.sin_hz = 5.
+        self.d_ratio = 0.1
 
     def Init(self):
         self.amp = self.amp_first
@@ -200,7 +202,7 @@ class Inhand:
             else:
                 self.amp = min(self.amp + self.amp_dec, self.amp_first)
         self.dec_f = [0, 0]
-        self.rubbing.Pulse_deformed(self.MV, self.amp, 5., 1., 0.3)
+        self.rubbing.Pulse_deformed(self.MV, self.amp, self.sin_hz, 1., self.d_ratio)
 
     def Maniloop(self):
         self.Set_open_step()
@@ -330,6 +332,7 @@ class Inhand:
             ],
             'judge': [
             ('entry',lambda: self.calculate_omega_d()),
+            (lambda: self.get_theta()>self.target_angle,'finish',lambda: Print('over target theta!')),
             (lambda: self.omega_d <= self.MV_i[0],'open'),
             (lambda: self.MV_i[1] < self.omega_d,'close'),
             (lambda: self.MV_i[0] < self.omega_d <= self.MV_i[1],'stay'),

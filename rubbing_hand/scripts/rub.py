@@ -151,9 +151,9 @@ class Rubbing():
 
         # # -----------------------------------------------------
         # # FLAT
-        # min_deg = 0
-        # max_deg = 8
-        # self.degree_of_finger = self.interval*(-0.585) + 16.7
+        # min_deg = 2
+        # max_deg = 7
+        # self.degree_of_finger = self.interval*(-0.585) + 16.2
         # # -----------------------------------------------------
 
         if self.degree_of_finger > max_deg:
@@ -231,18 +231,19 @@ class Rubbing():
     # 振動の，前半（開く）と後半（閉じる）の比を変更可能．
     # 線形関数とsin関数の合成で軌道生成
     # 線形パラ：runvel 傾き[mm/step]
-    # sinパラ： A 振幅[mm] f 周波数[/s] d_ratio 全体に対して後半の比(0~1)
+    # sinパラ： A 振幅(入力は波の下限から上限までの振幅．関数内では2で割って通常の振幅として使ってる)[mm] f 周波数[/s] d_ratio 全体に対して後半の比(0~1)
     # d_ratio:
     # 0.5で普通の振動．f=1[s]の場合，d_ratio=0.3にすると0.7秒で開いて0.3秒で閉じる感じ．
     # 指間距離のアレイを生成してupdate_interval()によって順に動かす
     # itvはintervalの略のつもり
     def Pulse_deformed(self, runvel = 0.01, A = 0.1, f = 5, num = 1, d_ratio = 0.5):
+        A = A/2
         itv_start = self.interval
         hz = 50. # モータへの送信周波数，実測値だいたい50くらい
         itv_goal = itv_start + (hz*runvel/f)*num
         rad_from_t = lambda t: np.pi*f*(t%(1./f))/(1-d_ratio) if (t%(1./f))*f < 1- d_ratio else np.pi*f*(t%(1./f))/d_ratio + (2 - 1./d_ratio)*np.pi
         run_time = float(num)/f
-        print(A)
+        # print(A)
         time = np.arange(0, run_time, 1/hz)
 
         if itv_start > itv_goal:
