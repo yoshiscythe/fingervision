@@ -53,10 +53,12 @@ class Inhand:
         self.Start_pub()
 
         self.amp = 1.5
+        self.amp_first = 1.5
         self.dec_f = [0, 0]
+        self.amp_dec = 0.1
 
     def Init(self):
-        self.amp = 1.5
+        self.amp = self.amp_first
         self.dec_f = [0, 0]
 
     #インハンドマニピュレーションを開始する関数
@@ -188,14 +190,15 @@ class Inhand:
         elif self.MV_i[1] < d_omega:
             self.dec_f[1] = 1
 
+    # open stateのエントリーアクション，振動しながら開く
     def Action_sin_open(self):
         self.MV = self.MV_o[0]
         if self.dec_f:
             if self.dec_f[1]:
-                self.amp = max(self.amp - 0.1, 0)
-            elif self.dec_f[0]:
-                # self.amp -= 0.1
-                pass
+                self.amp = max(self.amp - self.amp_dec, 0)
+                self.MV = 0
+            else:
+                self.amp = min(self.amp + self.amp_dec, self.amp_first)
         self.dec_f = [0, 0]
         self.rubbing.Pulse_deformed(self.MV, self.amp, 5., 1., 0.3)
 

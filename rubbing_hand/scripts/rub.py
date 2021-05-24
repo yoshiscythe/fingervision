@@ -242,7 +242,7 @@ class Rubbing():
         itv_goal = itv_start + (hz*runvel/f)*num
         rad_from_t = lambda t: np.pi*f*(t%(1./f))/(1-d_ratio) if (t%(1./f))*f < 1- d_ratio else np.pi*f*(t%(1./f))/d_ratio + (2 - 1./d_ratio)*np.pi
         run_time = float(num)/f
-        print(run_time)
+        print(A)
         time = np.arange(0, run_time, 1/hz)
 
         if itv_start > itv_goal:

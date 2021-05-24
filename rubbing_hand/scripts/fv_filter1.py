@@ -95,8 +95,8 @@ def ProxVision(msg,fv,pub_fobjinfo,options,state):
   if m00>0.0:
     obj_center= [(m10/m00-cx)/div, (m01/m00-cy)/div]
     obj_orientation= 0.5*math.atan2(2.0*mu11/m00, (mu20/m00-mu02/m00))
-    k = 0.7267534839
-    obj_orientation= np.arctan(k*np.tan(obj_orientation))
+    # k = 0.7267534839
+    # obj_orientation= np.arctan(k*np.tan(obj_orientation))
     obj_area= m00/diva
   else:
     obj_center= [0.0, 0.0]
