@@ -88,6 +88,36 @@ rosbag_to_csv_multi.pyで作成したcsvを使ってerror計算
 目標角速度超過量の2乗和を出す
 グラフもつくる
 
+# 録画
+OBSstudioを使う  
+FingerVisionの処理後・処理前ウィンドウと，正面から撮影しているUSBカメラのキャプチャと，（plotjugglerのウィンドウ）をひとまとめにして録画  
+
+![](image4md/2021-05-30-22-47-11.png)
+
+**注意**  
+現状，plotjugglerを起動しながらOBSstudioで録画を行うとPCがクソ重くなって遅延が発生するので，録画を行うときはplotjugglerは起動しないこと  
+
+- 設定ファイル  
+  - プロファイル  
+    ~/ドキュメント/obs_studio/profile_4rubbing_hand  
+    各種設定が保存されている  
+  - シーンコレクション  
+    ~/ドキュメント/obs_studio/scene_collection_4rubbing_hand.json  
+    ソースが保存されている  
+- 設定変更  
+  設定を開いて,,,  
+  - 保存フォルダの変更  
+    出力→録画→録画ファイルのパス  
+  - 保存ファイル名の変更  
+    詳細設定→録画→ファイル名書式設定  
+    CAVS%CCYY-%MM-%DD or FLAT%CCYY-%MM-%DD として，接頭語をつけている．  
+    ファイルが重複すると末尾に(1),(2),..がつくため，これをIDとみなして管理  
+- 録画開始/終了  
+  録画開始/終了ボタンを押せばいい  
+  ホットキー未設定  
+
+<br >
+
 # 以下テンプレ
 
 # hot key in EXTENSIONS
@@ -110,6 +140,13 @@ Ctrl + M        |   数学記述（4343とか書ける）
 Alt + C         |   タスクリストのチェック・チェック解除
 Ctrl + Shift + V|   プレビュー切り替え
 Ctrl + K V      |   プレビューを横に表示
+
+## Paste Image
+**画像を挿入する**  
+クリップボードに画像が保存されている状態で，  
+`ctrl+alt+V`  or `ctrl+shit+P(コントロールパレット)→Paste Image`  
+貼り付けられるmdファイルと同じ階層のimage4mdディレクトリ内に画像が保存され，下の文字列が挿入される  
+`![](image4md/YYYY-MM-DD-HH-mm-ss.png)`
 
 # 数式テスト
 * $a_i=a_{i-1}+a_{i-2}$
