@@ -61,7 +61,7 @@
   
 # データ採集
 - rosbag   
-  Sample
+  Sample 
   ~~~sh
   $ rosbag record -a -o CAVS00
   ~~~
