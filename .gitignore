@@ -4,3 +4,8 @@
 # 特定のディレクトリを無視する場合は先頭と末尾に/をつける
 # /path/to/directory
 /rubbing_hand/data/
+
+# .pycがめちゃくちゃゴミ
+# 次のコマンドをリポジトリのルートで実行するとすべての.pycファイルをgit rm -fへ渡してくれる！便利
+# $ find . -name "*.pyc" -exec git rm -f "{}" \;
+*.pyc
