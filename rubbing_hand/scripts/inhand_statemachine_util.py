@@ -56,8 +56,8 @@ class Inhand:
         self.dec_f = [0, 0]
         self.amp_dec = 0.
 
-        self.sin_hz = 5.
-        self.d_ratio = 0.3
+        self.sin_hz = 80.
+        self.d_ratio = 0.1
 
     def Init(self):
         self.amp = self.amp_first
@@ -198,7 +198,7 @@ class Inhand:
         if self.dec_f:
             if self.dec_f[1]:
                 self.amp = max(self.amp - self.amp_dec, 0)
-                # self.MV = 0
+                self.MV = 0
             else:
                 self.amp = min(self.amp + self.amp_dec, self.amp_first)
         self.dec_f = [0, 0]

@@ -11,8 +11,9 @@ import pandas as pd
 from datetime import datetime
 import os
 import matplotlib.pyplot as plt
+import numpy as np
 
-data_directory = "/home/suzuki/ros_ws/ay_tools/fingervision/suzuki/rubbing_hand/data/0510"
+data_directory = "/home/suzuki/ros_ws/ay_tools/fingervision/suzuki/rubbing_hand/data/0525"
 
 # 入力  path: ディレクリパス
 # 出力  csv_file: 入力ディレクトリ内のすべてのcsvファイル（IDが重複した場合は日時が遅い方を取得）の絶対パスをバリュー，IDをキーとした辞書型
@@ -32,20 +33,29 @@ def create_csv_dict(path):
 # 色々計算
 def calcurate_error(df):
     error_dict = {}
-    error = 0
-    # for omega in df["angular velocity"]:
-    #     omega_d = omega - 10
-    #     if omega_d > 0:
-    #         error+= omega_d**2
+    df = df[df["gripper position"]>20]
+
     last_angle = sum(df['angle'].tail(60))/60
     error_dict["last_angle"] = last_angle
+
     max_vel = max(df['angular velocity'])
     error_dict["max_angular_velocity"] = max_vel
-    df = df["angular velocity"]-10
-    df = df[df>0]
-    df = df**2
-    error = sum(df)
+
+    df_error = df["angular velocity"]-15
+    df_error = df_error[df_error>0]
+    df_error = df_error**2
+    error = sum(df_error)
     error_dict["error"] = error
+
+    df_rms = (df["angular velocity"]-15)**2
+    rms = np.sqrt(sum(df_rms)/len(df_rms))
+    error_dict["rms"] = rms
+
+    std = df["angular velocity"].std()
+    error_dict["std"] = std
+
+    mean = df["angular velocity"].mean()
+    error_dict["mean"] = mean
 
     return error_dict
 
@@ -121,10 +131,13 @@ for index, row in df_id_CAVS.iterrows():
     progress += 1
     print("CAVS: ", progress, "/", len(df_id_CAVS.index.values.tolist()))
 
-# df_error_CAVS.to_csv(data_directory+"/CAVS_error.csv")
-# df_error_FLAT.to_csv(data_directory+"/FLAT_error.csv")
+df_error_CAVS.to_csv(data_directory+"/CAVS_error.csv", index = False)
+df_error_FLAT.to_csv(data_directory+"/FLAT_error.csv", index = False)
 
-df_error_CAVS.plot.scatter(x="frequency", y="error")
-df_error_FLAT.plot.scatter(x="frequency", y="error")
+# df_error_CAVS.plot.scatter(x="ratio", y="std")
+# df_error_CAVS.plot.scatter(x="ratio", y="max_angular_velocity")
+# df_error_CAVS.plot.scatter(x="ratio", y="mean")
+# df_error_CAVS.plot.scatter(x="ratio", y="rms")
+# df_error_FLAT.plot.scatter(x="amp", y="error", )
 
 plt.show()

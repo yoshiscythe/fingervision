@@ -237,7 +237,7 @@ class Rubbing():
     # 指間距離のアレイを生成してupdate_interval()によって順に動かす
     # itvはintervalの略のつもり
     def Pulse_deformed(self, runvel = 0.01, A = 0.1, f = 5, num = 1, d_ratio = 0.5):
-        A = A/2
+        A = A/2.
         itv_start = self.interval
         hz = 50. # モータへの送信周波数，実測値だいたい50くらい
         itv_goal = itv_start + (hz*runvel/f)*num
