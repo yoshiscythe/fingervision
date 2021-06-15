@@ -10,8 +10,9 @@ df_CAVS = pd.read_csv("/home/suzuki/ros_ws/ay_tools/fingervision/suzuki/rubbing_
 df_CAVS = df_CAVS.astype(float)
 # print(df_CAVS)
 # df_CAVS = df_CAVS[df_CAVS["id"]>=88]
-df_CAVS = df_CAVS.iloc[[65,68,71,74,77,80,83,86],:]
+df_CAVS = df_CAVS.iloc[60,:]
 
+print(df_CAVS)
 fig, axes = plt.subplots(nrows=2, ncols=3, figsize=(12, 6))
 
 df_CAVS.plot(x="ratio", y="error", kind="scatter", ax=axes[0,0], sharex=True)

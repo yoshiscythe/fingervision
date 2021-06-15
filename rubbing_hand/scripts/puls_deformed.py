@@ -1,6 +1,8 @@
 #!/usr/bin/python
 #coding: utf-8
 
+# rub.py内のPulse_deformed関数を，プロットするプログラム
+
 import numpy as np
 import matplotlib.pyplot as plt
 
