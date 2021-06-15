@@ -38,7 +38,7 @@ class Inhand:
         # ex. MV_input  = [neutral_min, neutral_max]
         self.MV_i = [-5, 0]
         # ex. MV_output = [open, close]
-        self.MV_o = [0.008, -0.05]
+        self.MV_o = [0.5, -2.]
 
         self.hz = 60
         # self.tmp_pub = rospy.Publisher(rospy.get_namespace()+"tmp", Float64, queue_size=1)
@@ -152,10 +152,10 @@ class Inhand:
         
         return MV
 
-    #開く速度を入力値から得る
+    #開く速度[mm/sec]を入力値から得る
     #速度変えるたびにコード書き直してノード起動し直すのが面倒だったのでこうした
     def Set_open_step(self):
-        input_data = raw_input("input open step: ")
+        input_data = raw_input("input open velocity[mm/s]: ")
         
         self.MV_o[0] = float(input_data)
         print("set: ", self.MV_o[0])
@@ -171,16 +171,16 @@ class Inhand:
     def Substitution_MV(self, MV):
         self.MV = MV
 
-    def Action_close(self):
-        MV = self.MV_o[1]
-        print("close")
+    # def Action_close(self):
+    #     MV = self.MV_o[1]
+    #     print("close")
 
-        if self.get_alpha() > 500:
-            MV += -0.1
-            print("too fast")
+    #     if self.get_alpha() > 500:
+    #         MV += -0.1
+    #         print("too fast")
 
-        self.MV = MV
-        self.rubbing.Go2itv(self.rubbing.interval-0.2, self.MV)
+    #     self.MV = MV
+    #     self.rubbing.Go2itv(self.rubbing.interval-0.2, self.MV)
         
     def Decretion_amp(self):
         d_omega = self.calculate_omega_d()

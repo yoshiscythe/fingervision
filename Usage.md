@@ -3,35 +3,35 @@
 # How to use rubbing_hand
 
 - FingerVision起動  
-    1.  mjpgstreamer起動    
+  1.  mjpgstreamer起動
+      ~~~sh
+      $ ./mjpg_streamer -i "./input_uvc.so -f -1 -r 320x240 -d /dev/video4 -n" -o "./output_http.so -w ./www -p 8080"
+      ~~~
+      ダイレクトリンク    
+      http://localhost:8080/?action=stream&dummy=file.mjpg
+
+      - カメラのデバイス番号取得  
         ~~~sh
-        $ ./mjpg_streamer -i "./input_uvc.so -f -1 -r 320x240 -d /dev/video4 -n" -o "./output_http.so -w ./www -p 8080"
+        $ v4l2-ctl --list-devices
         ~~~
-        ダイレクトリンク    
-        http://localhost:8080/?action=stream&dummy=file.mjpg
-
-        - カメラのデバイス番号取得  
-          ~~~sh
-          $ v4l2-ctl --list-devices
-          ~~~
-        
-        - シェルスクリプト  
-          ~~~sh
-          $ bash mjpgstreamer.sh [camera device num e.g.4 default=2]
-          ~~~
-          homeとかrubbing_hand/scriptsとかに置いてある  
-          雑に絶対パスで書いてるのでどこから実行しても大丈夫だぁ
-
-
-    2.  FingerVisionのローンチファイル実行  
+      
+      - シェルスクリプト  
         ~~~sh
-        $ roslaunch rubbing_hand fv_1_filtered.launch 
+        $ bash mjpgstreamer.sh [camera device num e.g.4 default=2]
         ~~~
+        homeとかrubbing_hand/scriptsとかに置いてある  
+        雑に絶対パスで書いてるのでどこから実行しても大丈夫だぁ
 
-    3.  ~~フィルターノード起動~~ (2のローンチファイルに組み込み)
-        ~~~sh
-        $ rosrun rubbing_hand filter_node.py
-        ~~~
+
+  2.  FingerVisionのローンチファイル実行  
+      ~~~sh
+      $ roslaunch rubbing_hand fv_1_filtered.launch 
+      ~~~
+
+  3.  ~~フィルターノード起動~~ (2のローンチファイルに組み込み)
+      ~~~sh
+      $ rosrun rubbing_hand filter_node.py
+      ~~~
 
 - ロボットハンド起動
     1.  コントローラBluetooth接続
@@ -42,11 +42,40 @@
         [Joy-Con (L)]# exit
         ~~~
 
+        - bluetoothがpower onにならないとき  
+          1. まずsoftwareスイッチの状態を確認  
+              ```sh
+              $ sudo rfkill list all
+              0: hci0: Bluetooth
+                Soft blocked: yes
+                Hard blocked: no
+              1: phy0: Wireless LAN
+                Soft blocked: no
+                Hard blocked: no
+              ```
+              `Soft blocked`が`yes`の場合は、ソフトウェアの設定でBluetoothがOFFになっています。そして、GUIから操作してもどうしてもONに戻らない。
+          2. 強制的にすべてのブロックを解除
+              ```sh
+              $ sudo rfkill unblock all
+              ```
+          3. (option?)Bluetoothを再起動
+              ```sh
+              $ sudo systemctl restart bluetooth.service
+              ```
+
+
     2.  ダイナミクセルノード起動
         ~~~sh
         $ rosrun rubbing_hand dynamixel_thick_node.py 
         ~~~
         USBと電源挿してるか確認
+    
+    - おまじない
+      ```sh
+      $ bash rubbing_hand/scripts/fix_usb_latency.sh [ttyUSBX]
+      ```
+      USBのなんかいい感じの設定
+      ダイナミクセル起動前にどうぞ
 
 -   トピック確認    
     ~~~sh

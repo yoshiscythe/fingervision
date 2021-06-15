@@ -40,6 +40,9 @@ class Rubbing():
         self.running = 0
         self.control_f = False
 
+        self.holding = None
+        self.get_current_dynamixel_hz = lambda: self.holding.topic_hz.get_hz(["/dynamixel_data"])[0]
+
     #条件下での各指の根本角度を計算する
     def calculation_degree(self):
         theta = np.deg2rad(self.degree_of_surface)
@@ -168,69 +171,26 @@ class Rubbing():
         self.control_f = False
 
 
-    # 現在の指間距離から入力した指間距離itv_goalまで、入力された速度runvel[mm/step]で動かす
+    # 現在の指間距離から入力した指間距離itv_goalまで、入力された速度runvel[mm/sec]で動かす
     # 指間距離のアレイを生成してupdate_interval()によって順に動かす
     # itvはintervalの略のつもり
     def Go2itv(self, itv_goal, runvel= 0.01):
+        hz = self.get_current_dynamixel_hz()
         itv_start = self.interval
         if itv_start > itv_goal:
             runvel = -abs(runvel)
-        self.go2itv_array = np.arange(itv_start, itv_goal, runvel)
+        runstep = runvel/float(hz)
+        self.go2itv_array = np.arange(itv_start, itv_goal, runstep)
         self.go2itv_array = np.append(self.go2itv_array, [itv_goal, -1])
         self.go2itv_array = self.go2itv_array[1:]
         self.go2itv_f = 1
 
         return True
 
-    # 現在の指間距離から入力した指間距離itv_goalまで振動しながら動かす
-    # 線形関数とsin関数の合成で軌道生成
-    # 線形パラ：runvel 傾き[mm/step]
-    # sinパラ： A 振幅[mm] f 周波数[/s]
-    # 指間距離のアレイを生成してupdate_interval()によって順に動かす
-    # itvはintervalの略のつもり
-    def Go2itv_sin(self, itv_goal, runvel = 0.01, A = 0.1, f = 5):
-        itv_start = self.interval
-        hz = 50 # モータへの送信周波数，実測値だいたい50くらい
-        rad_per_step=2*np.pi/(hz/f)
-        t = abs(f*(itv_start-itv_goal)/(runvel*hz))
-
-        if itv_start > itv_goal:
-            runvel = -abs(runvel)
-        traj_linear = np.arange(itv_start, itv_goal, runvel)
-        traj_sin = [i*rad_per_step for i in range(len(traj_linear))]
-        traj_sin = A*np.sin(traj_sin)
-        self.go2itv_array = traj_linear + traj_sin
-        self.go2itv_array= np.append(self.go2itv_array, [itv_goal, -1])
-        self.go2itv_array = self.go2itv_array[1:]
-        self.go2itv_f = 1
-
-    # 指定回数（num）だけ振動しながら開く
-    # 線形関数とsin関数の合成で軌道生成
-    # 線形パラ：runvel 傾き[mm/step]
-    # sinパラ： A 振幅[mm] f 周波数[/s]
-    # 指間距離のアレイを生成してupdate_interval()によって順に動かす
-    # itvはintervalの略のつもり
-    def Pulse(self, runvel = 0.01, A = 0.1, f = 5, num = 1):
-        itv_start = self.interval
-        hz = 50 # モータへの送信周波数，実測値だいたい50くらい
-        itv_goal = itv_start + (hz*runvel/f)*num
-        rad_per_step=2*np.pi/(hz/f)
-        t = abs(f*(itv_start-itv_goal)/(runvel*hz))
-
-        if itv_start > itv_goal:
-            runvel = -abs(runvel)
-        traj_linear = np.arange(itv_start, itv_goal, runvel)
-        traj_sin = [i*rad_per_step for i in range(len(traj_linear))]
-        traj_sin = -A*np.cos(traj_sin) + A
-        self.go2itv_array = traj_linear + traj_sin
-        self.go2itv_array= np.append(self.go2itv_array, [itv_goal, -1])
-        self.go2itv_array = self.go2itv_array[1:]
-        self.go2itv_f = 1
-
     # 指定回数(num)だけ振動しながら開く
     # 振動の，前半（開く）と後半（閉じる）の比を変更可能．
     # 線形関数とsin関数の合成で軌道生成
-    # 線形パラ：runvel 傾き[mm/step]
+    # 線形パラ：runvel 傾き[mm/s]
     # sinパラ： A 振幅(入力は波の下限から上限までの振幅．関数内では2で割って通常の振幅として使ってる)[mm] f 周波数[/s] d_ratio 全体に対して後半の比(0~1)
     # d_ratio:
     # 0.5で普通の振動．f=1[s]の場合，d_ratio=0.3にすると0.7秒で開いて0.3秒で閉じる感じ．
@@ -239,8 +199,8 @@ class Rubbing():
     def Pulse_deformed(self, runvel = 0.01, A = 0.1, f = 5, num = 1, d_ratio = 0.5):
         A = A/2.
         itv_start = self.interval
-        hz = 50. # モータへの送信周波数，実測値だいたい50くらい
-        itv_goal = itv_start + (hz*runvel/f)*num
+        hz = float(self.get_current_dynamixel_hz())
+        itv_goal = itv_start + (runvel/f)*num
         rad_from_t = lambda t: np.pi*f*(t%(1./f))/(1-d_ratio) if (t%(1./f))*f < 1- d_ratio else np.pi*f*(t%(1./f))/d_ratio + (2 - 1./d_ratio)*np.pi
         run_time = float(num)/f
         # print(A)
@@ -250,7 +210,7 @@ class Rubbing():
             linear_sign = -1
         else:
             linear_sign = 1
-        traj_linear = [runvel*hz*t for t in time]
+        traj_linear = [runvel*t for t in time]
         # len_traj_linear = len(traj_linear)/num
         # len_second_half = int(len_traj_linear * d_ratio)
         # len_first_half = int(len_traj_linear - len_second_half)

@@ -5,7 +5,7 @@
 #$ bash /home/suzuki/prg/DynamixelSDK/python/src/ay_Dynamixel/robots/dynamixel/fix_usb_latency.sh
 
 import roslib; roslib.load_manifest('rubbing_hand')
-import rospy
+import rospy, rostopic
 rospy.init_node("dynamixel_node")
 
 from rubbing_hand.msg import dynamixel_msg, dynamixel_param_msg
@@ -233,7 +233,13 @@ class TDxlHolding(object):
     #擦り動作用アレイ
     thick_array = self.Gen_thick_array()
 
-    rate= TRate(self.ctrl_rate)
+    rate= rospy.Rate(self.ctrl_rate)
+
+    # topicの配信頻度を取得用
+    # dynamixelの制御Hzをとるのじゃ！
+    # rate, min_delta, max_delta, standard deviation, window number = self.topic_hz.get_hz([/dynamixel_data])
+    self.topic_hz = rostopic.ROSTopicHz(-1)
+    s = rospy.Subscriber('/dynamixel_data', dynamixel_msg, self.topic_hz.callback_hz, callback_args='/dynamixel_data')
 
     #Virtual offset:
     self.trg_offset= 0.0
@@ -346,6 +352,8 @@ class TDxlHolding(object):
       # print(self.trg_pos)
       self.controller(self.trg_pos)
 
+      rate.sleep()
+
       update_fps = 1/(time.time() - start)
 
       #各種パラメータをパブリッシュ
@@ -363,10 +371,8 @@ class TDxlHolding(object):
 
       time_all = time.time() - start
 
-      # # print(time_get, time_all)
+      # print(time_all,"s, ", 1./time_all,"Hz")
       # print(rubbing.interval, rubbing.degree_of_finger)
-
-      # rate.sleep()
 
 #------------------------------------------------------------------------------
 
@@ -399,19 +405,21 @@ def sync_observer():
     cur = dxl[0].ReadXSync("PRESENT_CURRENT")
   return pos, vel, pwm, cur
 
-rubbing = Rubbing()
-rubbing.filename = file_name
-rubbing.read_initial_position()
-inhand = Inhand(rubbing, sub_fv_filtered1_objinfo, sub_fv_smaf)
+
 rospy.Service('Set_interval', SetFloat64, lambda srv:rubbing.Set_interval(srv.data))
 rospy.Service('Go2itv', Set2Float64, lambda srv:rubbing.Go2itv(srv.data1, srv.data2))
 rospy.Service('Go2itv_sin', SetFloat64_array, lambda srv:rubbing.Go2itv_sin(srv.data[0], srv.data[1], srv.data[2], srv.data[3]))
 rospy.Service('Pulse_deformed', SetFloat64_array, lambda srv:rubbing.Pulse_deformed(srv.data[0], srv.data[1], srv.data[2], srv.data[3], srv.data[4]))
-holding= TDxlHolding()
+holding= TDxlHolding(rate=60)
 holding.observer= sync_observer
 holding.controller= syncpos_controller
 for id in range(len(dxl)):
   holding.SetTarget(dxl[id].Position(), dxl[id].Read('GOAL_PWM')*0.9, id)
+rubbing = Rubbing()
+rubbing.filename = file_name
+rubbing.read_initial_position()
+rubbing.holding = holding
+inhand = Inhand(rubbing, sub_fv_filtered1_objinfo, sub_fv_smaf)
 holding.Start()
 trg = 0
 
