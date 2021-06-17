@@ -64,18 +64,18 @@
               ```
 
 
-    2.  ダイナミクセルノード起動
+    2.  ダイナミクセルノード起動  
+        おまじない  
+        USBのlatencyをいい感じに直す？  
+        dynamixelとの通信が爆速になる
+        ```sh
+        $ bash rubbing_hand/scripts/fix_usb_latency.sh [ttyUSBX]
+        ```
+        ノード起動
         ~~~sh
         $ rosrun rubbing_hand dynamixel_thick_node.py 
         ~~~
         USBと電源挿してるか確認
-    
-    - おまじない
-      ```sh
-      $ bash rubbing_hand/scripts/fix_usb_latency.sh [ttyUSBX]
-      ```
-      USBのなんかいい感じの設定
-      ダイナミクセル起動前にどうぞ
 
 -   トピック確認    
     ~~~sh

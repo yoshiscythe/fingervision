@@ -238,7 +238,7 @@ class TDxlHolding(object):
     # topicの配信頻度を取得用
     # dynamixelの制御Hzをとるのじゃ！
     # rate, min_delta, max_delta, standard deviation, window number = self.topic_hz.get_hz([/dynamixel_data])
-    self.topic_hz = rostopic.ROSTopicHz(-1)
+    self.topic_hz = rostopic.ROSTopicHz(600)
     s = rospy.Subscriber('/dynamixel_data', dynamixel_msg, self.topic_hz.callback_hz, callback_args='/dynamixel_data')
 
     #Virtual offset:
@@ -406,10 +406,7 @@ def sync_observer():
   return pos, vel, pwm, cur
 
 
-rospy.Service('Set_interval', SetFloat64, lambda srv:rubbing.Set_interval(srv.data))
-rospy.Service('Go2itv', Set2Float64, lambda srv:rubbing.Go2itv(srv.data1, srv.data2))
-rospy.Service('Go2itv_sin', SetFloat64_array, lambda srv:rubbing.Go2itv_sin(srv.data[0], srv.data[1], srv.data[2], srv.data[3]))
-rospy.Service('Pulse_deformed', SetFloat64_array, lambda srv:rubbing.Pulse_deformed(srv.data[0], srv.data[1], srv.data[2], srv.data[3], srv.data[4]))
+
 holding= TDxlHolding(rate=60)
 holding.observer= sync_observer
 holding.controller= syncpos_controller
@@ -422,6 +419,11 @@ rubbing.holding = holding
 inhand = Inhand(rubbing, sub_fv_filtered1_objinfo, sub_fv_smaf)
 holding.Start()
 trg = 0
+
+rospy.Service('Set_interval', SetFloat64, lambda srv:rubbing.Set_interval(srv.data))
+rospy.Service('Go2itv', Set2Float64, lambda srv:rubbing.Go2itv(srv.data1, srv.data2))
+rospy.Service('Go2itv_sin', SetFloat64_array, lambda srv:rubbing.Go2itv_sin(srv.data[0], srv.data[1], srv.data[2], srv.data[3]))
+rospy.Service('Pulse_deformed', SetFloat64_array, lambda srv:rubbing.Pulse_deformed(srv.data[0], srv.data[1], srv.data[2], srv.data[3], srv.data[4]))
 
 def Search_device(device_name):
   devices = [evdev.InputDevice(fn) for fn in evdev.list_devices()]

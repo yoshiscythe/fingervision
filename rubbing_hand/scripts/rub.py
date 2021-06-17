@@ -41,7 +41,18 @@ class Rubbing():
         self.control_f = False
 
         self.holding = None
-        self.get_current_dynamixel_hz = lambda: self.holding.topic_hz.get_hz(["/dynamixel_data"])[0]
+        self.last_dynamixel_hz = None
+
+    def get_current_dynamixel_hz(self):
+        value = self.holding.topic_hz.get_hz("/dynamixel_data")
+
+        if value is None:
+            return self.last_dynamixel_hz
+        
+        value = value[0]
+        self.last_dynamixel_hz = value
+
+        return value
 
     #条件下での各指の根本角度を計算する
     def calculation_degree(self):
@@ -200,6 +211,7 @@ class Rubbing():
         A = A/2.
         itv_start = self.interval
         hz = float(self.get_current_dynamixel_hz())
+        # print(hz)
         itv_goal = itv_start + (runvel/f)*num
         rad_from_t = lambda t: np.pi*f*(t%(1./f))/(1-d_ratio) if (t%(1./f))*f < 1- d_ratio else np.pi*f*(t%(1./f))/d_ratio + (2 - 1./d_ratio)*np.pi
         run_time = float(num)/f
@@ -211,11 +223,6 @@ class Rubbing():
         else:
             linear_sign = 1
         traj_linear = [runvel*t for t in time]
-        # len_traj_linear = len(traj_linear)/num
-        # len_second_half = int(len_traj_linear * d_ratio)
-        # len_first_half = int(len_traj_linear - len_second_half)
-        # traj_sin_first = [i*rad_per_step for i in range(len_first_half)]
-        # traj_sin_second = [i*rad_per_step for i in range(len_second_half)]
         traj_sin_angle = [rad_from_t(t) for t in time]
         traj_sin = -A*np.cos(traj_sin_angle) + A
         go2itv_array = traj_linear + traj_sin + itv_start

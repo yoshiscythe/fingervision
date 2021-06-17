@@ -56,8 +56,8 @@ class Inhand:
         self.dec_f = [0, 0]
         self.amp_dec = 0.
 
-        self.sin_hz = 80.
-        self.d_ratio = 0.1
+        self.sin_hz = 5.
+        self.d_ratio = 0.5
 
     def Init(self):
         self.amp = self.amp_first
@@ -202,6 +202,7 @@ class Inhand:
             else:
                 self.amp = min(self.amp + self.amp_dec, self.amp_first)
         self.dec_f = [0, 0]
+        # print(self.MV, self.amp, self.sin_hz, 1., self.d_ratio)
         self.rubbing.Pulse_deformed(self.MV, self.amp, self.sin_hz, 1., self.d_ratio)
 
     def Maniloop(self):
