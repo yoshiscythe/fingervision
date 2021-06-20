@@ -48,7 +48,7 @@ class Inhand:
 
         #角速度のログ取り．最近の平均角速度の算出に使う
         self.log = {}
-        self.log["angular_velocity"] = Log(5)
+        self.log["angular_velocity"] = Log(10)
 
         self.remaining_time = 1e6
 
@@ -73,7 +73,7 @@ class Inhand:
         self.pub_is_running = True
         self.Start_pub()
 
-        self.margin_time_2stop = 0.2
+        self.margin_time_2stop = 1./60*5
 
         self.amp_first = 3.
         self.dec_f = [0, 0]
@@ -87,6 +87,7 @@ class Inhand:
         self.dec_f = [0, 0]
         self.log["angular_velocity"].clear()
         self.remaining_time = 1e6
+        self.time_stamp2stop = time.time()
 
     #インハンドマニピュレーションを開始する関数
     #Maniloop関数をスレッドで実行
@@ -233,14 +234,18 @@ class Inhand:
         self.rubbing.Pulse_deformed(self.MV, self.amp, self.sin_hz, 1., self.d_ratio)
 
     def Process_always(self):
-        cuur_angular_velocity = self.log["angular_velocity"].get_log()
-        mean_angular_velocity = sum(cuur_angular_velocity)/len(cuur_angular_velocity)
+        # cuur_angular_velocity = self.log["angular_velocity"].get_log()
+        # mean_angular_velocity = sum(cuur_angular_velocity)/len(cuur_angular_velocity)
+        mean_angular_velocity = self.get_omega()
+        mean_angular_velocity = max(1e-3, mean_angular_velocity)
         angle = self.get_theta()
         remaining_time_ = (self.target_angle-angle)/mean_angular_velocity
         # self.remaining_time = min(self.remaining_time, remaining_time_)
-        if self.remaining_time > remaining_time_:
-            self.remaining_time = remaining_time_
-            self.time_stamp2stop = time.time()
+        self.remaining_time = remaining_time_
+        self.time_stamp2stop = time.time()
+        debug_estimated_angle = self.get_theta() + mean_angular_velocity*self.margin_time_2stop
+        self.debug_array = [mean_angular_velocity, self.remaining_time, debug_estimated_angle]
+        # print(mean_angular_velocity, self.remaining_time)
 
 
     def Maniloop(self):
