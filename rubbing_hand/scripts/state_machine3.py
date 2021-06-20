@@ -27,6 +27,7 @@ class TStateMachine(object):
       self.Actions= []
       self.Else= None
       self.Deny= None
+      self.Process = None
 
   def LoadState(self, state):
     actions= self.TAction()
@@ -42,6 +43,9 @@ class TStateMachine(object):
       elif action[0]=="deny":
         if len(action)==2: actions.Deny=action[1]
         else:  raise Exception('Invalid state description.')
+      elif action[0]=='process':
+        if len(action)!=2:  raise Exception('Invalid state description.')
+        actions.Process= action[1]  #Action
       else:
         if len(action)==2:  actions.Actions.append((action[0],action[1],None))  #Condition, next state, no action
         elif len(action)==3:  actions.Actions.append((action[0],action[1],action[2]))  #Condition, next state, action
@@ -66,11 +70,15 @@ class TStateMachine(object):
       next_state= ''
 
       #"always"処理
-      #curr_stateがdenyリストに入っていなければ，alwaysのactionをcurr_stateアクションの前へ挿し込む
+      #curr_stateがdenyリストに入っていなければ，
+      #alwaysのactionをcurr_stateアクションの前へ挿し込む
+      #また，processがあればそれを行う
       if "always" in self.States:
         actions_always= self.LoadState("always")
         if self.curr_state not in actions_always.Deny:
           actions.Actions = actions_always.Actions + actions.Actions
+          if actions_always.Process:
+            actions_always.Process()
         else:
           pass
       else:

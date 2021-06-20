@@ -50,6 +50,8 @@ class Inhand:
         self.log = {}
         self.log["angular_velocity"] = Log(5)
 
+        self.remaining_time = 1e6
+
         self.target_angle = 60.
         # self.min_gstep = 0.01
         self.th_slip = 0.0001
@@ -71,6 +73,8 @@ class Inhand:
         self.pub_is_running = True
         self.Start_pub()
 
+        self.margin_time_2stop = 0.2
+
         self.amp_first = 3.
         self.dec_f = [0, 0]
         self.amp_dec = 0.
@@ -82,6 +86,7 @@ class Inhand:
         self.amp = self.amp_first
         self.dec_f = [0, 0]
         self.log["angular_velocity"].clear()
+        self.remaining_time = 1e6
 
     #インハンドマニピュレーションを開始する関数
     #Maniloop関数をスレッドで実行
@@ -227,6 +232,17 @@ class Inhand:
         # print(self.MV, self.amp, self.sin_hz, 1., self.d_ratio)
         self.rubbing.Pulse_deformed(self.MV, self.amp, self.sin_hz, 1., self.d_ratio)
 
+    def Process_always(self):
+        cuur_angular_velocity = self.log["angular_velocity"].get_log()
+        mean_angular_velocity = sum(cuur_angular_velocity)/len(cuur_angular_velocity)
+        angle = self.get_theta()
+        remaining_time_ = (self.target_angle-angle)/mean_angular_velocity
+        # self.remaining_time = min(self.remaining_time, remaining_time_)
+        if self.remaining_time > remaining_time_:
+            self.remaining_time = remaining_time_
+            self.time_stamp2stop = time.time()
+
+
     def Maniloop(self):
         self.Set_open_step()
 
@@ -265,7 +281,6 @@ class Inhand:
             ],
             'judge': [
             ('entry',lambda: self.calculate_omega_d()),
-            (lambda: self.get_theta()>self.target_angle,'finish',lambda: Print('over target theta!')),
             (lambda: self.omega_d <= self.MV_i[0],'open'),
             (lambda: self.MV_i[1] < self.omega_d,'close'),
             (lambda: self.MV_i[0] < self.omega_d <= self.MV_i[1],'stay'),
@@ -278,21 +293,18 @@ class Inhand:
             ],
             'close': [
             ('entry',lambda: (self.Substitution_MV(self.MV_o[1]),self.rubbing.Set_interval(self.rubbing.interval), self.rubbing.Go2itv(self.rubbing.interval-10, self.MV))),
-            (lambda: self.get_theta()>self.target_angle,'finish',lambda: Print('over target theta!')),
             (lambda: not self.MV_i[1] < self.calculate_omega_d(),'judge'),
             (lambda: not self.rubbing.go2itv_f,'wait'),
             ('else','close'),
             ],
             'wait': [
             ('entry',lambda:(self.Substitution_MV(0), GetStartTime())),
-            (lambda: self.get_theta()>self.target_angle,'finish',lambda: Print('over target theta!')),
             (lambda: self.calculate_omega_d() >= self.MV_i[1],'judge'),
             (lambda: (int(time.time())-start_time)>=2,'judge'),
             ('else','wait'),
             ],
             'stay': [
             ('entry',lambda: self.Substitution_MV(0)),
-            (lambda: self.get_theta()>self.target_angle,'finish',lambda: Print('over target theta!')),
             (lambda: not self.MV_i[0] < self.calculate_omega_d() <= self.MV_i[1],'judge'),
             ('else','stay'),
             ],
@@ -302,6 +314,8 @@ class Inhand:
             ],
             'always': [
             ('deny',["start", "finish"]),
+            ("process", lambda: self.Process_always()),
+            (lambda: (self.remaining_time - (time.time()-self.time_stamp2stop)) < self.margin_time_2stop,'finish',lambda: Print('over target theta is estimated!')),
             (lambda: self.get_theta()>self.target_angle,'finish',lambda: Print('over target theta! in always state')),
             ]
         }
