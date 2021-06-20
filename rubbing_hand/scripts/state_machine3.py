@@ -25,6 +25,7 @@ class TStateMachine(object):
       self.Entry= None
       self.Actions= []
       self.Else= None
+      self.Deny= None
 
   def LoadState(self, state):
     actions= self.TAction()
@@ -36,6 +37,9 @@ class TStateMachine(object):
       elif action[0]=='else':
         if len(action)==2:  actions.Else= (action[1],None)  #Next state, no action
         elif len(action)==3:  actions.Else= (action[1],action[2])  #Next state, action
+        else:  raise Exception('Invalid state description.')
+      elif action[0]=="deny":
+        if len(action)==2: action.Deny=action[1]
         else:  raise Exception('Invalid state description.')
       else:
         if len(action)==2:  actions.Actions.append((action[0],action[1],None))  #Condition, next state, no action
@@ -59,6 +63,18 @@ class TStateMachine(object):
 
       a_id_satisfied= -1
       next_state= ''
+
+      #"always"処理
+      #curr_stateがdenyリストに入っていなければ，alwaysのactionをcurr_stateアクションの前へ挿し込む
+      if "always" in self.States:
+        actions_always= self.LoadState("always")
+        if self.curr_state not in actions_always.Deny:
+          actions.Actions = actions_always.Actions + actions.Actions
+        else:
+          pass
+      else:
+        pass
+
       for a_id,(condition,next_st,action) in enumerate(actions.Actions):
         if condition():
           if a_id_satisfied>=0:
@@ -128,6 +144,10 @@ if __name__=='__main__':
       ('entry',lambda: Print('Finishing state machine')),
       ('else','.exit'),
       ],
+      'always': [
+      (lambda: Print("Want to stop?") or AskYesNo(),'stop', lambda: Print("to stop")),
+      ('deny',['start',"stop"]),
+      ]
     }
 
   sm= TStateMachine(states,'start')

@@ -13,6 +13,21 @@ roslib.load_manifest('rubbing_hand')
 from rubbing_hand.srv import *
 from rubbing_hand.msg import *
 
+class Log():
+    def __init__(self, length = 101):
+        self.log = []
+        self.length = length
+
+    def storing(self, data):
+        self.log.append(data)
+        if len(self.log)>self.length: self.log.pop(0)
+    
+    def get_log(self):
+        return self.log
+
+    def clear(self):
+        self.log = []
+
 class Inhand:
     def __init__(self, rubbing, sub_fv_filtered1_objinfo, sub_fv_smaf):
         self.is_running= False
@@ -24,12 +39,15 @@ class Inhand:
         self.get_theta = lambda: -np.degrees(self.sub_fv_filtered1_objinfo.req.obj_orientation)
         #get the angle velocity of object
         self.get_omega = lambda: -self.sub_fv_smaf.req.data[1]
-        # self.get_omega = lambda: np.degrees(self.sub_fv_filtered1_objinfo.req.d_obj_orientation)
+        self.get_raw_omega = lambda: np.degrees(self.sub_fv_filtered1_objinfo.req.d_obj_orientation)
         self.get_alpha = lambda: -self.sub_fv_smaf.req.data[4]
         #get the slip of object
         self.get_slip = lambda: sum(self.sub_fv_filtered1_objinfo.req.mv_s)
         self.MV = 0
         self.omega_d = 0
+
+        #角速度のログ取り．最近の平均角速度の算出に使う
+        self.log["angular_velocity"] = Log(5)
 
         self.target_angle = 60.
         # self.min_gstep = 0.01
@@ -62,6 +80,7 @@ class Inhand:
     def Init(self):
         self.amp = self.amp_first
         self.dec_f = [0, 0]
+        self.log["angular_velocity"].clear()
 
     #インハンドマニピュレーションを開始する関数
     #Maniloop関数をスレッドで実行
@@ -110,11 +129,13 @@ class Inhand:
 
     #インハンドマニピュレーションでつかったデータをpublishする関数
     #スレッドで使うことを想定
+    #ついでに角速度をスタックして最近の平均角速度の算出用にする
     def publish_inhand_data(self):
         r = rospy.Rate(self.hz)
         while self.pub_is_running and not rospy.is_shutdown():
             inhand_msg = self.generate_inhand_msg()
             self.inhand_pub.publish(inhand_msg)
+            self.log["angular_velocity"].storing(self.get_raw_omega())
             r.sleep()
 
     #インハンドマニピュレーションでつかったデータをまとめて、inhand_msgを生成する
@@ -236,96 +257,6 @@ class Inhand:
             global start_time
             start_time= int(time.time())
 
-        # states= {
-        #     'start': [
-        #     ('entry',lambda: Print('start inhand manipulation')),
-        #     ('else','judge'),
-        #     ],
-        #     'judge': [
-        #     ('entry',lambda: self.calculate_omega_d()),
-        #     (lambda: self.omega_d <= self.MV_i[0],'open'),
-        #     (lambda: self.MV_i[1] < self.omega_d,'close'),
-        #     (lambda: self.MV_i[0] < self.omega_d <= self.MV_i[1],'stay'),
-        #     ('else','judge',lambda: Print('judge failed, omega_d:'+str(self.omega_d))),
-        #     ],
-        #     'open': [
-        #     ('entry',lambda: (self.Substitution_MV(self.MV_o[0]), self.rubbing.Go2itv(self.rubbing.interval+0.2, self.MV))),
-        #     (lambda: self.get_theta()>self.target_angle,'finish',lambda: Print('over target theta!')),
-        #     (lambda: not self.calculate_omega_d() <= self.MV_i[0],'judge'),
-        #     (lambda: not self.rubbing.go2itv_f,'wait',lambda: Print('to wait')),
-        #     ('else','open'),
-        #     ],
-        #     'close': [
-        #     ('entry',lambda: (self.Substitution_MV(self.MV_o[1]), self.rubbing.Go2itv(self.rubbing.interval-0.2, self.MV))),
-        #     (lambda: self.get_theta()>self.target_angle,'finish',lambda: Print('over target theta!')),
-        #     (lambda: not self.MV_i[1] < self.calculate_omega_d(),'judge'),
-        #     (lambda: not self.rubbing.go2itv_f,'wait'),
-        #     ('else','close'),
-        #     ],
-        #     'wait': [
-        #     ('entry',lambda:(self.Substitution_MV(0), GetStartTime())),
-        #     (lambda: self.get_theta()>self.target_angle,'finish',lambda: Print('over target theta!')),
-        #     (lambda: self.calculate_omega_d() >= self.MV_i[1],'judge'),
-        #     (lambda: (int(time.time())-start_time)>=2,'judge'),
-        #     ('else','wait'),
-        #     ],
-        #     'stay': [
-        #     ('entry',lambda: self.Substitution_MV(0)),
-        #     (lambda: self.get_theta()>self.target_angle,'finish',lambda: Print('over target theta!')),
-        #     (lambda: not self.MV_i[0] < self.calculate_omega_d() <= self.MV_i[1],'judge'),
-        #     ('else','stay'),
-        #     ],
-        #     'finish': [
-        #     ('entry',lambda: (self.Substitution_MV(0), Print('Finishing state machine'))),
-        #     ('else','.exit'),
-        #     ],
-        # }
-
-        # states= {
-        #     'start': [
-        #     ('entry',lambda: Print('start inhand manipulation')),
-        #     ('else','judge'),
-        #     ],
-        #     'judge': [
-        #     ('entry',lambda: self.calculate_omega_d()),
-        #     (lambda: self.omega_d <= self.MV_i[0],'open'),
-        #     (lambda: self.MV_i[1] < self.omega_d,'close'),
-        #     (lambda: self.MV_i[0] < self.omega_d <= self.MV_i[1],'stay'),
-        #     ('else','judge',lambda: Print('judge failed, omega_d:'+str(self.omega_d))),
-        #     ],
-        #     'open': [
-        #     ('entry',lambda: (self.Substitution_MV(self.MV_o[0]), self.rubbing.Go2itv_sin(self.rubbing.interval+5, self.MV, 0.5, 5.))),
-        #     (lambda: self.get_theta()>self.target_angle,'finish',lambda: Print('over target theta!')),
-        #     (lambda: not self.calculate_omega_d() <= self.MV_i[0],'judge'),
-        #     (lambda: not self.rubbing.go2itv_f,'judge'),
-        #     ('else','open'),
-        #     ],
-        #     'close': [
-        #     ('entry',lambda: (self.Substitution_MV(self.MV_o[1]),self.rubbing.Set_interval(self.rubbing.interval-1), self.rubbing.Go2itv(self.rubbing.interval-10, self.MV))),
-        #     (lambda: self.get_theta()>self.target_angle,'finish',lambda: Print('over target theta!')),
-        #     (lambda: not self.MV_i[1] < self.calculate_omega_d(),'judge'),
-        #     (lambda: not self.rubbing.go2itv_f,'wait'),
-        #     ('else','close'),
-        #     ],
-        #     'wait': [
-        #     ('entry',lambda:(self.Substitution_MV(0), GetStartTime())),
-        #     (lambda: self.get_theta()>self.target_angle,'finish',lambda: Print('over target theta!')),
-        #     (lambda: self.calculate_omega_d() >= self.MV_i[1],'judge'),
-        #     (lambda: (int(time.time())-start_time)>=2,'judge'),
-        #     ('else','wait'),
-        #     ],
-        #     'stay': [
-        #     ('entry',lambda: self.Substitution_MV(0)),
-        #     (lambda: self.get_theta()>self.target_angle,'finish',lambda: Print('over target theta!')),
-        #     (lambda: not self.MV_i[0] < self.calculate_omega_d() <= self.MV_i[1],'judge'),
-        #     ('else','stay'),
-        #     ],
-        #     'finish': [
-        #     ('entry',lambda: (self.Substitution_MV(0), Print('Finishing state machine'))),
-        #     ('else','.exit'),
-        #     ],
-        # }
-
         states= {
             'start': [
             ('entry',lambda: Print('start inhand manipulation')),
@@ -368,6 +299,10 @@ class Inhand:
             ('entry',lambda: (self.Substitution_MV(0), Print('Finishing state machine'))),
             ('else','.exit'),
             ],
+            'always': [
+            ('deny',["start", "finish"]),
+            (lambda: self.get_theta()>self.target_angle,'finish',lambda: Print('over target theta! in always state')),
+            ]
         }
 
         sm= TStateMachine(states,'start', debug=False)
