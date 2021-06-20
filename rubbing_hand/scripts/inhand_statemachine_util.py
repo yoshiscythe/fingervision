@@ -242,7 +242,6 @@ class Inhand:
         remaining_time_ = (self.target_angle-angle)/mean_angular_velocity
         # self.remaining_time = min(self.remaining_time, remaining_time_)
         self.remaining_time = remaining_time_
-        self.time_stamp2stop = time.time()
         debug_estimated_angle = self.get_theta() + mean_angular_velocity*self.margin_time_2stop
         self.debug_array = [mean_angular_velocity, self.remaining_time, debug_estimated_angle]
         # print(mean_angular_velocity, self.remaining_time)
@@ -320,7 +319,7 @@ class Inhand:
             'always': [
             ('deny',["start", "finish"]),
             ("process", lambda: self.Process_always()),
-            (lambda: (self.remaining_time - (time.time()-self.time_stamp2stop)) < self.margin_time_2stop,'finish',lambda: Print('over target theta is estimated!')),
+            (lambda: self.remaining_time < self.margin_time_2stop,'finish',lambda: Print('over target theta is estimated!')),
             (lambda: self.get_theta()>self.target_angle,'finish',lambda: Print('over target theta! in always state')),
             ]
         }
