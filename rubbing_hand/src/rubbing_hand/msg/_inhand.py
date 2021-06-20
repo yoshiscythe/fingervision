@@ -9,7 +9,7 @@ import struct
 import std_msgs.msg
 
 class inhand(genpy.Message):
-  _md5sum = "a2d1a8e0bef86be5420a343697b29d8b"
+  _md5sum = "266b6584c02ea6d87499d928f5c0eec9"
   _type = "rubbing_hand/inhand"
   _has_header = True  # flag to mark the presence of a Header object
   _full_text = """Header header
@@ -68,6 +68,10 @@ float64 th_slip
 float64[] MV_i
 float64[] MV_o
 
+# マニピュレーション実行区間を表すフラグ
+# 0: してない， 1:マニピュレーション終了後の数秒間， 2:マニピュレーション中
+int32 process_f
+
 # -------------------------
 
 # なんでも入れていいよ
@@ -88,8 +92,8 @@ time stamp
 #Frame this data is associated with
 string frame_id
 """
-  __slots__ = ['header','interval','MV','mv_s','obj_orientation','obj_orientation_filtered','d_obj_orientation_filtered','target_obj_orientation','target_d_obj_orientation','omega_d','th_slip','MV_i','MV_o','debag']
-  _slot_types = ['std_msgs/Header','float64','float64','float32[]','float64','float64','float64','float64','float64','float64','float64','float64[]','float64[]','float64[]']
+  __slots__ = ['header','interval','MV','mv_s','obj_orientation','obj_orientation_filtered','d_obj_orientation_filtered','target_obj_orientation','target_d_obj_orientation','omega_d','th_slip','MV_i','MV_o','process_f','debag']
+  _slot_types = ['std_msgs/Header','float64','float64','float32[]','float64','float64','float64','float64','float64','float64','float64','float64[]','float64[]','int32','float64[]']
 
   def __init__(self, *args, **kwds):
     """
@@ -99,7 +103,7 @@ string frame_id
     changes.  You cannot mix in-order arguments and keyword arguments.
 
     The available fields are:
-       header,interval,MV,mv_s,obj_orientation,obj_orientation_filtered,d_obj_orientation_filtered,target_obj_orientation,target_d_obj_orientation,omega_d,th_slip,MV_i,MV_o,debag
+       header,interval,MV,mv_s,obj_orientation,obj_orientation_filtered,d_obj_orientation_filtered,target_obj_orientation,target_d_obj_orientation,omega_d,th_slip,MV_i,MV_o,process_f,debag
 
     :param args: complete set of field values, in .msg order
     :param kwds: use keyword arguments corresponding to message field names
@@ -134,6 +138,8 @@ string frame_id
         self.MV_i = []
       if self.MV_o is None:
         self.MV_o = []
+      if self.process_f is None:
+        self.process_f = 0
       if self.debag is None:
         self.debag = []
     else:
@@ -150,6 +156,7 @@ string frame_id
       self.th_slip = 0.
       self.MV_i = []
       self.MV_o = []
+      self.process_f = 0
       self.debag = []
 
   def _get_types(self):
@@ -188,6 +195,8 @@ string frame_id
       buff.write(_struct_I.pack(length))
       pattern = '<%sd'%length
       buff.write(struct.Struct(pattern).pack(*self.MV_o))
+      _x = self.process_f
+      buff.write(_get_struct_i().pack(_x))
       length = len(self.debag)
       buff.write(_struct_I.pack(length))
       pattern = '<%sd'%length
@@ -253,6 +262,9 @@ string frame_id
       self.MV_o = s.unpack(str[start:end])
       start = end
       end += 4
+      (self.process_f,) = _get_struct_i().unpack(str[start:end])
+      start = end
+      end += 4
       (length,) = _struct_I.unpack(str[start:end])
       pattern = '<%sd'%length
       start = end
@@ -295,6 +307,8 @@ string frame_id
       buff.write(_struct_I.pack(length))
       pattern = '<%sd'%length
       buff.write(self.MV_o.tostring())
+      _x = self.process_f
+      buff.write(_get_struct_i().pack(_x))
       length = len(self.debag)
       buff.write(_struct_I.pack(length))
       pattern = '<%sd'%length
@@ -361,6 +375,9 @@ string frame_id
       self.MV_o = numpy.frombuffer(str[start:end], dtype=numpy.float64, count=length)
       start = end
       end += 4
+      (self.process_f,) = _get_struct_i().unpack(str[start:end])
+      start = end
+      end += 4
       (length,) = _struct_I.unpack(str[start:end])
       pattern = '<%sd'%length
       start = end
@@ -393,3 +410,9 @@ def _get_struct_7d():
     if _struct_7d is None:
         _struct_7d = struct.Struct("<7d")
     return _struct_7d
+_struct_i = None
+def _get_struct_i():
+    global _struct_i
+    if _struct_i is None:
+        _struct_i = struct.Struct("<i")
+    return _struct_i

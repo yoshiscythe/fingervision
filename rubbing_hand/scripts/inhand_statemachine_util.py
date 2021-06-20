@@ -88,6 +88,7 @@ class Inhand:
         self.log["angular_velocity"].clear()
         self.remaining_time = 1e6
         self.time_stamp2stop = time.time()
+        self.process_f = 0
 
     #インハンドマニピュレーションを開始する関数
     #Maniloop関数をスレッドで実行
@@ -163,6 +164,7 @@ class Inhand:
         inhand_msg.th_slip = self.th_slip
         inhand_msg.MV_i = self.MV_i
         inhand_msg.MV_o = self.MV_o
+        inhand_msg.process_f = self.process_f
         inhand_msg.debag = self.debug_array
 
         return inhand_msg
@@ -325,14 +327,17 @@ class Inhand:
         }
 
         sm= TStateMachine(states,'start', debug=False)
+        self.process_f = 2
         sm.Run()
 
-        self.rubbing.Set_interval(20)
+        self.rubbing.Set_interval(25)
+        self.process_f = 1
         rospy.sleep(0.5)
         avg_angle = 0
         for i in range(60):
             avg_angle += self.get_theta()
             r.sleep()
+        self.process_f = 0
         avg_angle /= 60
         elapsed_time = time.time() - time_start
         # hyoka = omega_d_i/(time.time()-rotation_start)

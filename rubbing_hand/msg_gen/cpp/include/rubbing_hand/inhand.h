@@ -36,6 +36,7 @@ struct inhand_ {
   , th_slip(0.0)
   , MV_i()
   , MV_o()
+  , process_f(0)
   , debag()
   {
   }
@@ -54,6 +55,7 @@ struct inhand_ {
   , th_slip(0.0)
   , MV_i(_alloc)
   , MV_o(_alloc)
+  , process_f(0)
   , debag(_alloc)
   {
   }
@@ -97,6 +99,9 @@ struct inhand_ {
   typedef std::vector<double, typename ContainerAllocator::template rebind<double>::other >  _MV_o_type;
   std::vector<double, typename ContainerAllocator::template rebind<double>::other >  MV_o;
 
+  typedef int32_t _process_f_type;
+  int32_t process_f;
+
   typedef std::vector<double, typename ContainerAllocator::template rebind<double>::other >  _debag_type;
   std::vector<double, typename ContainerAllocator::template rebind<double>::other >  debag;
 
@@ -128,12 +133,12 @@ template<class ContainerAllocator>
 struct MD5Sum< ::rubbing_hand::inhand_<ContainerAllocator> > {
   static const char* value() 
   {
-    return "a2d1a8e0bef86be5420a343697b29d8b";
+    return "266b6584c02ea6d87499d928f5c0eec9";
   }
 
   static const char* value(const  ::rubbing_hand::inhand_<ContainerAllocator> &) { return value(); } 
-  static const uint64_t static_value1 = 0xa2d1a8e0bef86be5ULL;
-  static const uint64_t static_value2 = 0x420a343697b29d8bULL;
+  static const uint64_t static_value1 = 0x266b6584c02ea6d8ULL;
+  static const uint64_t static_value2 = 0x7499d928f5c0eec9ULL;
 };
 
 template<class ContainerAllocator>
@@ -206,6 +211,10 @@ float64 th_slip\n\
 float64[] MV_i\n\
 float64[] MV_o\n\
 \n\
+# マニピュレーション実行区間を表すフラグ\n\
+# 0: してない， 1:マニピュレーション終了後の数秒間， 2:マニピュレーション中\n\
+int32 process_f\n\
+\n\
 # -------------------------\n\
 \n\
 # なんでも入れていいよ\n\
@@ -259,6 +268,7 @@ template<class ContainerAllocator> struct Serializer< ::rubbing_hand::inhand_<Co
     stream.next(m.th_slip);
     stream.next(m.MV_i);
     stream.next(m.MV_o);
+    stream.next(m.process_f);
     stream.next(m.debag);
   }
 
@@ -316,6 +326,8 @@ s << std::endl;
       s << indent << "  MV_o[" << i << "]: ";
       Printer<double>::stream(s, indent + "  ", v.MV_o[i]);
     }
+    s << indent << "process_f: ";
+    Printer<int32_t>::stream(s, indent + "  ", v.process_f);
     s << indent << "debag[]" << std::endl;
     for (size_t i = 0; i < v.debag.size(); ++i)
     {

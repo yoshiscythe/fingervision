@@ -17,6 +17,11 @@ set(CMAKE_TARGET_DEFINITIONS_CXX
 # The include file search paths:
 set(CMAKE_CXX_TARGET_INCLUDE_PATH
   "/home/suzuki/ros_ws/ay_tools/fingervision/suzuki/rubbing_hand/include"
+  "/home/suzuki/ros_ws/ay_tools/fingervision/fingervision/include"
+  "/home/suzuki/ros_ws/ay_tools/fingervision/fingervision/../3rdparty"
+  "/home/suzuki/ros_ws/ay_tools/fingervision/fingervision_msgs/msg_gen/cpp/include"
+  "/home/suzuki/ros_ws/ay_tools/fingervision/fingervision_msgs/srv_gen/cpp/include"
+  "/opt/ros/melodic/include"
   "/usr/src/googletest/googletest/include"
   "/usr/src/googletest/googletest"
   )

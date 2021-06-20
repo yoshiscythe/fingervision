@@ -16,7 +16,7 @@ class Rubbing():
         #二指の中間面の中心からの移動
         self.surface_pos = 0
         #二指間の距離
-        self.interval = 20.
+        self.interval = 25.
         #仮想面の傾き(degree)
         self.degree_of_surface = 0.0
         #指先の傾き
@@ -163,11 +163,25 @@ class Rubbing():
         self.degree_of_finger = self.interval*(-0.44) + 15.2
         # --------------------------------------------------
 
+        # # --------------------------------------------------
+        # # CAVS thick
+        # min_deg = 1.
+        # max_deg = 6.0
+        # self.degree_of_finger = self.interval*(-0.44) + 23.2
+        # # --------------------------------------------------
+
         # # -----------------------------------------------------
         # # FLAT
         # min_deg = 2
         # max_deg = 7
         # self.degree_of_finger = self.interval*(-0.585) + 16.2
+        # # -----------------------------------------------------
+
+        # # -----------------------------------------------------
+        # # FLAT thick
+        # min_deg = 2
+        # max_deg = 7
+        # self.degree_of_finger = self.interval*(-0.585) + 24.2
         # # -----------------------------------------------------
 
         if self.degree_of_finger > max_deg:

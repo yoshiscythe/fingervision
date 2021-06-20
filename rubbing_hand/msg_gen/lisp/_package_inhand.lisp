@@ -25,6 +25,8 @@
           MV_I
           MV_O-VAL
           MV_O
+          PROCESS_F-VAL
+          PROCESS_F
           DEBAG-VAL
           DEBAG
 ))
