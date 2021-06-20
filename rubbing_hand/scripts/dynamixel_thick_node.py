@@ -33,7 +33,7 @@ file_name = "/home/suzuki/ros_ws/ay_tools/fingervision/suzuki/rubbing_hand/scrip
 data_pub = rospy.Publisher("dynamixel_data", dynamixel_msg, queue_size=1)
 param_pub = rospy.Publisher("dynamixel_param", dynamixel_param_msg, queue_size=1)
 
-#subscribe設定
+#subscribe設定 
 sub_fv_prox = Subscribe("ProxVision")
 sub_fv_filtered1_objinfo = Subscribe("Filter1ObjInfo")
 sub_fv_smaf = Subscribe("fv_smaf")
