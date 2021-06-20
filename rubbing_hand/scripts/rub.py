@@ -16,7 +16,7 @@ class Rubbing():
         #二指の中間面の中心からの移動
         self.surface_pos = 0
         #二指間の距離
-        self.interval = 25.
+        self.interval = 20.
         #仮想面の傾き(degree)
         self.degree_of_surface = 0.0
         #指先の傾き

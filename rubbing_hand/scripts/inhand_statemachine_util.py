@@ -331,7 +331,7 @@ class Inhand:
         self.process_f = 2
         sm.Run()
 
-        self.rubbing.Set_interval(25)
+        self.rubbing.Set_interval(20)
         self.process_f = 1
         rospy.sleep(0.5)
         avg_angle = 0
