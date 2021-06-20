@@ -47,6 +47,7 @@ class Inhand:
         self.omega_d = 0
 
         #角速度のログ取り．最近の平均角速度の算出に使う
+        self.log = {}
         self.log["angular_velocity"] = Log(5)
 
         self.target_angle = 60.

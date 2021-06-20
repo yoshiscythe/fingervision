@@ -1,4 +1,5 @@
 #!/usr/bin/python
+#coding: utf-8
 #\file    state_machine3.py
 #\brief   State machine ver.3
 #\author  Akihiko Yamaguchi, info@akihikoy.net
@@ -39,7 +40,7 @@ class TStateMachine(object):
         elif len(action)==3:  actions.Else= (action[1],action[2])  #Next state, action
         else:  raise Exception('Invalid state description.')
       elif action[0]=="deny":
-        if len(action)==2: action.Deny=action[1]
+        if len(action)==2: actions.Deny=action[1]
         else:  raise Exception('Invalid state description.')
       else:
         if len(action)==2:  actions.Actions.append((action[0],action[1],None))  #Condition, next state, no action
