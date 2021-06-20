@@ -65,6 +65,7 @@ class Inhand:
         # self.tmp_pub = rospy.Publisher(rospy.get_namespace()+"tmp", Float64, queue_size=1)
 
         self.debug_array = []
+        self.process_f = 0
 
         self.rubbing.itv_min=5
 
