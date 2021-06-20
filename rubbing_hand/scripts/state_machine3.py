@@ -6,6 +6,8 @@
 #\date    Mar.01, 2021
 #https://github.com/akihikoy/ay_test/blob/master/python/algorithms/state_machines/state_machine3.py
 
+import rospy
+
 def Print(*args):
   print ' '.join(map(str,args))
 CPrint= Print
@@ -16,6 +18,7 @@ class TStateMachine(object):
     self.States= states
     self.StartState= start_state
     self.Debug= debug
+    self.r = rospy.Rate(120)
 
   class TAction(object):
     def __init__(self):
@@ -93,6 +96,7 @@ class TStateMachine(object):
         self.prev_state= self.curr_state
         self.curr_state= next_state
 
+      self.r.sleep()
 
 if __name__=='__main__':
   import time,sys
