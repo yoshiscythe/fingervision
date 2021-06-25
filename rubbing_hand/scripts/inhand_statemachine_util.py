@@ -7,6 +7,7 @@ import rospy
 from rub import PID
 import time
 from state_machine3 import TStateMachine
+import matplotlib as plt
 
 import roslib
 roslib.load_manifest('rubbing_hand')
@@ -144,7 +145,7 @@ class Inhand:
         while self.pub_is_running and not rospy.is_shutdown():
             inhand_msg = self.generate_inhand_msg()
             self.inhand_pub.publish(inhand_msg)
-            self.log["angular_velocity"].storing(self.get_raw_omega())
+            self.log["angular_velocity"].storing(self.get_omega())
             r.sleep()
 
     #インハンドマニピュレーションでつかったデータをまとめて、inhand_msgを生成する
@@ -237,18 +238,48 @@ class Inhand:
         self.rubbing.Pulse_deformed(self.MV, self.amp, self.sin_hz, 1., self.d_ratio)
 
     def Process_always(self):
-        # cuur_angular_velocity = self.log["angular_velocity"].get_log()
-        # mean_angular_velocity = sum(cuur_angular_velocity)/len(cuur_angular_velocity)
+        # ------------------------------------------------------------------
+        cuur_angular_velocity = self.log["angular_velocity"].get_log()
+        estimated_angle_ = self.ApproximateOmega(cuur_angular_velocity)
+        # ------------------------------------------------------------------
+
+        # ------------------------------------------------------------------
         mean_angular_velocity = self.get_omega()
         mean_angular_velocity = max(1e-3, mean_angular_velocity)
         angle = self.get_theta()
         remaining_time_ = (self.target_angle-angle)/mean_angular_velocity
-        # self.remaining_time = min(self.remaining_time, remaining_time_)
-        self.remaining_time = remaining_time_
-        debug_estimated_angle = self.get_theta() + mean_angular_velocity*self.margin_time_2stop
-        self.debug_array = [mean_angular_velocity, self.remaining_time, debug_estimated_angle]
+        estimated_angle_ = self.get_theta() + mean_angular_velocity*self.margin_time_2stop
+        # ------------------------------------------------------------------
+
+        self.estimated_angle = estimated_angle_
+        debug_estimated_angle = estimated_angle_
+        self.debug_array = [mean_angular_velocity, debug_estimated_angle]
         # print(mean_angular_velocity, self.remaining_time)
 
+    def ApproximateOmega(self, omega_array, plotGraph = False):
+        y = np.array(omega_array)
+        # x_array = [-len(omega_array), -len(omega_array)+1, ... , 0]
+        x = np.flip(np.arange(len(y)*-1))
+        x_over = np.append(x, np.arange(1,11))
+
+        #近似式の係数
+        res1=np.polyfit(x, y, 1)
+        res2=np.polyfit(x, y, 2)
+        res3=np.polyfit(x, y, 3)
+        #近似式の計算
+        y1 = np.poly1d(res1)(x_overx) #1次
+        y2 = np.poly1d(res2)(x_over) #2次
+        y3 = np.poly1d(res3)(x_over) #3次
+        
+        if plotGraph:
+            plt.scatter(x, y, label='元データ')
+            plt.plot(x_over, y1, label='1次')
+            plt.plot(x_over, y2, label='2次')
+            plt.plot(x_over, y3, label='3次')
+            plt.legend()
+            plt.show()
+        
+        return y3[-1]
 
     def Maniloop(self):
         self.Set_open_step()
@@ -322,7 +353,7 @@ class Inhand:
             'always': [
             ('deny',["start", "finish"]),
             ("process", lambda: self.Process_always()),
-            (lambda: self.remaining_time < self.margin_time_2stop,'finish',lambda: Print('over target theta is estimated!')),
+            (lambda: self.estimated_angle > self.target_angle,'finish',lambda: Print('over target theta is estimated!')),
             (lambda: self.get_theta()>self.target_angle,'finish',lambda: Print('over target theta! in always state')),
             ]
         }
