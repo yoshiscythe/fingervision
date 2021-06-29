@@ -241,25 +241,31 @@ class Inhand:
         # ------------------------------------------------------------------
         cuur_angular_velocity = self.log["angular_velocity"].get_log()
         estimated_angle_ = self.ApproximateOmega(cuur_angular_velocity)
+        mean_angular_velocity_=cuur_angular_velocity[-1]
         # ------------------------------------------------------------------
 
-        # ------------------------------------------------------------------
-        mean_angular_velocity = self.get_omega()
-        mean_angular_velocity = max(1e-3, mean_angular_velocity)
-        angle = self.get_theta()
-        remaining_time_ = (self.target_angle-angle)/mean_angular_velocity
-        estimated_angle_ = self.get_theta() + mean_angular_velocity*self.margin_time_2stop
-        # ------------------------------------------------------------------
+        # # ------------------------------------------------------------------
+        # mean_angular_velocity = self.get_omega()
+        # mean_angular_velocity = max(1e-3, mean_angular_velocity)
+        # angle = self.get_theta()
+        # remaining_time_ = (self.target_angle-angle)/mean_angular_velocity
+        # estimated_angle_ = self.get_theta() + mean_angular_velocity*self.margin_time_2stop
+        # # ------------------------------------------------------------------
 
         self.estimated_angle = estimated_angle_
         debug_estimated_angle = estimated_angle_
+        mean_angular_velocity = mean_angular_velocity_
         self.debug_array = [mean_angular_velocity, debug_estimated_angle]
         # print(mean_angular_velocity, self.remaining_time)
 
     def ApproximateOmega(self, omega_array, plotGraph = False):
+        print omega_array
+        if omega_array is None:
+            return 0
         y = np.array(omega_array)
         # x_array = [-len(omega_array), -len(omega_array)+1, ... , 0]
-        x = np.flip(np.arange(len(y)*-1))
+        x = np.flip(np.arange(len(y))*-1)
+        print x
         x_over = np.append(x, np.arange(1,11))
 
         #近似式の係数
@@ -267,7 +273,7 @@ class Inhand:
         res2=np.polyfit(x, y, 2)
         res3=np.polyfit(x, y, 3)
         #近似式の計算
-        y1 = np.poly1d(res1)(x_overx) #1次
+        y1 = np.poly1d(res1)(x_over) #1次
         y2 = np.poly1d(res2)(x_over) #2次
         y3 = np.poly1d(res3)(x_over) #3次
         
