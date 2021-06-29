@@ -7,12 +7,26 @@ import rospy
 from rub import PID
 import time
 from state_machine3 import TStateMachine
-import matplotlib as plt
+import matplotlib.pyplot as plt
 
 import roslib
 roslib.load_manifest('rubbing_hand')
 from rubbing_hand.srv import *
 from rubbing_hand.msg import *
+
+
+def plt_setup():
+    global fig, ax
+
+    # plt.switch_backend('agg')
+
+    # 描画用
+    fig, ax = plt.subplots()
+    fig.canvas.draw()
+    fig.show()
+    
+    
+    return 0
 
 class Log():
     def __init__(self, length = 101):
@@ -50,6 +64,7 @@ class Inhand:
         #角速度のログ取り．最近の平均角速度の算出に使う
         self.log = {}
         self.log["angular_velocity"] = Log(10)
+        self.log["angle"] = Log(30)
 
         self.remaining_time = 1e6
 
@@ -88,9 +103,11 @@ class Inhand:
         self.amp = self.amp_first
         self.dec_f = [0, 0]
         self.log["angular_velocity"].clear()
+        self.log["angle"].clear()
         self.remaining_time = 1e6
         self.time_stamp2stop = time.time()
         self.process_f = 0
+        # plt_setup()
 
     #インハンドマニピュレーションを開始する関数
     #Maniloop関数をスレッドで実行
@@ -139,13 +156,11 @@ class Inhand:
 
     #インハンドマニピュレーションでつかったデータをpublishする関数
     #スレッドで使うことを想定
-    #ついでに角速度をスタックして最近の平均角速度の算出用にする
     def publish_inhand_data(self):
         r = rospy.Rate(self.hz)
         while self.pub_is_running and not rospy.is_shutdown():
             inhand_msg = self.generate_inhand_msg()
             self.inhand_pub.publish(inhand_msg)
-            self.log["angular_velocity"].storing(self.get_omega())
             r.sleep()
 
     #インハンドマニピュレーションでつかったデータをまとめて、inhand_msgを生成する
@@ -239,9 +254,10 @@ class Inhand:
 
     def Process_always(self):
         # ------------------------------------------------------------------
-        cuur_angular_velocity = self.log["angular_velocity"].get_log()
-        estimated_angle_ = self.ApproximateOmega(cuur_angular_velocity)
-        mean_angular_velocity_=cuur_angular_velocity[-1]
+        self.log["angle"].storing(self.get_theta())
+        cuur_angle = self.log["angle"].get_log()
+        estimated_angle_ = self.ApproximateData(cuur_angle, False)
+        mean_angular_velocity_=0
         # ------------------------------------------------------------------
 
         # # ------------------------------------------------------------------
@@ -258,14 +274,12 @@ class Inhand:
         self.debug_array = [mean_angular_velocity, debug_estimated_angle]
         # print(mean_angular_velocity, self.remaining_time)
 
-    def ApproximateOmega(self, omega_array, plotGraph = False):
-        print omega_array
-        if omega_array is None:
+    def ApproximateData(self, y_array, plotGraph = False):
+        if len(y_array) < 4:
             return 0
-        y = np.array(omega_array)
-        # x_array = [-len(omega_array), -len(omega_array)+1, ... , 0]
+        y = np.array(y_array)
+        # x_array = [-len(y_array), -len(y_array)+1, ... , 0]
         x = np.flip(np.arange(len(y))*-1)
-        print x
         x_over = np.append(x, np.arange(1,11))
 
         #近似式の係数
@@ -278,14 +292,32 @@ class Inhand:
         y3 = np.poly1d(res3)(x_over) #3次
         
         if plotGraph:
-            plt.scatter(x, y, label='元データ')
-            plt.plot(x_over, y1, label='1次')
-            plt.plot(x_over, y2, label='2次')
-            plt.plot(x_over, y3, label='3次')
+            # global fig, ax
+            # # ax.draw_artist(ax.patch)
+            # ax.clear()
+            # org =  ax.scatter(x, y, label='org data')
+            # ax.plot(x_over, y1, label='1st order')
+            # ax.plot(x_over, y2, label='2nd order')
+            # ax.plot(x_over, y3, label='3rd order')
+            # ax.legend()
+            # ax.draw_artist(ax)
+            # fig.canvas.draw()
+            # # fig.canvas.update()
+            # # fig.canvas.blit(ax.bbox)
+            # fig.canvas.flush_events()
+
+
+            plt.clf()
+            plt.scatter(x, y, label='org data')
+            plt.plot(x_over, y1, label='1st order')
+            plt.plot(x_over, y2, label='2nd order')
+            plt.plot(x_over, y3, label='3rd order')
             plt.legend()
-            plt.show()
+            plt.pause(0.0005)
+
+        print(y1[-1], y2[-1], y3[-1])
         
-        return y3[-1]
+        return y2[-1]
 
     def Maniloop(self):
         self.Set_open_step()
