@@ -257,6 +257,11 @@ class Inhand:
         # print(self.MV, self.amp, self.sin_hz, 1., self.d_ratio)
         self.rubbing.Pulse_deformed(self.MV, self.amp, self.sin_hz, 1., self.d_ratio)
 
+    def Action_linear_open(self):
+        self.MV = self.MV_o[0]
+        self.last_itv = self.rubbing.interval
+        self.rubbing.Go2itv(self.rubbing.interval+10, self.MV)
+
     def Process_always(self):
         # # ------------------------------------------------------------------
         # self.log["angle"].storing(self.get_theta())
@@ -359,7 +364,7 @@ class Inhand:
             global start_time
             start_time= int(time.time())
 
-        states= {
+        states_sin= {
             'start': [
             ('entry',lambda: Print('start inhand manipulation')),
             ('else','judge'),
@@ -410,7 +415,53 @@ class Inhand:
             ]
         }
 
-        sm= TStateMachine(states,'start', debug=False)
+        states_linear= {
+            'start': [
+            ('entry',lambda: Print('start inhand manipulation')),
+            ('else','judge'),
+            ],
+            'judge': [
+            ('entry',lambda: self.calculate_omega_d()),
+            (lambda: self.omega_d <= self.MV_i[0],'open'),
+            (lambda: self.MV_i[1] < self.omega_d,'close'),
+            (lambda: self.MV_i[0] < self.omega_d <= self.MV_i[1],'stay'),
+            ('else','judge',lambda: Print('judge failed, omega_d:'+str(self.omega_d))),
+            ],
+            'open': [
+            ('entry',lambda: self.Action_linear_open()),
+            (lambda: not self.MV_i[0] >= self.calculate_omega_d(),'judge'),
+            (lambda: not self.rubbing.go2itv_f,'judge'),
+            ('else','open'),
+            ],
+            'close': [
+            ('entry',lambda: (self.Substitution_MV(self.MV_o[1]),self.rubbing.Set_interval(self.rubbing.interval), self.rubbing.Go2itv(self.rubbing.interval-10, self.MV))),
+            (lambda: not self.MV_i[1] < self.calculate_omega_d(),'judge'),
+            (lambda: not self.rubbing.go2itv_f,'judge'),
+            ('else','close'),
+            ],
+            'stay': [
+            ('entry',lambda: self.Substitution_MV(0)),
+            (lambda: not self.MV_i[0] < self.calculate_omega_d() <= self.MV_i[1],'judge'),
+            ('else','stay'),
+            ],
+            'finish': [
+            ('entry',lambda: (self.Substitution_MV(0), Print('Finishing state machine'))),
+            (lambda: self.target_angle - self.get_theta() > self.angle_margin,'judge',lambda: (Print('remain large angle, restart!'), self.rubbing.Set_interval(self.last_itv))),
+            ('else','.exit'),
+            ],
+            'stop': [
+            ('entry',lambda: (self.Substitution_MV(0), self.rubbing.Set_interval(self.grasp_itv), Print('stop object rotation'), rospy.sleep(0.5))),
+            ('else','finish'),
+            ],
+            'always': [
+            ('deny',["start", "finish", "stop"]),
+            ("process", lambda: self.Process_always()),
+            (lambda: self.estimated_angle > self.target_angle,'stop',lambda: Print('over target theta is estimated!')),
+            (lambda: self.get_theta()>self.target_angle,'stop',lambda: Print('over target theta! in always state')),
+            ]
+        }
+
+        sm= TStateMachine(states_linear,'start', debug=False)
         self.process_f = 2
         sm.Run()
 
