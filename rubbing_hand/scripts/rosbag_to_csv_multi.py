@@ -15,7 +15,7 @@ import glob
 import os
 
 def create_df(ID):
-    directory_path = "/home/suzuki/ros_ws/ay_tools/fingervision/suzuki/rubbing_hand/data/0525/*/rosbag/"
+    directory_path = "/home/suzuki/ros_ws/ay_tools/fingervision/suzuki/rubbing_hand/data/0621/*/rosbag/"
     file_name = directory_path+ID+"*.bag"
     ls = glob.glob(file_name)
     ls = sorted(ls)
@@ -30,7 +30,7 @@ def create_df(ID):
         # The bag file should be in the same directory as your terminal
         bag = rosbag.Bag(l)
         topic = '/inhand'
-        column_names = ['time', 'angle', "angular velocity", "gripper position", "gripper velocity"]
+        column_names = ['time', 'angle', "angular velocity", "gripper position", "gripper velocity", "process"]
         df = pd.DataFrame(columns=column_names)
 
         first_f=False
@@ -40,6 +40,7 @@ def create_df(ID):
             angular_velocity = msg.d_obj_orientation_filtered
             gripper_position = msg.interval
             manipulated_variable = msg.MV
+            process_f = msg.process_f
 
             if not first_f:
                 start_time = time
@@ -50,7 +51,8 @@ def create_df(ID):
                 'angle': angle,
                 'angular velocity': angular_velocity,
                 "gripper position": gripper_position,
-                "gripper velocity": manipulated_variable*50},
+                "gripper velocity": manipulated_variable,
+                "process": process_f},
                 ignore_index=True
             )
         result_dict[base] = [df, base, ext]
@@ -62,7 +64,7 @@ fs = 30
 ls = 20
 lgs = 20
 
-ID = "CAVS"
+ID = "FLAT"
 
 
 
@@ -80,7 +82,7 @@ for item in result_dict.values():
 
 
     fig, axes = plt.subplots(nrows=4, ncols=1, figsize=(16, 12))
-    df.plot(x="time", subplots=True, ax=axes)
+    df.plot(x="time", y=['angle', "angular velocity", "gripper position", "gripper velocity"],subplots=True, ax=axes)
 
     x_min=0
     x_max=df["time"].tail(1)

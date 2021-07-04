@@ -13,7 +13,7 @@ import os
 import matplotlib.pyplot as plt
 import numpy as np
 
-data_directory = "/home/suzuki/ros_ws/ay_tools/fingervision/suzuki/rubbing_hand/data/0525"
+data_directory = "/home/suzuki/ros_ws/ay_tools/fingervision/suzuki/rubbing_hand/data/0621"
 
 # 入力  path: ディレクリパス
 # 出力  csv_file: 入力ディレクトリ内のすべてのcsvファイル（IDが重複した場合は日時が遅い方を取得）の絶対パスをバリュー，IDをキーとした辞書型
@@ -33,9 +33,10 @@ def create_csv_dict(path):
 # 色々計算
 def calcurate_error(df):
     error_dict = {}
-    df = df[df["gripper position"]>20]
+    df_last = df[df["process"]>0]
+    df = df[df["process"]>1]
 
-    last_angle = sum(df['angle'].tail(60))/60
+    last_angle = sum(df_last['angle'].tail(60))/60
     error_dict["last_angle"] = last_angle
 
     max_vel = max(df['angular velocity'])
@@ -44,17 +45,19 @@ def calcurate_error(df):
     df_error = df["angular velocity"]-15
     df_error = df_error[df_error>0]
     df_error = df_error**2
-    error = sum(df_error)
+    error = sum(df_error)/len(df_error)
     error_dict["error"] = error
 
     df_rms = (df["angular velocity"]-15)**2
     rms = np.sqrt(sum(df_rms)/len(df_rms))
+    error_dict["rms_sum"] = sum(df_rms)
+    error_dict["rms_len"] = len(df_rms)
     error_dict["rms"] = rms
 
     std = df["angular velocity"].std()
     error_dict["std"] = std
 
-    mean = df["angular velocity"].mean()
+    mean = (df["angular velocity"]-15).mean()
     error_dict["mean"] = mean
 
     return error_dict
@@ -134,10 +137,11 @@ for index, row in df_id_CAVS.iterrows():
 df_error_CAVS.to_csv(data_directory+"/CAVS_error.csv", index = False)
 df_error_FLAT.to_csv(data_directory+"/FLAT_error.csv", index = False)
 
-# df_error_CAVS.plot.scatter(x="ratio", y="std")
-# df_error_CAVS.plot.scatter(x="ratio", y="max_angular_velocity")
-# df_error_CAVS.plot.scatter(x="ratio", y="mean")
-# df_error_CAVS.plot.scatter(x="ratio", y="rms")
-# df_error_FLAT.plot.scatter(x="amp", y="error", )
+# df_error_CAVS.plot.scatter(x="step", y="std")
+# df_error_CAVS.plot.scatter(x="step", y="max_angular_velocity")
+# df_error_CAVS.plot.scatter(x="step", y="mean")
+df_error_CAVS.plot.scatter(x="step", y="rms")
+df_error_FLAT.plot.scatter(x="step", y="rms")
+# df_error_CAVS.plot.scatter(x="step", y="error")
 
 plt.show()
