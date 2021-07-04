@@ -64,7 +64,7 @@ class Inhand:
         #角速度のログ取り．最近の平均角速度の算出に使う
         self.log = {}
         self.log["angular_velocity"] = Log(10)
-        self.log["angle"] = Log(30)
+        self.log["angle"] = Log(5)
 
         self.remaining_time = 1e6
 
@@ -99,6 +99,9 @@ class Inhand:
         self.sin_hz = 5.
         self.d_ratio = 0.1
 
+        self.grasp_itv = 20
+        self.angle_margin = 3
+
     def Init(self):
         self.amp = self.amp_first
         self.dec_f = [0, 0]
@@ -107,6 +110,7 @@ class Inhand:
         self.remaining_time = 1e6
         self.time_stamp2stop = time.time()
         self.process_f = 0
+        self.last_itv = self.grasp_itv
         # plt_setup()
 
     #インハンドマニピュレーションを開始する関数
@@ -242,6 +246,7 @@ class Inhand:
     # open stateのエントリーアクション，振動しながら開く
     def Action_sin_open(self):
         self.MV = self.MV_o[0]
+        self.last_itv = self.rubbing.interval
         if self.dec_f:
             if self.dec_f[1]:
                 self.amp = max(self.amp - self.amp_dec, 0)
@@ -253,20 +258,20 @@ class Inhand:
         self.rubbing.Pulse_deformed(self.MV, self.amp, self.sin_hz, 1., self.d_ratio)
 
     def Process_always(self):
-        # ------------------------------------------------------------------
-        self.log["angle"].storing(self.get_theta())
-        cuur_angle = self.log["angle"].get_log()
-        estimated_angle_ = self.ApproximateData(cuur_angle, False)
-        mean_angular_velocity_=0
-        # ------------------------------------------------------------------
+        # # ------------------------------------------------------------------
+        # self.log["angle"].storing(self.get_theta())
+        # # cuur_angle = self.log["angle"].get_log()
+        # estimated_angle_ = self.ApproximateData(self.log["angle"], False)
+        # mean_angular_velocity_=0
+        # # ------------------------------------------------------------------
 
-        # # ------------------------------------------------------------------
-        # mean_angular_velocity = self.get_omega()
-        # mean_angular_velocity = max(1e-3, mean_angular_velocity)
-        # angle = self.get_theta()
-        # remaining_time_ = (self.target_angle-angle)/mean_angular_velocity
-        # estimated_angle_ = self.get_theta() + mean_angular_velocity*self.margin_time_2stop
-        # # ------------------------------------------------------------------
+        # ------------------------------------------------------------------
+        mean_angular_velocity_ = self.get_omega()
+        mean_angular_velocity_ = max(1e-3, mean_angular_velocity_)
+        angle = self.get_theta()
+        remaining_time_ = (self.target_angle-angle)/mean_angular_velocity_
+        estimated_angle_ = self.get_theta() + mean_angular_velocity_*self.margin_time_2stop
+        # ------------------------------------------------------------------
 
         self.estimated_angle = estimated_angle_
         debug_estimated_angle = estimated_angle_
@@ -274,13 +279,14 @@ class Inhand:
         self.debug_array = [mean_angular_velocity, debug_estimated_angle]
         # print(mean_angular_velocity, self.remaining_time)
 
-    def ApproximateData(self, y_array, plotGraph = False):
-        if len(y_array) < 4:
+    def ApproximateData(self, y_log, plotGraph = False):
+        y = np.array(y_log.get_log())
+        if len(y) < y_log.length:
             return 0
-        y = np.array(y_array)
+        
         # x_array = [-len(y_array), -len(y_array)+1, ... , 0]
         x = np.flip(np.arange(len(y))*-1)
-        x_over = np.append(x, np.arange(1,11))
+        x_over = np.append(x, np.arange(1,6))
 
         #近似式の係数
         res1=np.polyfit(x, y, 1)
@@ -290,6 +296,9 @@ class Inhand:
         y1 = np.poly1d(res1)(x_over) #1次
         y2 = np.poly1d(res2)(x_over) #2次
         y3 = np.poly1d(res3)(x_over) #3次
+
+        if y2[-1] > 60:
+            plotGraph = True
         
         if plotGraph:
             # global fig, ax
@@ -327,7 +336,7 @@ class Inhand:
         r = rospy.Rate(self.hz)
 
         #初期の指間距離保存
-        grasp_itv = self.rubbing.interval
+        self.grasp_itv = self.rubbing.interval
 
         #get the initial angle
         avg_angle = 0
@@ -386,13 +395,18 @@ class Inhand:
             ],
             'finish': [
             ('entry',lambda: (self.Substitution_MV(0), Print('Finishing state machine'))),
+            (lambda: self.target_angle - self.get_theta() > self.angle_margin,'judge',lambda: (Print('remain large angle, restart!'), self.rubbing.Set_interval(self.last_itv))),
             ('else','.exit'),
             ],
+            'stop': [
+            ('entry',lambda: (self.Substitution_MV(0), self.rubbing.Set_interval(self.grasp_itv), Print('stop object rotation'), rospy.sleep(0.5))),
+            ('else','finish'),
+            ],
             'always': [
-            ('deny',["start", "finish"]),
+            ('deny',["start", "finish", "stop"]),
             ("process", lambda: self.Process_always()),
-            (lambda: self.estimated_angle > self.target_angle,'finish',lambda: Print('over target theta is estimated!')),
-            (lambda: self.get_theta()>self.target_angle,'finish',lambda: Print('over target theta! in always state')),
+            (lambda: self.estimated_angle > self.target_angle,'stop',lambda: Print('over target theta is estimated!')),
+            (lambda: self.get_theta()>self.target_angle,'stop',lambda: Print('over target theta! in always state')),
             ]
         }
 
@@ -400,9 +414,10 @@ class Inhand:
         self.process_f = 2
         sm.Run()
 
-        self.rubbing.Set_interval(20)
+        # self.rubbing.Set_interval(self.grasp_itv)
+        # rospy.sleep(0.5)
+
         self.process_f = 1
-        rospy.sleep(0.5)
         avg_angle = 0
         for i in range(60):
             avg_angle += self.get_theta()
