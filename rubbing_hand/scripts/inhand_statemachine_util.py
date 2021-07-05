@@ -461,7 +461,7 @@ class Inhand:
             ]
         }
 
-        sm= TStateMachine(states_linear,'start', debug=False)
+        sm= TStateMachine(states_sin,'start', debug=False)
         self.process_f = 2
         sm.Run()
 

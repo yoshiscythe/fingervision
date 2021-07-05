@@ -36,8 +36,8 @@ def calcurate_error(df):
     df_last = df[df["process"]>0]
     df = df[df["process"]>1]
 
-    last_angle = sum(df_last['angle'].tail(60))/60
-    error_dict["last_angle"] = last_angle
+    last_angle = (sum(df_last['angle'].tail(60))/60)-60
+    error_dict["last_angle_error"] = last_angle
 
     max_vel = max(df['angular velocity'])
     error_dict["max_angular_velocity"] = max_vel
@@ -60,6 +60,9 @@ def calcurate_error(df):
     mean = (df["angular velocity"]-15).mean()
     error_dict["mean"] = mean
 
+    elasped_time = df.iloc[-1]["time"] - df.iloc[0]["time"]
+    error_dict["elasped_time"] = elasped_time
+
     return error_dict
 
 # カラム名の変更用の辞書を作成
@@ -79,17 +82,20 @@ df_id = pd.read_csv(id_file_name)
 # 接頭語に応じて，CAVSとFLATのデータを分ける
 columns_list = df_id.columns.values
 FLAT_columns = [s for s in columns_list if s.startswith("FLAT")]
-df_id_FLAT = df_id.loc[:, FLAT_columns]
-FLAT_rename_columns_dict = Generate_rename_columns_dict(FLAT_columns)
-df_id_FLAT = df_id_FLAT.rename(columns=FLAT_rename_columns_dict)
-df_id_FLAT = df_id_FLAT.set_index("id")
-df_id_FLAT = df_id_FLAT.dropna()
+if FLAT_columns:
+    df_id_FLAT = df_id.loc[:, FLAT_columns]
+    FLAT_rename_columns_dict = Generate_rename_columns_dict(FLAT_columns)
+    df_id_FLAT = df_id_FLAT.rename(columns=FLAT_rename_columns_dict)
+    df_id_FLAT = df_id_FLAT.set_index("id")
+    df_id_FLAT = df_id_FLAT.dropna(subset=['step'])
 CAVS_columns = [s for s in columns_list if s.startswith("CAVS")]
-df_id_CAVS = df_id.loc[:, CAVS_columns]
-CAVS_rename_columns_dict = Generate_rename_columns_dict(CAVS_columns)
-df_id_CAVS = df_id_CAVS.rename(columns=CAVS_rename_columns_dict)
-df_id_CAVS = df_id_CAVS.set_index("id")
-df_id_CAVS = df_id_CAVS.dropna()
+if CAVS_columns:
+    df_id_CAVS = df_id.loc[:, CAVS_columns]
+    CAVS_rename_columns_dict = Generate_rename_columns_dict(CAVS_columns)
+    df_id_CAVS = df_id_CAVS.rename(columns=CAVS_rename_columns_dict)
+    df_id_CAVS = df_id_CAVS.set_index("id")
+    df_id_CAVS = df_id_CAVS.dropna(subset=['step'])
+    # print(df_id_CAVS)
 
 print("read csv")
 
@@ -101,47 +107,56 @@ print("created csv_dict")
 
 
 # calcurate_error()でerrorとかを計算して，dfにまとめる
-progress = 0
-for index, row in df_id_FLAT.iterrows():
-    id = str(int(index)).rjust(2, "0")
-    result_dict={"id": id}
-    result_dict.update(row.to_dict())
-    error_dict = calcurate_error(pd.read_csv(csv_FLAT[id]))
-    result_dict.update(error_dict)
-    
-    # 初回は，いい感じのカラム名がついたpdデータフレームを作成
-    if progress == 0:
-        FLAT_column_names = list(result_dict.keys())
-        df_error_FLAT = pd.DataFrame(columns=FLAT_column_names)
+if "df_id_FLAT" in locals():
+    progress = 0
+    for index, row in df_id_FLAT.iterrows():
+        id = str(int(index)).rjust(2, "0")
+        result_dict={"id": id}
+        result_dict.update(row.to_dict())
+        error_dict = calcurate_error(pd.read_csv(csv_FLAT[id]))
+        result_dict.update(error_dict)
+        
+        # 初回は，いい感じのカラム名がついたpdデータフレームを作成
+        if progress == 0:
+            FLAT_column_names = list(result_dict.keys())
+            df_error_FLAT = pd.DataFrame(columns=FLAT_column_names)
 
-    df_error_FLAT = df_error_FLAT.append(result_dict,ignore_index=True)
-    progress += 1
-    print("FLAT: ", progress, "/", len(df_id_FLAT.index.values.tolist()))
+        df_error_FLAT = df_error_FLAT.append(result_dict,ignore_index=True)
+        progress += 1
+        print("FLAT: ", progress, "/", len(df_id_FLAT.index.values.tolist()))
 
-progress = 0
-for index, row in df_id_CAVS.iterrows():
-    id = str(int(index)).rjust(2, "0")
-    result_dict={"id": id}
-    result_dict.update(row.to_dict())
-    error_dict = calcurate_error(pd.read_csv(csv_CAVS[id]))
-    result_dict.update(error_dict)
-    
-    if progress == 0:
-        CAVS_column_names = list(result_dict.keys())
-        df_error_CAVS = pd.DataFrame(columns=CAVS_column_names)
+if "df_id_CAVS" in locals():
+    progress = 0
+    for index, row in df_id_CAVS.iterrows():
+        id = str(int(index)).rjust(2, "0")
+        result_dict={"id": id}
+        result_dict.update(row.to_dict())
+        error_dict = calcurate_error(pd.read_csv(csv_CAVS[id]))
+        result_dict.update(error_dict)
+        
+        if progress == 0:
+            CAVS_column_names = list(result_dict.keys())
+            df_error_CAVS = pd.DataFrame(columns=CAVS_column_names)
 
-    df_error_CAVS = df_error_CAVS.append(result_dict,ignore_index=True)
-    progress += 1
-    print("CAVS: ", progress, "/", len(df_id_CAVS.index.values.tolist()))
+        df_error_CAVS = df_error_CAVS.append(result_dict,ignore_index=True)
+        progress += 1
+        print("CAVS: ", progress, "/", len(df_id_CAVS.index.values.tolist()))
 
-df_error_CAVS.to_csv(data_directory+"/CAVS_error.csv", index = False)
-df_error_FLAT.to_csv(data_directory+"/FLAT_error.csv", index = False)
+if "df_error_CAVS" in locals():
+    df_error_CAVS.to_csv(data_directory+"/CAVS_error.csv", index = False)
+if "df_error_FLAT" in locals():
+    df_error_FLAT.to_csv(data_directory+"/FLAT_error.csv", index = False)
 
 # df_error_CAVS.plot.scatter(x="step", y="std")
 # df_error_CAVS.plot.scatter(x="step", y="max_angular_velocity")
 # df_error_CAVS.plot.scatter(x="step", y="mean")
-df_error_CAVS.plot.scatter(x="step", y="rms")
-df_error_FLAT.plot.scatter(x="step", y="rms")
+# df_error_CAVS.plot.scatter(x="step", y="rms")
+# df_error_FLAT.plot.scatter(x="step", y="rms")
 # df_error_CAVS.plot.scatter(x="step", y="error")
 
-plt.show()
+# ruler_sin = df_error_CAVS[(df_error_CAVS["tool"] == 0) & (df_error_CAVS["method"] == 0)]
+# ruler_sin.plot.scatter(x="step", y="rms")
+# ruler_linear = df_error_CAVS[(df_error_CAVS["tool"] == 0) & (df_error_CAVS["method"] == 1)]
+# ruler_linear.plot.scatter(x="step", y="rms")
+
+# plt.show()

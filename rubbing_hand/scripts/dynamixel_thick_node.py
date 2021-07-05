@@ -296,11 +296,11 @@ class TDxlHolding(object):
       # elif self.DIRECTIONS[3] == -1:
       #   rubbing.degree_of_surface -= self.p*0.1
       
-      # #ボタン上下は指の傾き
-      # if self.DIRECTIONS[2] == 1:
-      #   rubbing.degree_of_finger += self.p*0.1
-      # elif self.DIRECTIONS[2] == -1:
-      #   rubbing.degree_of_finger -= self.p*0.1
+      #ボタン上下は指の傾き
+      if self.DIRECTIONS[2] == 1:
+        rubbing.degree_of_finger += self.p*0.1
+      elif self.DIRECTIONS[2] == -1:
+        rubbing.degree_of_finger -= self.p*0.1
 
       rubbing.control_f = any(self.FLAG_MOVES[:2])
 

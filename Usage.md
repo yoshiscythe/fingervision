@@ -108,14 +108,19 @@
 # データプロット
 ## rosbag -> csv,png,eps
 **rosbag_to_csv_multi.py**  
-rosbagを読み取り，['time', 'angle', "angular velocity", "gripper position", "gripper velocity"]をcsvへ保存  
+rosbagを読み取り，['time', 'angle', "angular velocity", "gripper position", "gripper velocity", "process"]をcsvへ保存  
 4つのグラフの画像も作ってくれる．
 
-## csv -> error計算,png
+## csv -> error_csv,png
 **csv_to_error.py**  
-rosbag_to_csv_multi.pyで作成したcsvを使ってerror計算
-目標角速度超過量の2乗和を出す
+rosbag_to_csv_multi.pyで作成したcsvを使ってerror計算  
+~~目標角速度超過量の2乗和を出す~~  
+色々評価指標を計算  
 グラフもつくる
+
+## error_csv -> png
+**csv_to_graph4.py**  
+csv_to_error.pyで作成したerror記載のcsvを使ってグラフ作成
 
 # 録画
 OBSstudioを使う  

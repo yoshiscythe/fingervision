@@ -15,7 +15,7 @@ import glob
 import os
 
 def create_df(ID):
-    directory_path = "/home/suzuki/ros_ws/ay_tools/fingervision/suzuki/rubbing_hand/data/0621/*/rosbag/"
+    directory_path = "/home/suzuki/ros_ws/ay_tools/fingervision/suzuki/rubbing_hand/data/0705/*/rosbag/"
     file_name = directory_path+ID+"*.bag"
     ls = glob.glob(file_name)
     ls = sorted(ls)
@@ -64,7 +64,7 @@ fs = 30
 ls = 20
 lgs = 20
 
-ID = "FLAT"
+ID = "CAVS"
 
 
 
