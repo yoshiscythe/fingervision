@@ -6,10 +6,10 @@ import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib.ticker import MaxNLocator
 
-df_CAVS = pd.read_csv("/home/suzuki/ros_ws/ay_tools/fingervision/suzuki/rubbing_hand/data/0621/CAVS_error.csv")
-df_FLAT = pd.read_csv("/home/suzuki/ros_ws/ay_tools/fingervision/suzuki/rubbing_hand/data/0621/FLAT_error.csv")
+df_CAVS = pd.read_csv("/home/suzuki/ros_ws/ay_tools/fingervision/suzuki/rubbing_hand/data/0705/CAVS_error.csv")
+df_FLAT = pd.read_csv("/home/suzuki/ros_ws/ay_tools/fingervision/suzuki/rubbing_hand/data/0705/FLAT_error.csv")
 
-def create_error_bar_graph(df, x_label, y_label, ax, color, label):
+def create_error_bar_graph(df, x_label, x_label_display, y_label, y_label_display, ax, color, label):
     data_dict = {}
     for index, row in df.iterrows():
         row = row.to_dict()
@@ -30,10 +30,10 @@ def create_error_bar_graph(df, x_label, y_label, ax, color, label):
     print(x, y_mean, y_err)
 
     ax.errorbar(x, y_mean, yerr=y_err, capsize=4, fmt='o', ecolor=color, color=color, label=label)
-    ax.set_xlabel(x_label, fontsize=12)
-    ax.set_ylabel(y_label, fontsize=12)
+    ax.set_xlabel(x_label_display, fontsize=fontsize)
+    ax.set_ylabel(y_label_display, fontsize=fontsize)
 
-def create_rmse_graph(df, x_label, y_label, ax, color, label):
+def create_rmse_graph(df, x_label, x_label_display, y_label, y_label_display, ax, color, label):
     data_dict = {}
     for index, row in df.iterrows():
         row = row.to_dict()
@@ -53,37 +53,80 @@ def create_rmse_graph(df, x_label, y_label, ax, color, label):
         rmse = np.sqrt(v[0]/v[1])
         y.append(rmse)
     ax.scatter(x, y, color=color, label=label)
-    ax.set_xlabel(x_label, fontsize=12)
-    ax.set_ylabel(y_label, fontsize=12)
+    ax.set_xlabel(x_label_display, fontsize=fontsize)
+    ax.set_ylabel(y_label_display, fontsize=fontsize)
+
+def create_rmse_graph2(df, x_label, x_label_display, y_label, y_label_display, ax, color, label):
+    data_dict = {}
+    for index, row in df.iterrows():
+        row = row.to_dict()
+        x_data = row[x_label]
+        y_data = row[y_label]
+        if not x_data in data_dict:
+            data_dict[x_data] = [y_data]
+        else:
+            data_dict[x_data].append(y_data)
+    x = []
+    y = []
+    for k, v in data_dict.items():
+        print(k)
+        rmse = np.sqrt(np.square(v).mean(axis=0))
+        x.append(k)
+        y.append(rmse)
+    print(x, y)
+
+    ax.scatter(x, y, color=color, label=label)
+    ax.set_xlabel(x_label_display, fontsize=fontsize)
+    ax.set_ylabel(y_label_display, fontsize=fontsize)
 
 fig, axes = plt.subplots(2, 2, figsize=(16, 12))
 
-# CAVS_ruler_sin = df_CAVS[(df_CAVS["tool"] == 0) & (df_CAVS["method"] == 0)]
-# CAVS_ruler_linear = df_CAVS[(df_CAVS["tool"] == 0) & (df_CAVS["method"] == 1)]
-# CAVS_wood_sin = df_CAVS[(df_CAVS["tool"] == 1) & (df_CAVS["method"] == 0)]
-# CAVS_wood_linear = df_CAVS[(df_CAVS["tool"] == 1) & (df_CAVS["method"] == 1)]
+CAVS_ruler_sin = df_CAVS[(df_CAVS["tool"] == 0) & (df_CAVS["method"] == 0)]
+CAVS_ruler_linear = df_CAVS[(df_CAVS["tool"] == 0) & (df_CAVS["method"] == 1)]
+CAVS_wood_sin = df_CAVS[(df_CAVS["tool"] == 1) & (df_CAVS["method"] == 0)]
+CAVS_wood_linear = df_CAVS[(df_CAVS["tool"] == 1) & (df_CAVS["method"] == 1)]
 
-# FLAT_ruler_sin = df_FLAT[(df_FLAT["tool"] == 0) & (df_FLAT["method"] == 0)]
-# FLAT_ruler_linear = df_FLAT[(df_FLAT["tool"] == 0) & (df_FLAT["method"] == 1)]
-# FLAT_wood_sin = df_FLAT[(df_FLAT["tool"] == 1) & (df_FLAT["method"] == 0)]
-# FLAT_wood_linear = df_FLAT[(df_FLAT["tool"] == 1) & (df_FLAT["method"] == 1)]
+FLAT_ruler_sin = df_FLAT[(df_FLAT["tool"] == 0) & (df_FLAT["method"] == 0)]
+FLAT_ruler_linear = df_FLAT[(df_FLAT["tool"] == 0) & (df_FLAT["method"] == 1)]
+FLAT_wood_sin = df_FLAT[(df_FLAT["tool"] == 1) & (df_FLAT["method"] == 0)]
+FLAT_wood_linear = df_FLAT[(df_FLAT["tool"] == 1) & (df_FLAT["method"] == 1)]
+
+fontsize=16
+
+# df_C = CAVS_ruler_sin
+# df_F = CAVS_ruler_linear
+# create_error_bar_graph(df_C, "step", "max_angular_velocity", axes[0][1], "red", label="CAVS")
+# create_error_bar_graph(df_F, "step", "max_angular_velocity", axes[0][1], "blue", label="FLAT")
+# create_error_bar_graph(df_C, "step", "last_angle", axes[1][0], "red", label="CAVS")
+# create_error_bar_graph(df_F, "step", "last_angle", axes[1][0], "blue", label="FLAT")
+# create_error_bar_graph(df_C, "step", "elasped_time", axes[1][1], "red", label="CAVS")
+# create_error_bar_graph(df_F, "step", "elasped_time", axes[1][1], "blue", label="FLAT")
+# create_rmse_graph(df_C, "step", "rmse", axes[0][0], "red", label="CAVS")
+# create_rmse_graph(df_F, "step", "rmse", axes[0][0], "blue", label="FLAT")
 
 
-df_C = df_CAVS
-df_F = df_FLAT
-create_error_bar_graph(df_C, "step", "max_angular_velocity", axes[0][1], "red", label="CAVS")
-create_error_bar_graph(df_F, "step", "max_angular_velocity", axes[0][1], "blue", label="FLAT")
-create_error_bar_graph(df_C, "step", "last_angle_error", axes[1][0], "red", label="CAVS")
-create_error_bar_graph(df_F, "step", "last_angle_error", axes[1][0], "blue", label="FLAT")
-create_error_bar_graph(df_C, "step", "elasped_time", axes[1][1], "red", label="CAVS")
-create_error_bar_graph(df_F, "step", "elasped_time", axes[1][1], "blue", label="FLAT")
-create_rmse_graph(df_C, "step", "rmse", axes[0][0], "red", label="CAVS")
-create_rmse_graph(df_F, "step", "rmse", axes[0][0], "blue", label="FLAT")
+# sinとlinearの比較
+df_C = CAVS_ruler_sin
+df_F = CAVS_ruler_linear
+create_error_bar_graph(df_C, "step", "open velocity [mm/s]", "max_angular_velocity", "max angular velocity", axes[0][1], "red", label="vibration")
+create_error_bar_graph(df_F, "step", "open velocity [mm/s]", "max_angular_velocity", "max angular velocity", axes[0][1], "blue", label="non vibration")
+create_rmse_graph2(df_C, "step", "open velocity [mm/s]", "last_angle", "RMSE of last angle", axes[1][0], "red", label="vibration")
+create_rmse_graph2(df_F, "step", "open velocity [mm/s]", "last_angle", "RMSE of last angle", axes[1][0], "blue", label="non vibration")
+create_error_bar_graph(df_C, "step", "open velocity [mm/s]", "elasped_time", "elasped time", axes[1][1], "red", label="vibration")
+create_error_bar_graph(df_F, "step", "open velocity [mm/s]", "elasped_time", "elasped time", axes[1][1], "blue", label="non vibration")
+create_rmse_graph(df_C, "step", "open velocity [mm/s]", "rmse", "RMSE of angular velocity", axes[0][0], "red", label="vibration")
+create_rmse_graph(df_F, "step", "open velocity [mm/s]", "rmse", "RMSE of angular velocity", axes[0][0], "blue", label="non vibration")
+
+# 凡例表示
+for ax1 in axes:
+    for ax in ax1:
+        ax.legend()
 
 # create_rmse_graph(df_CAVS, "step", ax, "red")
 # create_rmse_graph(df_FLAT, "step", ax, "blue")
 
-plt.savefig("/home/suzuki/ros_ws/ay_tools/fingervision/suzuki/rubbing_hand/data/0705/ruler_sin.png")
+plt.savefig("/home/suzuki/ros_ws/ay_tools/fingervision/suzuki/rubbing_hand/data/0705/CAVS_sin_vs_linear.png")
+plt.savefig("/home/suzuki/ros_ws/ay_tools/fingervision/suzuki/rubbing_hand/data/0705/CAVS_sin_vs_linear.eps")
 plt.show()
 
 # plt.scatter(x=df_FLAT["step"], y=df_FLAT["error"]/60, color="blue", label="FLAT")

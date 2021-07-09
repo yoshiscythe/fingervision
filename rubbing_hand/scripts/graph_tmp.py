@@ -26,5 +26,5 @@ plt.semilogx()
 plt.hlines(10, 0, 0.11, linestyles="dashed")
 plt.legend(bbox_to_anchor=(0, 1), loc='upper left', borderaxespad=1, fontsize=18)
 
-plt.savefig("/home/suzuki/ros_ws/ay_tools/fingervision/suzuki/rubbing_hand/data/0221/matome_data.png")
+# plt.savefig("/home/suzuki/ros_ws/ay_tools/fingervision/suzuki/rubbing_hand/data/0221/matome_data.png")
 plt.show()
