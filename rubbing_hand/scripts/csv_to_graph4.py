@@ -91,7 +91,12 @@ FLAT_ruler_linear = df_FLAT[(df_FLAT["tool"] == 0) & (df_FLAT["method"] == 1)]
 FLAT_wood_sin = df_FLAT[(df_FLAT["tool"] == 1) & (df_FLAT["method"] == 0)]
 FLAT_wood_linear = df_FLAT[(df_FLAT["tool"] == 1) & (df_FLAT["method"] == 1)]
 
-fontsize=16
+# 軸名のサイズ
+fontsize=24
+# 軸ラベルのサイズ
+labelsize=16
+# 凡例のサイズ
+lfontsize=20
 
 # df_C = CAVS_ruler_sin
 # df_F = CAVS_ruler_linear
@@ -108,25 +113,26 @@ fontsize=16
 # sinとlinearの比較
 df_C = CAVS_ruler_sin
 df_F = CAVS_ruler_linear
-create_error_bar_graph(df_C, "step", "open velocity [mm/s]", "max_angular_velocity", "max angular velocity", axes[0][1], "red", label="vibration")
-create_error_bar_graph(df_F, "step", "open velocity [mm/s]", "max_angular_velocity", "max angular velocity", axes[0][1], "blue", label="non vibration")
-create_rmse_graph2(df_C, "step", "open velocity [mm/s]", "last_angle", "RMSE of last angle", axes[1][0], "red", label="vibration")
-create_rmse_graph2(df_F, "step", "open velocity [mm/s]", "last_angle", "RMSE of last angle", axes[1][0], "blue", label="non vibration")
-create_error_bar_graph(df_C, "step", "open velocity [mm/s]", "elasped_time", "elasped time", axes[1][1], "red", label="vibration")
-create_error_bar_graph(df_F, "step", "open velocity [mm/s]", "elasped_time", "elasped time", axes[1][1], "blue", label="non vibration")
-create_rmse_graph(df_C, "step", "open velocity [mm/s]", "rmse", "RMSE of angular velocity", axes[0][0], "red", label="vibration")
-create_rmse_graph(df_F, "step", "open velocity [mm/s]", "rmse", "RMSE of angular velocity", axes[0][0], "blue", label="non vibration")
+create_error_bar_graph(df_C, "step", "$v_{open}$ [mm/s]", "max_angular_velocity", "max angular velocity", axes[0][1], "red", label="vibration")
+create_error_bar_graph(df_F, "step", "$v_{open}$ [mm/s]", "max_angular_velocity", "max angular velocity", axes[0][1], "blue", label="fuzzy")
+create_rmse_graph2(df_C, "step", "$v_{open}$ [mm/s]", "last_angle", "RMSE of last angle", axes[1][0], "red", label="vibration")
+create_rmse_graph2(df_F, "step", "$v_{open}$ [mm/s]", "last_angle", "RMSE of last angle", axes[1][0], "blue", label="fuzzy")
+create_error_bar_graph(df_C, "step", "$v_{open}$ [mm/s]", "elasped_time", "elasped time", axes[1][1], "red", label="vibration")
+create_error_bar_graph(df_F, "step", "$v_{open}$ [mm/s]", "elasped_time", "elasped time", axes[1][1], "blue", label="fuzzy")
+create_rmse_graph(df_C, "step", "$v_{open}$ [mm/s]", "rmse", "RMSE of angular velocity", axes[0][0], "red", label="vibration")
+create_rmse_graph(df_F, "step", "$v_{open}$ [mm/s]", "rmse", "RMSE of angular velocity", axes[0][0], "blue", label="fuzzy")
 
 # 凡例表示
 for ax1 in axes:
     for ax in ax1:
-        ax.legend()
+        ax.legend(fontsize=lfontsize)
+        ax.tick_params(labelsize=labelsize)
 
 # create_rmse_graph(df_CAVS, "step", ax, "red")
 # create_rmse_graph(df_FLAT, "step", ax, "blue")
 
-plt.savefig("/home/suzuki/ros_ws/ay_tools/fingervision/suzuki/rubbing_hand/data/0705/CAVS_sin_vs_linear.png")
-plt.savefig("/home/suzuki/ros_ws/ay_tools/fingervision/suzuki/rubbing_hand/data/0705/CAVS_sin_vs_linear.eps")
+plt.savefig("/home/suzuki/ros_ws/ay_tools/fingervision/suzuki/rubbing_hand/data/0705/CAVS_sin_vs_linear_fuzzy.png")
+plt.savefig("/home/suzuki/ros_ws/ay_tools/fingervision/suzuki/rubbing_hand/data/0705/CAVS_sin_vs_linear_fuzzy.eps")
 plt.show()
 
 # plt.scatter(x=df_FLAT["step"], y=df_FLAT["error"]/60, color="blue", label="FLAT")

@@ -24,8 +24,8 @@ def create_df(ID):
     for l in ls:
         base, ext = os.path.splitext(l)
 
-        if os.path.isfile(base+".png"):
-            continue
+        # if os.path.isfile(base+".png"):
+        #     continue
 
         # The bag file should be in the same directory as your terminal
         bag = rosbag.Bag(l)
@@ -64,7 +64,7 @@ fs = 30
 ls = 20
 lgs = 20
 
-ID = "CAVS"
+ID = "CAVS04"
 
 
 
@@ -102,7 +102,7 @@ for item in result_dict.values():
     # axes[1].yaxis.set_ticks([0, 10, 30, 50]) 
     axes[1].set_ylabel("[deg/s]", fontsize=fs)
     axes[1].set_xlabel('')
-    axes[1].set_ylim(-5, 200)
+    axes[1].set_ylim(-5, 300)
     axes[1].tick_params(labelsize=ls) 
     axes[1].tick_params(labelbottom=False)
 
@@ -110,7 +110,7 @@ for item in result_dict.values():
     axes[2].yaxis.set_ticks([15, 20, 25, 30])
     axes[2].set_ylabel("[mm]", fontsize=fs)
     axes[2].set_xlabel('')
-    axes[2].set_ylim(20, 30)
+    axes[2].set_ylim(19, 30)
     axes[2].tick_params(labelsize=ls)
     axes[2].tick_params(labelbottom=False)
 
@@ -124,7 +124,7 @@ for item in result_dict.values():
     axes[3].tick_params(labelsize=ls)
     axes[3].set_xlabel('time [s]', fontsize=fs)
 
-    df.to_csv(base+".csv")
+    # df.to_csv(base+".csv")
     plt.savefig(base+".eps")
     plt.savefig(base+".png")
-# plt.show()
+    plt.show()

@@ -43,8 +43,10 @@ if __name__=='__main__':
     #     p = pulses[i]
     #     ax.plot(p, '-', label=hzs[i])
 
-    p = Pulse_deformed(5, 3., 10., 1., 0.3)
+    p = Pulse_deformed(5, 3., 10., 5., 0.3)
+    t = np.arange(len(p))
     ax.plot(p, "-", linewidth=10, color="black")
+    ax.plot(t[999:1500], p[999:1500], "-", linewidth=10, color="blue")
     ax.tick_params(labelbottom=False,
                labelleft=False,
                labelright=False,
@@ -55,7 +57,7 @@ if __name__=='__main__':
                top=False)
     ax.axis("off")
     # ax.legend(loc=0)
-    plt.savefig("/home/suzuki/pulse_nonB.eps")
-    plt.savefig("/home/suzuki/pulse_nonB.png")
+    plt.savefig("/home/suzuki/pulses.eps")
+    plt.savefig("/home/suzuki/pulses.png")
     plt.show()
     
