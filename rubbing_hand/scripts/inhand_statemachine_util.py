@@ -71,7 +71,7 @@ class Inhand:
         self.target_angle = 60.
         # self.min_gstep = 0.01
         self.th_slip = 0.0001
-        self.target_omega = 15.
+        self.target_omega = 160.
         # ex. MV_input  = [neutral_min, neutral_max]
         self.MV_i = [-5, 0]
         # ex. MV_output = [open, close]
@@ -221,6 +221,9 @@ class Inhand:
 
     def Substitution_MV(self, MV):
         self.MV = MV
+        
+    def Substitution_process(self, f):
+        self.process_f = f
 
     # def Action_close(self):
     #     MV = self.MV_o[1]
@@ -364,26 +367,32 @@ class Inhand:
             global start_time
             start_time= int(time.time())
 
+        # 操作：指を一定の速度で開く.物体が回転したら（目標角速度を超えたら）指を安定把持まで一瞬で閉じる．
+        # 目的：指をきゅっと閉めてからどのくらいで物体の回転が止まるか調べるのだ．\Delta t(v) を調べるのじゃ．
         states_dtdetector= {
             'start': [
-            ('entry',lambda: Print('start inhand manipulation')),
+            ('entry',lambda: (self.Substitution_MV(0), self.Substitution_process(0), Print('start inhand manipulation'))),
             ('else','open'),
             ],
             'continue': [
             ('else','open'),
             ],
             'open': [
-            ('entry',lambda: self.Action_sin_open()),
+            ('entry',lambda: self.Action_linear_open()),
             (lambda: not self.rubbing.go2itv_f,'continue'),
             ('else','open'),
             ],
             'finish': [
-            ('entry',lambda: (self.Substitution_MV(0), Print('Finishing state machine'))),
+            ('entry',lambda: (Print('Finishing state machine'))),
             ('else','.exit'),
             ],
+            'stop': [
+            ('entry',lambda: (self.Substitution_MV(0), self.Substitution_process(0), self.rubbing.Set_interval(self.grasp_itv), Print('stop object rotation'), rospy.sleep(0.5))),
+            ('else','finish'),
+            ],
             'always': [
-            ('deny',["start", "finish"]),
-            (lambda: self.get_theta()>self.target_angle,'finish',lambda: Print('over target theta! in always state')),
+            ('deny',["start", "finish", "stop"]),
+            (lambda: self.get_omega()>self.target_omega,'stop',lambda: Print('over target omega! in always state')),
             ]
         }
 
@@ -484,7 +493,7 @@ class Inhand:
             ]
         }
 
-        sm= TStateMachine(states_sin,'start', debug=False)
+        sm= TStateMachine(states_dtdetector,'start', debug=False)
         self.process_f = 2
         sm.Run()
 
