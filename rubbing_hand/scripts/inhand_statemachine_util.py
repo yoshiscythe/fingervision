@@ -364,6 +364,29 @@ class Inhand:
             global start_time
             start_time= int(time.time())
 
+        states_dtdetector= {
+            'start': [
+            ('entry',lambda: Print('start inhand manipulation')),
+            ('else','open'),
+            ],
+            'continue': [
+            ('else','open'),
+            ],
+            'open': [
+            ('entry',lambda: self.Action_sin_open()),
+            (lambda: not self.rubbing.go2itv_f,'continue'),
+            ('else','open'),
+            ],
+            'finish': [
+            ('entry',lambda: (self.Substitution_MV(0), Print('Finishing state machine'))),
+            ('else','.exit'),
+            ],
+            'always': [
+            ('deny',["start", "finish"]),
+            (lambda: self.get_theta()>self.target_angle,'finish',lambda: Print('over target theta! in always state')),
+            ]
+        }
+
         states_sin= {
             'start': [
             ('entry',lambda: Print('start inhand manipulation')),
