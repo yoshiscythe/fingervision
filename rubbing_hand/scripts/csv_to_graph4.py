@@ -81,10 +81,10 @@ def create_rmse_graph2(df, x_label, x_label_display, y_label, y_label_display, a
 
 fig, axes = plt.subplots(2, 2, figsize=(16, 12))
 
-# CAVS_ruler_sin = df_CAVS[(df_CAVS["tool"] == 0) & (df_CAVS["method"] == 0)]
-# CAVS_ruler_linear = df_CAVS[(df_CAVS["tool"] == 0) & (df_CAVS["method"] == 1)]
-# CAVS_wood_sin = df_CAVS[(df_CAVS["tool"] == 1) & (df_CAVS["method"] == 0)]
-# CAVS_wood_linear = df_CAVS[(df_CAVS["tool"] == 1) & (df_CAVS["method"] == 1)]
+CAVS_ruler_sin = df_CAVS[(df_CAVS["tool"] == 0) & (df_CAVS["method"] == 0)]
+CAVS_ruler_linear = df_CAVS[(df_CAVS["tool"] == 0) & (df_CAVS["method"] == 1)]
+CAVS_wood_sin = df_CAVS[(df_CAVS["tool"] == 1) & (df_CAVS["method"] == 0)]
+CAVS_wood_linear = df_CAVS[(df_CAVS["tool"] == 1) & (df_CAVS["method"] == 1)]
 
 FLAT_ruler_sin = df_FLAT[(df_FLAT["tool"] == 0) & (df_FLAT["method"] == 0)]
 FLAT_ruler_linear = df_FLAT[(df_FLAT["tool"] == 0) & (df_FLAT["method"] == 1)]
@@ -111,8 +111,8 @@ lfontsize=20
 
 
 # sinとlinearの比較
-df_C = FLAT_wood_sin
-df_F = FLAT_wood_linear
+df_C = CAVS_wood_sin
+df_F = CAVS_wood_linear
 create_error_bar_graph(df_C, "step", "$v_{open}$ [mm/s]", "max_angular_velocity", "max angular velocity", axes[0][1], "red", label="vibration")
 create_error_bar_graph(df_F, "step", "$v_{open}$ [mm/s]", "max_angular_velocity", "max angular velocity", axes[0][1], "blue", label="fuzzy")
 create_rmse_graph2(df_C, "step", "$v_{open}$ [mm/s]", "last_angle_error", "RMSE of last angle", axes[1][0], "red", label="vibration")
