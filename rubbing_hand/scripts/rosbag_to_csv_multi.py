@@ -15,7 +15,7 @@ import glob
 import os
 
 def create_df(ID):
-    directory_path = "/home/suzuki/ros_ws/ay_tools/fingervision/suzuki/rubbing_hand/data/0705/*/rosbag/"
+    directory_path = "/home/suzuki/ros_ws/ay_tools/fingervision/suzuki/rubbing_hand/data/0718/*/rosbag/"
     file_name = directory_path+ID+"*.bag"
     ls = glob.glob(file_name)
     ls = sorted(ls)
@@ -24,8 +24,8 @@ def create_df(ID):
     for l in ls:
         base, ext = os.path.splitext(l)
 
-        # if os.path.isfile(base+".png"):
-        #     continue
+        if os.path.isfile(base+".png"):
+            continue
 
         # The bag file should be in the same directory as your terminal
         bag = rosbag.Bag(l)
@@ -64,7 +64,7 @@ fs = 30
 ls = 20
 lgs = 20
 
-ID = "CAVS04"
+ID = "CAVS"
 
 
 
@@ -124,7 +124,7 @@ for item in result_dict.values():
     axes[3].tick_params(labelsize=ls)
     axes[3].set_xlabel('time [s]', fontsize=fs)
 
-    # df.to_csv(base+".csv")
+    df.to_csv(base+".csv")
     plt.savefig(base+".eps")
     plt.savefig(base+".png")
-    plt.show()
+    # plt.show()

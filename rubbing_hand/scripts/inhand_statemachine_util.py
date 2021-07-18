@@ -5,7 +5,7 @@ import numpy as np
 import threading
 import rospy
 from rub import PID
-import time
+import time, datetime
 from state_machine3 import TStateMachine
 import matplotlib.pyplot as plt
 
@@ -43,6 +43,9 @@ class Log():
     def clear(self):
         self.log = []
 
+    def clear2(self):
+        self.log = [self.log[-1]]
+
 class Inhand:
     def __init__(self, rubbing, sub_fv_filtered1_objinfo, sub_fv_smaf):
         self.is_running= False
@@ -64,14 +67,14 @@ class Inhand:
         #角速度のログ取り．最近の平均角速度の算出に使う
         self.log = {}
         self.log["angular_velocity"] = Log(10)
-        self.log["angle"] = Log(5)
+        self.log["angle"] = Log(1000)
 
         self.remaining_time = 1e6
 
         self.target_angle = 60.
         # self.min_gstep = 0.01
         self.th_slip = 0.0001
-        self.target_omega = 160.
+        self.target_omega = 15.
         # ex. MV_input  = [neutral_min, neutral_max]
         self.MV_i = [-5, 0]
         # ex. MV_output = [open, close]
@@ -90,7 +93,7 @@ class Inhand:
         self.pub_is_running = True
         self.Start_pub()
 
-        self.margin_time_2stop = 1./60*5
+        self.margin_time_2stop = 1./60*6
 
         self.amp_first = 3.
         self.dec_f = [0, 0]
@@ -266,21 +269,26 @@ class Inhand:
         self.rubbing.Go2itv(self.rubbing.interval+10, self.MV)
 
     def Process_always(self):
-        # # ------------------------------------------------------------------
-        # self.log["angle"].storing(self.get_theta())
-        # # cuur_angle = self.log["angle"].get_log()
-        # estimated_angle_ = self.ApproximateData(self.log["angle"], False)
-        # mean_angular_velocity_=0
-        # # ------------------------------------------------------------------
-
         # ------------------------------------------------------------------
-        mean_angular_velocity_ = self.get_omega()
-        mean_angular_velocity_ = max(1e-3, mean_angular_velocity_)
-        angle = self.get_theta()
-        remaining_time_ = (self.target_angle-angle)/mean_angular_velocity_
-        estimated_angle_ = self.get_theta() + mean_angular_velocity_*self.margin_time_2stop
+        self.log["angle"].storing(self.get_theta())
+        if self.calculate_omega_d() > self.MV_i[1]:
+            estimated_angle_, remaining_steps_ = self.ApproximateData(self.log["angle"], False)
+            remaining_time_ = remaining_steps_/self.hz
+        else:
+            self.log["angle"].clear2()
+            estimated_angle_, remaining_time_ = 0, 1e6
+        mean_angular_velocity_=0
         # ------------------------------------------------------------------
 
+        # # ------------------------------------------------------------------
+        # mean_angular_velocity_ = self.get_omega()
+        # mean_angular_velocity_ = max(1e-3, mean_angular_velocity_)
+        # angle = self.get_theta()
+        # remaining_time_ = (self.target_angle-angle)/mean_angular_velocity_
+        # estimated_angle_ = self.get_theta() + mean_angular_velocity_*self.margin_time_2stop
+        # # ------------------------------------------------------------------
+
+        self.remaining_time = remaining_time_
         self.estimated_angle = estimated_angle_
         debug_estimated_angle = estimated_angle_
         mean_angular_velocity = mean_angular_velocity_
@@ -289,24 +297,32 @@ class Inhand:
 
     def ApproximateData(self, y_log, plotGraph = False):
         y = np.array(y_log.get_log())
-        if len(y) < y_log.length:
-            return 0
+        if len(y) < 3:
+            return 0, 1e6
         
         # x_array = [-len(y_array), -len(y_array)+1, ... , 0]
         x = np.flip(np.arange(len(y))*-1)
         x_over = np.append(x, np.arange(1,6))
 
+        # print(x,y)
+
         #近似式の係数
         res1=np.polyfit(x, y, 1)
         res2=np.polyfit(x, y, 2)
-        res3=np.polyfit(x, y, 3)
+        # res3=np.polyfit(x, y, 3)
         #近似式の計算
         y1 = np.poly1d(res1)(x_over) #1次
         y2 = np.poly1d(res2)(x_over) #2次
-        y3 = np.poly1d(res3)(x_over) #3次
+        # y3 = np.poly1d(res3)(x_over) #3次
 
-        if y2[-1] > 60:
-            plotGraph = True
+        p = np.poly1d(res2)
+        y_trg = self.target_angle
+        x_trg = max((p - y_trg).roots)
+        if isinstance(x_trg, complex):
+            x_trg = 1e6
+
+        # if x_trg/self.hz < self.margin_time_2stop:
+        #     plotGraph = True
         
         if plotGraph:
             # global fig, ax
@@ -328,13 +344,15 @@ class Inhand:
             plt.scatter(x, y, label='org data')
             plt.plot(x_over, y1, label='1st order')
             plt.plot(x_over, y2, label='2nd order')
-            plt.plot(x_over, y3, label='3rd order')
+            # plt.plot(x_over, y3, label='3rd order')
             plt.legend()
-            plt.pause(0.0005)
-
-        print(y1[-1], y2[-1], y3[-1])
+            data_directory = "/home/suzuki/ros_ws/ay_tools/fingervision/suzuki/rubbing_hand/data/0718"
+            plt.savefig(data_directory+"/CAVS/estimate/CAVS"+datetime.datetime.today().strftime("%Y-%m-%d-%H-%M-%S")+"_estimate.png")
+            plt.clf()
+            
+        # print(y1[-1], y2[-1], y3[-1])
         
-        return y2[-1]
+        return y2[-1], x_trg
 
     def Maniloop(self):
         self.Set_open_step()
@@ -371,7 +389,7 @@ class Inhand:
         # 目的：指をきゅっと閉めてからどのくらいで物体の回転が止まるか調べるのだ．\Delta t(v) を調べるのじゃ．
         states_dtdetector= {
             'start': [
-            ('entry',lambda: (self.Substitution_MV(0), self.Substitution_process(0), Print('start inhand manipulation'))),
+            ('entry',lambda: (self.Substitution_MV(0), self.Substitution_process(2), Print('start inhand manipulation'))),
             ('else','open'),
             ],
             'continue': [
@@ -398,7 +416,7 @@ class Inhand:
 
         states_sin= {
             'start': [
-            ('entry',lambda: Print('start inhand manipulation')),
+            ('entry',lambda: (self.Substitution_MV(0), self.Substitution_process(2), Print('start inhand manipulation'))),
             ('else','judge'),
             ],
             'judge': [
@@ -431,25 +449,25 @@ class Inhand:
             ('else','stay'),
             ],
             'finish': [
-            ('entry',lambda: (self.Substitution_MV(0), Print('Finishing state machine'))),
-            (lambda: self.target_angle - self.get_theta() > self.angle_margin,'judge',lambda: (Print('remain large angle, restart!'), self.rubbing.Set_interval(self.last_itv))),
+            ('entry',lambda: (Print('Finishing state machine'))),
+            (lambda: self.target_angle - self.get_theta() > self.angle_margin,'judge',lambda: (Print('remain {:.2f}, restart!'.format(self.target_angle - self.get_theta())), self.Substitution_process(2), self.rubbing.Set_interval(self.last_itv))),
             ('else','.exit'),
             ],
             'stop': [
-            ('entry',lambda: (self.Substitution_MV(0), self.rubbing.Set_interval(self.grasp_itv), Print('stop object rotation'), rospy.sleep(0.5))),
+            ('entry',lambda: (self.Substitution_MV(0), self.Substitution_process(0), self.rubbing.Set_interval(self.grasp_itv), Print('stop object rotation'), rospy.sleep(0.5))),
             ('else','finish'),
             ],
             'always': [
             ('deny',["start", "finish", "stop"]),
             ("process", lambda: self.Process_always()),
-            (lambda: self.estimated_angle > self.target_angle,'stop',lambda: Print('over target theta is estimated!')),
+            (lambda: self.margin_time_2stop > self.remaining_time,'stop',lambda: Print('over target theta is estimated!')),
             (lambda: self.get_theta()>self.target_angle,'stop',lambda: Print('over target theta! in always state')),
             ]
         }
 
         states_linear= {
             'start': [
-            ('entry',lambda: Print('start inhand manipulation')),
+            ('entry',lambda: (self.Substitution_MV(0), self.Substitution_process(2), Print('start inhand manipulation'))),
             ('else','judge'),
             ],
             'judge': [
@@ -477,23 +495,23 @@ class Inhand:
             ('else','stay'),
             ],
             'finish': [
-            ('entry',lambda: (self.Substitution_MV(0), Print('Finishing state machine'))),
-            (lambda: self.target_angle - self.get_theta() > self.angle_margin,'judge',lambda: (Print('remain large angle, restart!'), self.rubbing.Set_interval(self.last_itv))),
+            ('entry',lambda: (Print('Finishing state machine'))),
+            (lambda: self.target_angle - self.get_theta() > self.angle_margin,'judge',lambda: (Print('remain {:.2f}, restart!'.format(self.target_angle - self.get_theta())), self.Substitution_process(2), self.rubbing.Set_interval(self.last_itv))),
             ('else','.exit'),
             ],
             'stop': [
-            ('entry',lambda: (self.Substitution_MV(0), self.rubbing.Set_interval(self.grasp_itv), Print('stop object rotation'), rospy.sleep(0.5))),
+            ('entry',lambda: (self.Substitution_MV(0), self.Substitution_process(0), self.rubbing.Set_interval(self.grasp_itv), Print('stop object rotation'), rospy.sleep(0.5))),
             ('else','finish'),
             ],
             'always': [
             ('deny',["start", "finish", "stop"]),
             ("process", lambda: self.Process_always()),
-            (lambda: self.estimated_angle > self.target_angle,'stop',lambda: Print('over target theta is estimated!')),
+            (lambda: self.margin_time_2stop > self.remaining_time,'stop',lambda: Print('over target theta is estimated!')),
             (lambda: self.get_theta()>self.target_angle,'stop',lambda: Print('over target theta! in always state')),
             ]
         }
 
-        sm= TStateMachine(states_dtdetector,'start', debug=False)
+        sm= TStateMachine(states_linear,'start', debug=False)
         self.process_f = 2
         sm.Run()
 

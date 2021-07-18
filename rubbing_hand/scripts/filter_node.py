@@ -450,7 +450,7 @@ class SMAF2:
         self.last_tm = msg.header.stamp
 
         theta_log = self.log["obj_orientation_filtered"].get_log()
-        theta_dot_s = three_points_katagawa_koutai_sabunshiki(theta_log, dt, 5)
+        theta_dot_s = three_points_katagawa_koutai_sabunshiki(theta_log, dt, 2)
         theta_dot_dot_s = four_points_katagawa_koutai_sabunshiki(theta_log, dt, 5)
 
         data = Float64Array()
