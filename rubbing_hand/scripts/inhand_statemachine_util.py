@@ -86,7 +86,7 @@ class Inhand:
         self.debug_array = []
         self.process_f = 0
 
-        self.rubbing.itv_min=5
+        # self.rubbing.itv_min=5
 
         # publisher設定
         self.inhand_pub = rospy.Publisher("inhand", inhand, queue_size=1)
@@ -95,7 +95,7 @@ class Inhand:
 
         self.margin_time_2stop = 1./60*6
 
-        self.amp_first = 3.
+        self.amp_first = 1.
         self.dec_f = [0, 0]
         self.amp_dec = 0.
 
@@ -511,7 +511,7 @@ class Inhand:
             ]
         }
 
-        sm= TStateMachine(states_sin,'start', debug=False)
+        sm= TStateMachine(states_linear,'start', debug=False)
         self.process_f = 2
         sm.Run()
 

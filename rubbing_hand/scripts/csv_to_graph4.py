@@ -112,15 +112,15 @@ lfontsize=20
 
 # sinとlinearの比較
 df_C = CAVS_wood_sin
-df_F = CAVS_wood_linear
-create_error_bar_graph(df_C, "step", "$v_{open}$ [mm/s]", "max_angular_velocity", "max angular velocity", axes[0][1], "red", label="vibration")
-create_error_bar_graph(df_F, "step", "$v_{open}$ [mm/s]", "max_angular_velocity", "max angular velocity", axes[0][1], "blue", label="fuzzy")
-create_rmse_graph2(df_C, "step", "$v_{open}$ [mm/s]", "last_angle_error", "RMSE of last angle", axes[1][0], "red", label="vibration")
-create_rmse_graph2(df_F, "step", "$v_{open}$ [mm/s]", "last_angle_error", "RMSE of last angle", axes[1][0], "blue", label="fuzzy")
-create_error_bar_graph(df_C, "step", "$v_{open}$ [mm/s]", "elasped_time", "elasped time", axes[1][1], "red", label="vibration")
-create_error_bar_graph(df_F, "step", "$v_{open}$ [mm/s]", "elasped_time", "elasped time", axes[1][1], "blue", label="fuzzy")
-create_rmse_graph(df_C, "step", "$v_{open}$ [mm/s]", "rmse", "RMSE of angular velocity", axes[0][0], "red", label="vibration")
-create_rmse_graph(df_F, "step", "$v_{open}$ [mm/s]", "rmse", "RMSE of angular velocity", axes[0][0], "blue", label="fuzzy")
+df_F = FLAT_wood_sin
+create_error_bar_graph(df_C, "step", "$v_{open}$ [mm/s]", "max_angular_velocity", "max angular velocity", axes[0][1], "red", label="CAVS")
+create_error_bar_graph(df_F, "step", "$v_{open}$ [mm/s]", "max_angular_velocity", "max angular velocity", axes[0][1], "blue", label="FLAT")
+create_rmse_graph2(df_C, "step", "$v_{open}$ [mm/s]", "last_angle_error", "RMSE of last angle", axes[1][0], "red", label="CAVS")
+create_rmse_graph2(df_F, "step", "$v_{open}$ [mm/s]", "last_angle_error", "RMSE of last angle", axes[1][0], "blue", label="FLAT")
+create_error_bar_graph(df_C, "step", "$v_{open}$ [mm/s]", "elasped_time", "elasped time", axes[1][1], "red", label="CAVS")
+create_error_bar_graph(df_F, "step", "$v_{open}$ [mm/s]", "elasped_time", "elasped time", axes[1][1], "blue", label="FLAT")
+create_rmse_graph(df_C, "step", "$v_{open}$ [mm/s]", "rmse", "RMSE of angular velocity", axes[0][0], "red", label="CAVS")
+create_rmse_graph(df_F, "step", "$v_{open}$ [mm/s]", "rmse", "RMSE of angular velocity", axes[0][0], "blue", label="FLAT")
 
 # 凡例表示
 for ax1 in axes:
@@ -131,8 +131,8 @@ for ax1 in axes:
 # create_rmse_graph(df_CAVS, "step", ax, "red")
 # create_rmse_graph(df_FLAT, "step", ax, "blue")
 
-# plt.savefig("/home/suzuki/ros_ws/ay_tools/fingervision/suzuki/rubbing_hand/data/0705/CAVS_sin_vs_linear_fuzzy.png")
-# plt.savefig("/home/suzuki/ros_ws/ay_tools/fingervision/suzuki/rubbing_hand/data/0705/CAVS_sin_vs_linear_fuzzy.eps")
+plt.savefig("/home/suzuki/ros_ws/ay_tools/fingervision/suzuki/rubbing_hand/data/0718/CAVS_sin_vs_FLAT_sin_wood.png")
+plt.savefig("/home/suzuki/ros_ws/ay_tools/fingervision/suzuki/rubbing_hand/data/0718/CAVS_sin_vs_FLAT_sin_wood.eps")
 plt.show()
 
 # plt.scatter(x=df_FLAT["step"], y=df_FLAT["error"]/60, color="blue", label="FLAT")

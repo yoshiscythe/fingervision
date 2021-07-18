@@ -25,6 +25,8 @@ class Rubbing():
         self.deg_per_pos = 360.0/4096
         self.pos_per_deg = 4096.0/360
 
+        self.pos_per_itv = -535./86.7
+
         self.filename = ""
         self.init_pos_r = 0
         self.init_pos_l = 0
@@ -84,6 +86,10 @@ class Rubbing():
     #     pro_l = left_finger_deg - abs_deg_l
     #     return pro_r, pro_l
 
+    def itv2pos_rhp12rn(self, itv):
+        pos = itv*self.pos_per_itv + self.init_pos
+        return pos
+
     def range_check(self):
         range_max = int(-self.finger_interval/2 + self.interval/2 + self.link_length)
         if self.surface_pos > range_max:
@@ -114,12 +120,22 @@ class Rubbing():
           self.init_pos_l = obj['init_pos_l']
           self.init_pos_r_dist = obj['init_pos_r_dist']
           self.init_pos_l_dist = obj['init_pos_l_dist']
+        
+    def read_initial_position_rhp12rn(self):
+        with open(self.filename) as file:
+          obj = yaml.safe_load(file)
+          self.init_pos = obj['init_pos']
 
     def write_initial_position(self, clb_init_pos_l, clb_init_pos_r, clb_init_pos_l_dist, clb_init_pos_r_dist):
         obj = { 'init_pos_r': clb_init_pos_r,
                 'init_pos_l': clb_init_pos_l,
                 'init_pos_r_dist': clb_init_pos_r_dist,
                 'init_pos_l_dist': clb_init_pos_l_dist}
+        with open(self.filename, 'w') as file:
+            yaml.dump(obj, file)
+
+    def write_initial_position_rhp12rn(self, clb_init_pos):
+        obj = { 'init_pos': clb_init_pos}
         with open(self.filename, 'w') as file:
             yaml.dump(obj, file)
 
