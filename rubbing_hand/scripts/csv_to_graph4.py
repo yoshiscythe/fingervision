@@ -9,6 +9,14 @@ from matplotlib.ticker import MaxNLocator
 df_CAVS = pd.read_csv("/home/suzuki/ros_ws/ay_tools/fingervision/suzuki/rubbing_hand/data/0718/CAVS_error.csv")
 df_FLAT = pd.read_csv("/home/suzuki/ros_ws/ay_tools/fingervision/suzuki/rubbing_hand/data/0718/FLAT_error.csv")
 
+def create_scatter_graph(df, x_label, x_label_display, y_label, y_label_display, ax, color, label):
+    x = df[x_label].values.tolist()
+    y = df[y_label].values.tolist()
+
+    ax.scatter(x, y, color=color, label=label)
+    ax.set_xlabel(x_label_display, fontsize=fontsize)
+    ax.set_ylabel(y_label_display, fontsize=fontsize)
+
 def create_error_bar_graph(df, x_label, x_label_display, y_label, y_label_display, ax, color, label):
     data_dict = {}
     for index, row in df.iterrows():
@@ -75,7 +83,7 @@ def create_rmse_graph2(df, x_label, x_label_display, y_label, y_label_display, a
         y.append(rmse)
     print(x, y)
 
-    ax.scatter(x, y, color=color, label=label)
+    ax.scatter(x, y, color=color, label=label, marker="*")
     ax.set_xlabel(x_label_display, fontsize=fontsize)
     ax.set_ylabel(y_label_display, fontsize=fontsize)
 
@@ -111,28 +119,42 @@ lfontsize=20
 
 
 # sinとlinearの比較
-df_C = CAVS_wood_sin
-df_F = FLAT_wood_sin
+df_C = CAVS_ruler_sin
+df_F = FLAT_ruler_sin
 create_error_bar_graph(df_C, "step", "$v_{open}$ [mm/s]", "max_angular_velocity", "max angular velocity", axes[0][1], "red", label="CAVS")
 create_error_bar_graph(df_F, "step", "$v_{open}$ [mm/s]", "max_angular_velocity", "max angular velocity", axes[0][1], "blue", label="FLAT")
+create_error_bar_graph(df_C, "step", "$v_{open}$ [mm/s]", "last_angle_error", "RMSE of last angle", axes[1][0], "red", label="CAVS")
+create_error_bar_graph(df_F, "step", "$v_{open}$ [mm/s]", "last_angle_error", "RMSE of last angle", axes[1][0], "blue", label="FLAT")
 create_rmse_graph2(df_C, "step", "$v_{open}$ [mm/s]", "last_angle_error", "RMSE of last angle", axes[1][0], "red", label="CAVS")
 create_rmse_graph2(df_F, "step", "$v_{open}$ [mm/s]", "last_angle_error", "RMSE of last angle", axes[1][0], "blue", label="FLAT")
-create_error_bar_graph(df_C, "step", "$v_{open}$ [mm/s]", "elasped_time", "elasped time", axes[1][1], "red", label="CAVS")
-create_error_bar_graph(df_F, "step", "$v_{open}$ [mm/s]", "elasped_time", "elasped time", axes[1][1], "blue", label="FLAT")
+create_error_bar_graph(df_C, "step", "$v_{open}$ [mm/s]", "elasped_time", "elapsed time", axes[1][1], "red", label="CAVS")
+create_error_bar_graph(df_F, "step", "$v_{open}$ [mm/s]", "elasped_time", "elapsed time", axes[1][1], "blue", label="FLAT")
 create_rmse_graph(df_C, "step", "$v_{open}$ [mm/s]", "rmse", "RMSE of angular velocity", axes[0][0], "red", label="CAVS")
 create_rmse_graph(df_F, "step", "$v_{open}$ [mm/s]", "rmse", "RMSE of angular velocity", axes[0][0], "blue", label="FLAT")
 
-# 凡例表示
-for ax1 in axes:
-    for ax in ax1:
-        ax.legend(fontsize=lfontsize)
-        ax.tick_params(labelsize=labelsize)
+# -------------------------------------------------------------------------------------------------------------------------------------
+# -----------------------------------------[position at close] vs----------------------------------------------------------------------
+# create_scatter_graph(df_C, "pos_when_close", "$p$ [mm]", "last_angle_error", "error of last angle", axes[1][0], "red", label="CAVS")
+# create_scatter_graph(df_F, "pos_when_close", "$p$ [mm]", "last_angle_error", "error of last angle", axes[1][0], "blue", label="FLAT")
+# create_scatter_graph(df_C, "pos_when_close", "$p$ [mm]", "max_angular_velocity", "max angular velocity", axes[0][1], "red", label="CAVS")
+# create_scatter_graph(df_F, "pos_when_close", "$p$ [mm]", "max_angular_velocity", "max angular velocity", axes[0][1], "blue", label="FLAT")
+# create_scatter_graph(df_C, "pos_when_close", "$p$ [mm]", "rms", "RMSE of angular velocity", axes[0][0], "red", label="CAVS")
+# create_scatter_graph(df_F, "pos_when_close", "$p$ [mm]", "rms", "RMSE of angular velocity", axes[0][0], "blue", label="FLAT")
+# create_scatter_graph(df_C, "pos_when_close", "$p$ [mm]", "elasped_time", "elapsed time", axes[1][1], "red", label="CAVS")
+# create_scatter_graph(df_F, "pos_when_close", "$p$ [mm]", "elasped_time", "elapsed time", axes[1][1], "blue", label="FLAT")
+# -------------------------------------------------------------------------------------------------------------------------------------
+
+# # 凡例表示
+# for ax1 in axes:
+#     for ax in ax1:
+#         ax.legend(fontsize=lfontsize)
+#         ax.tick_params(labelsize=labelsize)
 
 # create_rmse_graph(df_CAVS, "step", ax, "red")
 # create_rmse_graph(df_FLAT, "step", ax, "blue")
 
-plt.savefig("/home/suzuki/ros_ws/ay_tools/fingervision/suzuki/rubbing_hand/data/0718/CAVS_sin_vs_FLAT_sin_wood.png")
-plt.savefig("/home/suzuki/ros_ws/ay_tools/fingervision/suzuki/rubbing_hand/data/0718/CAVS_sin_vs_FLAT_sin_wood.eps")
+plt.savefig("/home/suzuki/ros_ws/ay_tools/fingervision/suzuki/rubbing_hand/data/0718/CAVS_sin_vs_FLAT_sin_ruler_true.png")
+plt.savefig("/home/suzuki/ros_ws/ay_tools/fingervision/suzuki/rubbing_hand/data/0718/CAVS_sin_vs_FLAT_sin_ruler_true.eps")
 plt.show()
 
 # plt.scatter(x=df_FLAT["step"], y=df_FLAT["error"]/60, color="blue", label="FLAT")

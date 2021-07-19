@@ -35,7 +35,10 @@ def create_csv_dict(path):
 def calcurate_error(df):
     error_dict = {}
     df_last = df[df["process"]>0]
-    df = df[df["process"]>1]
+    df_mobile = df[df["gripper velocity"]!=0]
+    start_index = list(df[df["process"]>1].index)[0]
+    finish_index = list(df[df["process"]>0].index)[-1]
+    df = df[start_index:finish_index+1]
 
     last_angle = (sum(df_last['angle'].tail(60))/60)-60
     error_dict["last_angle_error"] = last_angle
@@ -63,6 +66,9 @@ def calcurate_error(df):
 
     elasped_time = df.iloc[-1]["time"] - df.iloc[0]["time"]
     error_dict["elasped_time"] = elasped_time
+
+    pos_when_close = df_mobile.iloc[-1]["gripper position"]
+    error_dict["pos_when_close"] = pos_when_close
 
     return error_dict
 
