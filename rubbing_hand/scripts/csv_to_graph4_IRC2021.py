@@ -72,13 +72,123 @@ def create_boxplot_graph(df, x_label, x_label_display, y_label, y_label_display,
 def create_boxplot_graph2(dfs, x_label, x_label_display, y_label, y_label_display, ax, colors, labels):
     for (df, label) in zip(dfs, labels):
         # print(df, label)
-        df["pad"] = label
+        df["series"] = label
     cdf = pd.concat(dfs)
     # mdf = pd.melt(cdf, id_vars=[x_label], var_name=[y_label])
 
     # print(cdf.head())
 
-    sns.boxplot(x=x_label, y=y_label, hue="pad", data=cdf, ax=ax, whis="range", width=0.3)
+    sns.boxplot(x=x_label, y=y_label, hue="series", data=cdf, ax=ax, whis="range", width=0.5)
+    # ax.set_xticklabels(x)
+    ax.set_xlabel(x_label_display, fontsize=fontsize)
+    ax.set_ylabel(y_label_display, fontsize=fontsize)
+
+# rmse of angular velocity
+def create_barplot_graph(dfs, x_label, x_label_display, y_label, y_label_display, ax, colors, labels):
+    df_list = []
+    for (df, label) in zip(dfs, labels):
+        # print(df, label)
+        data_dict = {}
+        for index, row in df.iterrows():
+            row = row.to_dict()
+            x_data = row[x_label]
+            y_data = eval(row[y_label])
+            rmse_sum = float(y_data[1])
+            rmse_len = float(y_data[2])
+            data = np.array([rmse_sum, rmse_len])
+            # print(type(y_data), y_data, data)
+            if not x_data in data_dict:
+                data_dict[x_data] = data
+            else:
+                data_dict[x_data] += data
+        y = []
+        x = []
+        for k, v in data_dict.items():
+            # print(k)
+            x.append(k)
+            rmse = np.sqrt(v[0]/v[1]) if v[1] != 0 else 0
+            y.append(rmse)
+        df_list.append(pd.DataFrame({   x_label: x,
+                                        y_label: y,
+                                        "series": label
+                                    })
+                        )
+    cdf = pd.concat(df_list)
+    # mdf = pd.melt(cdf, id_vars=[x_label], var_name=[y_label])
+
+    # print(cdf.head())
+
+    sns.barplot(x=x_label, y=y_label, hue="series", data=cdf, ax=ax)
+    new_width = 0.1
+    color_stuck = []
+    shift_table = [-1, 2, 1, 0]
+    for patch in ax.patches :
+        color_stuck.append(patch.get_facecolor())
+    color_stuck = list(set(color_stuck))
+    # print(color_stuck)
+    for patch in ax.patches :
+        i = color_stuck.index(patch.get_facecolor())
+        shift = shift_table[i]
+        current_width = patch.get_width()
+        diff = current_width - new_width
+
+        # we change the bar width
+        patch.set_width(new_width)
+        # we recenter the bar
+        patch.set_x(patch.get_x() + diff*shift)
+    # ax.set_xticklabels(x)
+    ax.set_xlabel(x_label_display, fontsize=fontsize)
+    ax.set_ylabel(y_label_display, fontsize=fontsize)
+
+
+# rmse of last angle
+def create_barplot_graph2(dfs, x_label, x_label_display, y_label, y_label_display, ax, colors, labels):
+    df_list = []
+    for (df, label) in zip(dfs, labels):
+        # print(df, label)
+        data_dict = {}
+        for index, row in df.iterrows():
+            row = row.to_dict()
+            x_data = row[x_label]
+            y_data = row[y_label]
+            if not x_data in data_dict:
+                data_dict[x_data] = [y_data]
+            else:
+                data_dict[x_data].append(y_data)
+        x = []
+        y = []
+        for k, v in data_dict.items():
+            # print(k)
+            rmse = np.sqrt(np.square(v).mean(axis=0))
+            x.append(k)
+            y.append(rmse)
+        df_list.append(pd.DataFrame({   x_label: x,
+                                        y_label: y,
+                                        "series": label
+                                    })
+                        )
+    cdf = pd.concat(df_list)
+    # mdf = pd.melt(cdf, id_vars=[x_label], var_name=[y_label])
+
+    # print(cdf.head())
+    sns.barplot(x=x_label, y=y_label, hue="series", data=cdf, ax=ax)
+    new_width = 0.1
+    color_stuck = []
+    shift_table = [-1, 2, 1, 0]
+    for patch in ax.patches :
+        color_stuck.append(patch.get_facecolor())
+    color_stuck = list(set(color_stuck))
+    # print(color_stuck)
+    for patch in ax.patches :
+        i = color_stuck.index(patch.get_facecolor())
+        shift = shift_table[i]
+        current_width = patch.get_width()
+        diff = current_width - new_width
+
+        # we change the bar width
+        patch.set_width(new_width)
+        # we recenter the bar
+        patch.set_x(patch.get_x() + diff*shift)
     # ax.set_xticklabels(x)
     ax.set_xlabel(x_label_display, fontsize=fontsize)
     ax.set_ylabel(y_label_display, fontsize=fontsize)
@@ -182,6 +292,9 @@ def create_rmse_graph3(df, x_label, x_label_display, y_label, y_label_display, a
 
 fig, axes = plt.subplots(2, 2, figsize=(16, 12))
 
+df_CAVS = df_CAVS[df_CAVS["step"] < 3]
+df_FLAT = df_FLAT[df_FLAT["step"] < 3]
+
 CAVS_ruler_sin = df_CAVS[(df_CAVS["tool"] == 0) & (df_CAVS["method"] == 0)]
 CAVS_ruler_linear = df_CAVS[(df_CAVS["tool"] == 0) & (df_CAVS["method"] == 1)]
 CAVS_wood_sin = df_CAVS[(df_CAVS["tool"] == 1) & (df_CAVS["method"] == 0)]
@@ -193,11 +306,11 @@ FLAT_wood_sin = df_FLAT[(df_FLAT["tool"] == 1) & (df_FLAT["method"] == 0)]
 FLAT_wood_linear = df_FLAT[(df_FLAT["tool"] == 1) & (df_FLAT["method"] == 1)]
 
 # 軸名のサイズ
-fontsize=24
+fontsize=12
 # 軸ラベルのサイズ
-labelsize=16
+labelsize=8
 # 凡例のサイズ
-lfontsize=20
+lfontsize=8
 
 # df_C = CAVS_ruler_sin
 # df_F = CAVS_ruler_linear
@@ -216,70 +329,38 @@ df_C = CAVS_ruler_sin
 df_F = FLAT_ruler_sin
 
 
-create_error_bar_graph(df_C, "step", "$v_{open}$ [mm/s]", "max_angular_velocity", "max angular velocity", axes[0][1], "red", label="CAVS")
-create_error_bar_graph(df_F, "step", "$v_{open}$ [mm/s]", "max_angular_velocity", "max angular velocity", axes[0][1], "blue", label="FLAT")
-create_error_bar_graph(df_C, "step", "$v_{open}$ [mm/s]", "last_angle_error", "RMSE of last angle", axes[1][0], "red", label="CAVS")
-create_error_bar_graph(df_F, "step", "$v_{open}$ [mm/s]", "last_angle_error", "RMSE of last angle", axes[1][0], "blue", label="FLAT")
-create_rmse_graph2(df_C, "step", "$v_{open}$ [mm/s]", "last_angle_error", "RMSE of last angle", axes[1][0], "red", label="CAVS")
-create_rmse_graph2(df_F, "step", "$v_{open}$ [mm/s]", "last_angle_error", "RMSE of last angle", axes[1][0], "blue", label="FLAT")
-create_error_bar_graph(df_C, "step", "$v_{open}$ [mm/s]", "elasped_time", "elapsed time", axes[1][1], "red", label="CAVS")
-create_error_bar_graph(df_F, "step", "$v_{open}$ [mm/s]", "elasped_time", "elapsed time", axes[1][1], "blue", label="FLAT")
-create_rmse_graph3(df_C, "step", "$v_{open}$ [mm/s]", "rms_th=15", "RMSE of angular velocity", axes[0][0], "red", label="CAVS")
-create_rmse_graph3(df_F, "step", "$v_{open}$ [mm/s]", "rms_th=15", "RMSE of angular velocity", axes[0][0], "blue", label="FLAT")
+# ruler
+create_boxplot_graph2([CAVS_ruler_linear, CAVS_ruler_sin, FLAT_ruler_linear, FLAT_ruler_sin], "step", "$v_{open}$ [mm/s]", "max_angular_velocity", "max angular velocity", axes[0][1], colors=["red", "blue"], labels=["CAVS-fazzy", "CAVS-vibration", "FLAT-fazzy", "FLAT-vibration"])
+create_boxplot_graph2([CAVS_ruler_linear, CAVS_ruler_sin, FLAT_ruler_linear, FLAT_ruler_sin], "step", "$v_{open}$ [mm/s]", "elasped_time", "elapsed time", axes[1][1], colors=["red", "blue"], labels=["CAVS-fazzy", "CAVS-vibration", "FLAT-fazzy", "FLAT-vibration"])
+create_barplot_graph([CAVS_ruler_linear, CAVS_ruler_sin, FLAT_ruler_linear, FLAT_ruler_sin], "step", "$v_{open}$ [mm/s]", "rms_th=15", "RMSE of angular velocity", axes[0][0], colors=["red", "blue"], labels=["CAVS-fazzy", "CAVS-vibration", "FLAT-fazzy", "FLAT-vibration"])
+create_barplot_graph2([CAVS_ruler_linear, CAVS_ruler_sin, FLAT_ruler_linear, FLAT_ruler_sin], "step", "$v_{open}$ [mm/s]", "last_angle_error", "RMSE of last angle", axes[1][0], colors=["red", "blue"], labels=["CAVS-fazzy", "CAVS-vibration", "FLAT-fazzy", "FLAT-vibration"])
 
+# # wood
+# create_boxplot_graph2([CAVS_wood_linear, CAVS_wood_sin, FLAT_wood_linear, FLAT_wood_sin], "step", "$v_{open}$ [mm/s]", "max_angular_velocity", "max angular velocity", axes[0][1], colors=["red", "blue"], labels=["CAVS-fazzy", "CAVS-vibration", "FLAT-fazzy", "FLAT-vibration"])
+# create_boxplot_graph2([CAVS_wood_linear, CAVS_wood_sin, FLAT_wood_linear, FLAT_wood_sin], "step", "$v_{open}$ [mm/s]", "elasped_time", "elapsed time", axes[1][1], colors=["red", "blue"], labels=["CAVS-fazzy", "CAVS-vibration", "FLAT-fazzy", "FLAT-vibration"])
+# create_barplot_graph([CAVS_wood_linear, CAVS_wood_sin, FLAT_wood_linear, FLAT_wood_sin], "step", "$v_{open}$ [mm/s]", "rms_th=15", "RMSE of angular velocity", axes[0][0], colors=["red", "blue"], labels=["CAVS-fazzy", "CAVS-vibration", "FLAT-fazzy", "FLAT-vibration"])
+# create_barplot_graph2([CAVS_wood_linear, CAVS_wood_sin, FLAT_wood_linear, FLAT_wood_sin], "step", "$v_{open}$ [mm/s]", "last_angle_error", "RMSE of last angle", axes[1][0], colors=["red", "blue"], labels=["CAVS-fazzy", "CAVS-vibration", "FLAT-fazzy", "FLAT-vibration"])
 
+axes[0][1].set_ylim(ymin=0)
+axes[1][1].set_ylim(ymin=0)
 
-# -------------------------------------------------------------------------------------------------------------------------------------
-# -----------------------------------------[position at close] vs----------------------------------------------------------------------
-# create_scatter_graph(df_C, "pos_when_close", "$p$ [mm]", "last_angle_error", "error of last angle", axes[1][0], "red", label="CAVS")
-# create_scatter_graph(df_F, "pos_when_close", "$p$ [mm]", "last_angle_error", "error of last angle", axes[1][0], "blue", label="FLAT")
-# create_scatter_graph(df_C, "pos_when_close", "$p$ [mm]", "max_angular_velocity", "max angular velocity", axes[0][1], "red", label="CAVS")
-# create_scatter_graph(df_F, "pos_when_close", "$p$ [mm]", "max_angular_velocity", "max angular velocity", axes[0][1], "blue", label="FLAT")
-# create_scatter_graph(df_C, "pos_when_close", "$p$ [mm]", "rms", "RMSE of angular velocity", axes[0][0], "red", label="CAVS")
-# create_scatter_graph(df_F, "pos_when_close", "$p$ [mm]", "rms", "RMSE of angular velocity", axes[0][0], "blue", label="FLAT")
-# create_scatter_graph(df_C, "pos_when_close", "$p$ [mm]", "elasped_time", "elapsed time", axes[1][1], "red", label="CAVS")
-# create_scatter_graph(df_F, "pos_when_close", "$p$ [mm]", "elasped_time", "elapsed time", axes[1][1], "blue", label="FLAT")
-# -------------------------------------------------------------------------------------------------------------------------------------
-
-
-# # -------------------------------------------------------------------------------------------------------------------------------------
-# # -----------------------------------------variety of th of rmse of angular velosity ------------------------------------------------------------------------------
-# create_rmse_graph3(df_C, "step", "$v_{open}$ [mm/s]", "rms_th=15", "th=15", axes[0][0], "red", label="CAVS")
-# create_rmse_graph3(df_F, "step", "$v_{open}$ [mm/s]", "rms_th=15", "th=15", axes[0][0], "blue", label="FLAT")
-# create_rmse_graph3(df_C, "step", "$v_{open}$ [mm/s]", "rms_th=30", "th=30", axes[0][1], "red", label="CAVS")
-# create_rmse_graph3(df_F, "step", "$v_{open}$ [mm/s]", "rms_th=30", "th=30", axes[0][1], "blue", label="FLAT")
-# create_rmse_graph3(df_C, "step", "$v_{open}$ [mm/s]", "rms_th=60", "th=60", axes[1][0], "red", label="CAVS")
-# create_rmse_graph3(df_F, "step", "$v_{open}$ [mm/s]", "rms_th=60", "th=60", axes[1][0], "blue", label="FLAT")
-# create_rmse_graph3(df_C, "step", "$v_{open}$ [mm/s]", "rms_th=90", "th=90", axes[1][1], "red", label="CAVS")
-# create_rmse_graph3(df_F, "step", "$v_{open}$ [mm/s]", "rms_th=90", "th=90", axes[1][1], "blue", label="FLAT")
-# # -------------------------------------------------------------------------------------------------------------------------------------
-
-# create_error_bar_graph(df_C, "step", "$v_{open}$ [mm/s]", "omega_when_close", "omega_when_close", axes[0][0], "red", label="CAVS")
-# create_error_bar_graph(df_F, "step", "$v_{open}$ [mm/s]", "omega_when_close", "omega_when_close", axes[0][0], "blue", label="FLAT")
-# create_boxplot_graph2([df_C, df_F], "step", "$v_{open}$ [mm/s]", "omega_when_close", "omega_when_close", axes[0][0], colors=["red", "blue"], labels=["CAVS", "FLAT"])
-# create_rmse_graph3(df_C, "step", "$v_{open}$ [mm/s]", "final_rms", "final_rms", axes[0][1], "red", label="CAVS")
-# create_rmse_graph3(df_F, "step", "$v_{open}$ [mm/s]", "final_rms", "final_rms", axes[0][1], "blue", label="FLAT")
-
-# create_boxplot_graph2([df_C, df_F], "step", "$v_{open}$ [mm/s]", "last_angle_error", "error of last angle", axes[1][0], colors=["red", "blue"], labels=["CAVS", "FLAT"])
-# create_boxplot_graph2([df_C, df_F], "step", "$v_{open}$ [mm/s]", "max_angular_velocity", "max angular velocity", axes[0][1], colors=["red", "blue"], labels=["CAVS", "FLAT"])
-# create_boxplot_graph2([df_C, df_F], "step", "$v_{open}$ [mm/s]", "elasped_time", "elapsed time", axes[1][1], colors=["red", "blue"], labels=["CAVS", "FLAT"])
-
-# axes[0][0].legend(fontsize=lfontsize)
-# axes[0][0].set_ylim(ymin=0)
-# axes[0][1].set_ylim(ymin=0)
-# axes[1][1].set_ylim(ymin=0)
+axes[0][0].set_ylim(ymax=200)
+axes[0][1].set_ylim(ymax=600)
+axes[1][0].set_ylim(ymax=20)
+axes[1][1].set_ylim(ymax=40)
 
 # # 凡例表示
-# for ax1 in axes:
-#     for ax in ax1:
-#         ax.legend(fontsize=lfontsize)
+for ax1 in axes:
+    for ax in ax1:
+        ax.legend(fontsize=lfontsize)
+        # ax.legend(fontsize=lfontsize).get_frame().set_alpha(0.6)
 #         ax.tick_params(labelsize=labelsize)
 
 # create_rmse_graph(df_CAVS, "step", ax, "red")
 # create_rmse_graph(df_FLAT, "step", ax, "blue")
 
-# plt.savefig("/home/suzuki/ros_ws/ay_tools/fingervision/suzuki/rubbing_hand/data/0718/CAVS_sin_vs_FLAT_sin_ruler_final.png")
-# plt.savefig("/home/suzuki/ros_ws/ay_tools/fingervision/suzuki/rubbing_hand/data/0718/CAVS_sin_vs_FLAT_sin_ruler_final.eps")
+plt.savefig("/home/suzuki/ros_ws/ay_tools/fingervision/suzuki/rubbing_hand/data/0718/IRC2021_ruler_4series_thin.png")
+plt.savefig("/home/suzuki/ros_ws/ay_tools/fingervision/suzuki/rubbing_hand/data/0718/IRC2021_ruler_4series_thin.eps")
 plt.show()
 
 # plt.scatter(x=df_FLAT["step"], y=df_FLAT["error"]/60, color="blue", label="FLAT")

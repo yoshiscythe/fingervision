@@ -51,12 +51,14 @@ def calcurate_error(df):
     df_error = df_error**2
     error = sum(df_error)/len(df_error)
     error_dict["error"] = error
-
-    df_rms = (df["angular velocity"]-15)**2
-    rms = np.sqrt(sum(df_rms)/len(df_rms))
-    error_dict["rms_sum"] = sum(df_rms)
-    error_dict["rms_len"] = len(df_rms)
-    error_dict["rms"] = rms
+    
+    for th in [15, 30, 60, 90]:
+        df_over_th = df['angular velocity'][df['angular velocity']>th]
+        df_rms = (df_over_th-th)**2
+        rms_sum = sum(df_rms)
+        rms_len = len(df_rms)
+        rms = np.sqrt(sum(df_rms)/len(df_rms)) if rms_len != 0 else 0
+        error_dict["rms_th="+str(th)] = [rms, rms_sum, rms_len]
 
     std = df["angular velocity"].std()
     error_dict["std"] = std
@@ -69,6 +71,16 @@ def calcurate_error(df):
 
     pos_when_close = df_mobile.iloc[-1]["gripper position"]
     error_dict["pos_when_close"] = pos_when_close
+
+    omega_when_close = df_mobile.iloc[-1]["angular velocity"]
+    error_dict["omega_when_close"] = omega_when_close
+
+    df_final = df['angular velocity'][(df['angle']>50) & (df['angular velocity']>15)]
+    df_rms = (df_final-15)**2
+    rms_sum = sum(df_rms)
+    rms_len = len(df_rms)
+    rms = np.sqrt(sum(df_rms)/len(df_rms)) if rms_len != 0 else 0
+    error_dict["final_rms"] = [rms, rms_sum, rms_len]
 
     return error_dict
 
