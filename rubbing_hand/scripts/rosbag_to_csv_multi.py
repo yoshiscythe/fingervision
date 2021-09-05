@@ -15,7 +15,7 @@ import glob
 import os
 
 def create_df(ID):
-    directory_path = "/home/suzuki/ros_ws/ay_tools/fingervision/suzuki/rubbing_hand/data/0718/*/rosbag/"
+    directory_path = "/home/suzuki/ros_ws/ay_tools/fingervision/suzuki/rubbing_hand/data/0905/*/rosbag/"
     file_name = directory_path+ID+"*.bag"
     ls = glob.glob(file_name)
     ls = sorted(ls)
@@ -24,7 +24,7 @@ def create_df(ID):
     for l in ls:
         base, ext = os.path.splitext(l)
 
-        if os.path.isfile(base+".png"):
+        if os.path.isfile(base+".csv"):
             continue
 
         # The bag file should be in the same directory as your terminal
@@ -64,7 +64,7 @@ fs = 30
 ls = 20
 lgs = 20
 
-ID = "CAVS90"
+ID = "CAVS"
 
 
 
@@ -76,55 +76,51 @@ for item in result_dict.values():
     base = item[1]
     ext = item[2]
 
-    # df = df[df["time"]>6]
 
-    # df["time"] = df["time"] - 6
+    # fig, axes = plt.subplots(nrows=4, ncols=1, figsize=(16, 12))
+    # df.plot(x="time", y=['angle', "angular velocity", "gripper position", "gripper velocity"],subplots=True, ax=axes)
 
+    # x_min=0
+    # x_max=df["time"].tail(1)
 
-    fig, axes = plt.subplots(nrows=4, ncols=1, figsize=(16, 12))
-    df.plot(x="time", y=['angle', "angular velocity", "gripper position", "gripper velocity"],subplots=True, ax=axes)
+    # axes[0].legend(bbox_to_anchor=(0, 1), loc='upper left', borderaxespad=0, fontsize=lgs)
+    # axes[0].hlines(60, x_min, x_max, linestyles='dashed')
+    # axes[0].yaxis.set_ticks([0, 30, 60, 90]) 
+    # axes[0].set_ylabel("[deg]", fontsize=fs)
+    # axes[0].set_xlabel('')
+    # axes[0].tick_params(labelbottom=False)
+    # axes[0].set_ylim(-5, 90)
+    # axes[0].tick_params(labelsize=ls) 
 
-    x_min=0
-    x_max=df["time"].tail(1)
+    # axes[1].legend(bbox_to_anchor=(0, 1), loc='upper left', borderaxespad=0, fontsize=lgs)
+    # axes[1].hlines(15, x_min, x_max, linestyles='dashed')
+    # axes[1].hlines(0, x_min, x_max, linestyles='dashed')
+    # # axes[1].yaxis.set_ticks([0, 10, 30, 50]) 
+    # axes[1].set_ylabel("[deg/s]", fontsize=fs)
+    # axes[1].set_xlabel('')
+    # axes[1].set_ylim(-5, 300)
+    # axes[1].tick_params(labelsize=ls) 
+    # axes[1].tick_params(labelbottom=False)
 
-    axes[0].legend(bbox_to_anchor=(0, 1), loc='upper left', borderaxespad=0, fontsize=lgs)
-    axes[0].hlines(60, x_min, x_max, linestyles='dashed')
-    axes[0].yaxis.set_ticks([0, 30, 60, 90]) 
-    axes[0].set_ylabel("[deg]", fontsize=fs)
-    axes[0].set_xlabel('')
-    axes[0].tick_params(labelbottom=False)
-    axes[0].set_ylim(-5, 90)
-    axes[0].tick_params(labelsize=ls) 
+    # axes[2].legend(bbox_to_anchor=(0, 1), loc='upper left', borderaxespad=0, fontsize=lgs)
+    # axes[2].yaxis.set_ticks([15, 20, 25, 30])
+    # axes[2].set_ylabel("[mm]", fontsize=fs)
+    # axes[2].set_xlabel('')
+    # axes[2].set_ylim(19, 30)
+    # axes[2].tick_params(labelsize=ls)
+    # axes[2].tick_params(labelbottom=False)
 
-    axes[1].legend(bbox_to_anchor=(0, 1), loc='upper left', borderaxespad=0, fontsize=lgs)
-    axes[1].hlines(15, x_min, x_max, linestyles='dashed')
-    axes[1].hlines(0, x_min, x_max, linestyles='dashed')
-    # axes[1].yaxis.set_ticks([0, 10, 30, 50]) 
-    axes[1].set_ylabel("[deg/s]", fontsize=fs)
-    axes[1].set_xlabel('')
-    axes[1].set_ylim(-5, 300)
-    axes[1].tick_params(labelsize=ls) 
-    axes[1].tick_params(labelbottom=False)
-
-    axes[2].legend(bbox_to_anchor=(0, 1), loc='upper left', borderaxespad=0, fontsize=lgs)
-    axes[2].yaxis.set_ticks([15, 20, 25, 30])
-    axes[2].set_ylabel("[mm]", fontsize=fs)
-    axes[2].set_xlabel('')
-    axes[2].set_ylim(19, 30)
-    axes[2].tick_params(labelsize=ls)
-    axes[2].tick_params(labelbottom=False)
-
-    axes[3].legend(bbox_to_anchor=(0, 1), loc='upper left', borderaxespad=0, fontsize=lgs)
-    axes[3].hlines(0, x_min, x_max, linestyles='dashed')
-    MV_open=df["gripper velocity"].max()
-    MV_ticks=[-2.5, 0, MV_open]
-    axes[3].yaxis.set_ticks(MV_ticks)
-    axes[3].set_ylabel("[mm/s]", fontsize=fs)
-    axes[3].set_ylim(-2.55, MV_open+1)
-    axes[3].tick_params(labelsize=ls)
-    axes[3].set_xlabel('time [s]', fontsize=fs)
+    # axes[3].legend(bbox_to_anchor=(0, 1), loc='upper left', borderaxespad=0, fontsize=lgs)
+    # axes[3].hlines(0, x_min, x_max, linestyles='dashed')
+    # MV_open=df["gripper velocity"].max()
+    # MV_ticks=[-2.5, 0, MV_open]
+    # axes[3].yaxis.set_ticks(MV_ticks)
+    # axes[3].set_ylabel("[mm/s]", fontsize=fs)
+    # axes[3].set_ylim(-2.55, MV_open+1)
+    # axes[3].tick_params(labelsize=ls)
+    # axes[3].set_xlabel('time [s]', fontsize=fs)
 
     df.to_csv(base+".csv")
-    plt.savefig(base+".eps")
-    plt.savefig(base+".png")
+    # plt.savefig(base+".eps")
+    # plt.savefig(base+".png")
     # plt.show()

@@ -122,6 +122,10 @@ rosbag_to_csv_multi.pyで作成したcsvを使ってerror計算
 **csv_to_graph4.py**  
 csv_to_error.pyで作成したerror記載のcsvを使ってグラフ作成
 
+## csv -> png
+**csv_to_timeseriesgraph.py**
+rosbag_to_csv_multi.pyで作成したcsvを使って，angle/angular velocity/gripper positionのグラフ作成
+
 # 録画
 OBSstudioを使う  
 FingerVisionの処理後・処理前ウィンドウと，正面から撮影しているUSBカメラのキャプチャと，（plotjugglerのウィンドウ）をひとまとめにして録画  

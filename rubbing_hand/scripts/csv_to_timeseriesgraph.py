@@ -10,7 +10,7 @@ import os
 
 
 def create_df(ID):
-    directory_path = "/home/suzuki/ros_ws/ay_tools/fingervision/suzuki/rubbing_hand/data/0718/*/rosbag/"
+    directory_path = "/home/suzuki/ros_ws/ay_tools/fingervision/suzuki/rubbing_hand/data/0905/*/rosbag/"
     ls = []
     if isinstance(ID, list):
         for id in ID:
@@ -87,7 +87,7 @@ def Create_and_save_graph(df, base):
     plt.cla()
 
 
-ID = "FLAT"
+ID = "CAVS"
 fs = 30
 ls = 20
 lgs = 20
