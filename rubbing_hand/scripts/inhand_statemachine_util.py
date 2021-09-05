@@ -95,7 +95,7 @@ class Inhand:
 
         self.margin_time_2stop = 1./60*6
 
-        self.amp_first = 1.
+        self.amp_first = 3.
         self.dec_f = [0, 0]
         self.amp_dec = 0.
 
@@ -511,7 +511,7 @@ class Inhand:
             ]
         }
 
-        sm= TStateMachine(states_linear,'start', debug=False)
+        sm= TStateMachine(states_sin,'start', debug=False)
         self.process_f = 2
         sm.Run()
 

@@ -407,7 +407,7 @@ def sync_observer():
 
 
 
-holding= TDxlHolding(rate=120)
+holding= TDxlHolding(rate=60)
 holding.observer= sync_observer
 holding.controller= syncpos_controller
 for id in range(len(dxl)):
