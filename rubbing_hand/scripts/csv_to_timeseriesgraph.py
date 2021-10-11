@@ -10,7 +10,7 @@ import os
 
 
 def create_df(ID):
-    directory_path = "/home/suzuki/ros_ws/ay_tools/fingervision/suzuki/rubbing_hand/data/0905/*/rosbag/"
+    directory_path = "/home/suzuki/ros_ws/ay_tools/fingervision/suzuki/rubbing_hand/data/0718/*/rosbag/"
     ls = []
     if isinstance(ID, list):
         for id in ID:
@@ -50,7 +50,8 @@ def Create_and_save_graph(df, base):
     df.plot(x="time", y=['angle', "angular velocity", "gripper position"],subplots=True, ax=axes, legend=False)
 
     x_min=-1
-    x_max=df["time"].tail(1)
+    # x_max=df["time"].tail(1)
+    x_max=15
 
     plt.rcParams["mathtext.fontset"] = "cm"
 
@@ -78,16 +79,18 @@ def Create_and_save_graph(df, base):
     axes[2].tick_params(labelsize=ls)
     # axes[2].tick_params(labelbottom=False)
 
-    plt.savefig(base+"_3series.eps")
-    plt.savefig(base+"_3series.png")
+    plt.xlim(-0.5, 14.5)
 
-    # plt.show()
+    plt.savefig(base+"_3series_scaled.eps")
+    plt.savefig(base+"_3series_scaled.png")
+
+    plt.show()
     print(base+" is saved.")
 
     plt.cla()
 
 
-ID = "CAVS"
+ID = "CAVS24"
 fs = 30
 ls = 20
 lgs = 20

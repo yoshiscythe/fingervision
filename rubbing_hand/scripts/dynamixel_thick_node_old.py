@@ -23,7 +23,7 @@ import evdev
 from rub import Rubbing, PID
 import yaml
 
-file_name = "/home/suzuki/prg/DynamixelSDK/python/src/ay_Dynamixel/robots/dynamixel/init_pos.yaml"
+file_name = "/home/suzuki/ros_ws/ay_tools/fingervision/suzuki/rubbing_hand/scripts/init_pos.yaml"
 
 #ROSのpublisher設定
 data_pub = rospy.Publisher("dynamixel_data", dynamixel_msg)
@@ -31,7 +31,7 @@ param_pub = rospy.Publisher("dynamixel_param", dynamixel_param_msg)
 
 #Setup the device
 DXL_ID= [1,2,3,4]   #Note: value and 
-BAUDRATE= 57600
+BAUDRATE= 2e6
 DXL_TYPE= 'XM430-W350'
 dev='/dev/ttyUSB0'
 dxl= [TDynamixel1(DXL_TYPE,dev), TDynamixel1(DXL_TYPE,dev), TDynamixel1(DXL_TYPE,dev), TDynamixel1(DXL_TYPE,dev)]
@@ -45,9 +45,10 @@ for id in range(len(dxl)):
   dxl[id].OpMode= 'EXTPOS' # ただのPOSITIONだと一回転のレンジでしか動かない
   dxl[id].Setup()
   dxl[id].SetPosLimit(-4095, 4095)
-  dxl[id].SetPosGain(500, 50, 10) #fps20ちょっと
+  dxl[id].SetBaudRate(BAUDRATE)
+  # dxl[id].SetPosGain(500, 50, 10) #fps20ちょっと
   # dxl[id].SetPosGain(150, 50, 10)  #fps7くらいの時に使ってた
-  # dxl[id].SetPosGain(900, 0, 0)
+  dxl[id].SetPosGain(900, 0, 0)
   dxl[id].EnableTorque()
 dxl[0].SetupPosSyncWrite()
 dxl[0].SetupSyncRead()
@@ -111,7 +112,7 @@ class TDxlHolding(object):
     self.max_pwm= [100 for id in range(len(dxl))]
     self.is_running= False
     self.dv = 0
-    self.p = 10
+    self.p = 1
     self.v = 10
 
     self.th_p= 3
@@ -257,9 +258,9 @@ class TDxlHolding(object):
 
       #スティックX軸は擦り動作
       if self.DIRECTIONS[0] == 1:
-        rubbing.surface_pos = rubbing.surface_pos + self.v*0.1
+        rubbing.surface_pos = rubbing.surface_pos - self.v*0.05
       elif self.DIRECTIONS[0] == -1:
-        rubbing.surface_pos = rubbing.surface_pos - self.v*0.1
+        rubbing.surface_pos = rubbing.surface_pos + self.v*0.05
       
       #スティックY軸は指缶距離調整
       if self.DIRECTIONS[1] == 1:
@@ -267,21 +268,17 @@ class TDxlHolding(object):
       elif self.DIRECTIONS[1] == -1:
         rubbing.interval = rubbing.interval + self.p*0.1
 
-      #ボタン左右は両指先を同方向へ動かす
+      #ボタン左右は仮想面の傾き
       if self.DIRECTIONS[3] == 1:
-        rubbing.offset_r_dist += self.p
-        rubbing.offset_l_dist += self.p
+        rubbing.degree_of_surface -= self.p*0.1
       elif self.DIRECTIONS[3] == -1:
-        rubbing.offset_r_dist -= self.p
-        rubbing.offset_l_dist -= self.p
+        rubbing.degree_of_surface += self.p*0.1
       
-      #ボタン上下は両指先を逆方向へ動かす
+      #ボタン上下は指の傾き
       if self.DIRECTIONS[2] == 1:
-        rubbing.offset_r_dist -= self.p
-        rubbing.offset_l_dist += self.p
+        rubbing.degree_of_finger += self.p*0.1
       elif self.DIRECTIONS[2] == -1:
-        rubbing.offset_r_dist += self.p
-        rubbing.offset_l_dist -= self.p
+        rubbing.degree_of_finger -= self.p*0.1
 
       # if self.DIRECTIONS[4] == 1:
       #   self.trg_vel[0] = self.v
