@@ -10,7 +10,7 @@ import os
 
 
 def create_df(ID):
-    directory_path = "/home/suzuki/ros_ws/ay_tools/fingervision/suzuki/rubbing_hand/data/0718/*/rosbag/"
+    directory_path = "/home/suzuki/ros_ws/ay_tools/fingervision/suzuki/rubbing_hand/data/1024/*/rosbag/"
     ls = []
     if isinstance(ID, list):
         for id in ID:
@@ -28,8 +28,8 @@ def create_df(ID):
     for l in ls:
         base, ext = os.path.splitext(l)
 
-        # if os.path.isfile(base+".png"):
-        #     continue
+        if os.path.isfile(base+"*.png"):
+            continue
 
         df = pd.read_csv(l)
 
@@ -81,16 +81,16 @@ def Create_and_save_graph(df, base):
 
     plt.xlim(-0.5, 14.5)
 
-    plt.savefig(base+"_3series_scaled.eps")
-    plt.savefig(base+"_3series_scaled.png")
+    plt.savefig(base+"_3series.eps")
+    plt.savefig(base+"_3series.png")
 
-    plt.show()
+    # plt.show()
     print(base+" is saved.")
 
     plt.cla()
 
 
-ID = "CAVS24"
+ID = "CAVS"
 fs = 30
 ls = 20
 lgs = 20
