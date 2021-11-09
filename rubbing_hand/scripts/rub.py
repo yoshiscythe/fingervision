@@ -66,6 +66,14 @@ class Rubbing():
         left_finger_deg = np.rad2deg(np.arccos((self.finger_interval/2+self.surface_pos-(self.interval/2)*np.cos(theta)-self.distance_j2f*np.sin(theta+phi))/self.link_length))
         return right_finger_deg, left_finger_deg
 
+    #エンコーダのモータポジションから指間距離を計算
+    def calculation_interval_from_pos(self, now_pos_r, now_pos_l, pos_r_dist, pos_l_dist):
+        phi_r, phi_l = np.deg2rad(self.calculation_deg_from_pos_dist(pos_r_dist, pos_l_dist))
+        deg_r, deg_l = self.pos2deg(now_pos_r, now_pos_l)
+        deg_r, deg_l = np.deg2rad(deg_r), np.deg2rad(deg_l)
+        interval_encode = self.finger_interval - self.link_length*np.cos(deg_r) - self.link_length*np.cos(deg_l) - self.distance_j2f*np.sin(phi_r) - self.distance_j2f*np.sin(phi_l)
+        return interval_encode
+
     def pos2deg(self, now_pos_r, now_pos_l):
         abs_pos_r = self.init_pos_r - now_pos_r
         abs_deg_r = abs_pos_r*self.deg_per_pos + 90
@@ -112,6 +120,14 @@ class Rubbing():
         pos_l_dist = self.init_pos_l_dist + (theta+phi)*self.pos_per_deg
 
         return pos_r_dist, pos_l_dist
+    
+    # theta=0 とする
+    def calculation_deg_from_pos_dist(self,pos_r_dist,pos_l_dist):
+
+        phi_r  = (self.init_pos_r_dist - pos_r_dist)*self.deg_per_pos
+        phi_l  = -(self.init_pos_l_dist - pos_l_dist)*self.deg_per_pos
+
+        return phi_r, phi_l
 
     def read_initial_position(self):
         with open(self.filename) as file:

@@ -59,7 +59,7 @@ for id in range(len(dxl)):
   dxl[id].SetBaudRate(BAUDRATE)
   # dxl[id].SetPosGain(500, 50, 10) #fps20ちょっと
   # dxl[id].SetPosGain(150, 50, 10)  #fps7くらいの時に使ってた
-  dxl[id].SetPosGain(900, 0, 0) #fps48くらい
+  dxl[id].SetPosGain(9000, 0, 0) #fps48くらい
   dxl[id].EnableTorque()
 dxl[0].SetupPosSyncWrite()
 dxl[0].SetupSyncRead()
@@ -256,6 +256,8 @@ class TDxlHolding(object):
       for i in range(4):
         self.trg_pos[i] = pos[i]
 
+      encoded_interval = rubbing.calculation_interval_from_pos(pos[2], pos[0], pos[3], pos[1])
+
       #取得した情報をパブリッシュ
       dy_data = dynamixel_msg()
       dy_data.header.stamp = rospy.Time.now()
@@ -338,7 +340,7 @@ class TDxlHolding(object):
 
       if self.test_button_f:
         if self.first_f:
-          rubbing.Pulse_deformed(0.01, 1.5, 5, 10, 0.3)
+          rubbing.Pulse_deformed(0.5, 3, 5, 10, 0.1)
           self.first_f = False
         self.test_button_f = False
 
@@ -362,7 +364,8 @@ class TDxlHolding(object):
       dy_param.header.stamp = rospy.Time.now()
       dy_param.surface_pos = rubbing.surface_pos
       dy_param.interval = rubbing.interval
-      dy_param.fps = update_fps
+      # dy_param.fps = update_fps
+      dy_param.fps = encoded_interval
       dy_param.trg_pos = self.trg_pos
       dy_param.degree_of_finger = rubbing.degree_of_finger
       # print(dy_param)
