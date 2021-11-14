@@ -59,7 +59,7 @@ for id in range(len(dxl)):
   dxl[id].SetBaudRate(BAUDRATE)
   # dxl[id].SetPosGain(500, 50, 10) #fps20ちょっと
   # dxl[id].SetPosGain(150, 50, 10)  #fps7くらいの時に使ってた
-  dxl[id].SetPosGain(9000, 0, 0) #fps48くらい
+  dxl[id].SetPosGain(900, 0, 0) #fps48くらい
   dxl[id].EnableTorque()
 dxl[0].SetupPosSyncWrite()
 dxl[0].SetupSyncRead()
