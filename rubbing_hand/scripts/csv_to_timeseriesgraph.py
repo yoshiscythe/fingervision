@@ -10,7 +10,7 @@ import os
 
 
 def create_df(ID):
-    directory_path = "/home/suzuki/ros_ws/ay_tools/fingervision/suzuki/rubbing_hand/data/1024/*/rosbag/"
+    directory_path = "/home/suzuki/ros_ws/ay_tools/fingervision/suzuki/rubbing_hand/data/1114/*/rosbag/"
     ls = []
     if isinstance(ID, list):
         for id in ID:
@@ -50,8 +50,8 @@ def Create_and_save_graph(df, base):
     df.plot(x="time", y=['angle', "angular velocity", "gripper position"],subplots=True, ax=axes, legend=False)
 
     x_min=-1
-    # x_max=df["time"].tail(1)
-    x_max=15
+    x_max=df["time"].tail(1)
+    # x_max=15
 
     plt.rcParams["mathtext.fontset"] = "cm"
 
@@ -75,11 +75,11 @@ def Create_and_save_graph(df, base):
     axes[2].yaxis.set_ticks(np.arange(0, 50, 2))
     axes[2].set_ylabel("gripper position\n"+r"$p$ [mm]", fontsize=fs)
     axes[2].set_xlabel('time $t$ [s]', fontsize=fs)
-    axes[2].set_ylim(df["gripper position"].min() -1, df["gripper position"].min() +11)
+    axes[2].set_ylim(df["gripper position"].min() -1, df["gripper position"].min() +16)
     axes[2].tick_params(labelsize=ls)
     # axes[2].tick_params(labelbottom=False)
 
-    plt.xlim(-0.5, 14.5)
+    # plt.xlim(-0.5, 14.5)
 
     plt.savefig(base+"_3series.eps")
     plt.savefig(base+"_3series.png")

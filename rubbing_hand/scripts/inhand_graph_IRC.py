@@ -23,7 +23,7 @@ def print_target_position(df):
         x = 9.5 + offset[i]*1.5
         y = item[378] + offset_y[i]*3
         s = column_name
-        plt.text(x, y, s, size=40, color=cm[i])
+        plt.text(x, y, s, size=50, color=cm[i])
         i+=1
     # plt.text(9.5, 65, "target position", size=25)
 
@@ -43,7 +43,7 @@ def print_target_position_FLAT(df):
     # plt.text(9.5, 65, "target position", size=25)
 
 hz = 42.3
-fz =40
+fz =50
 offsettime = 10 #FLAT:5, CAVS:10
 
 df = pd.read_csv("/home/suzuki/ros_ws/ay_tools/fingervision/suzuki/rubbing_hand/data/0117/inhand0117CAVS0.01_shusei.csv", header=0)
@@ -71,7 +71,7 @@ cm_red = plt.get_cmap("Reds")
 
 #colormapサンプル
 #https://matplotlib.org/examples/color/colormaps_reference.html
-ax = orientations.plot(x="time", color=generate_cm(cm_blue,len(orientations.columns)-1), figsize=(18, 10), xlim=[0,15], ylim=[-5, 70], fontsize=fz, legend=False, linestyle='solid')
+ax = orientations.plot(x="time", color=generate_cm(cm_blue,len(orientations.columns)-1), figsize=(18, 13), xlim=[0,15], ylim=[-5, 70], fontsize=fz, legend=False, linestyle='solid')
 
 orientations_goal = []
 interval_list = []
@@ -109,7 +109,7 @@ ax.set_ylabel(r"angle $\theta$ [deg]", fontsize = fz)
 
 print_target_position(orientations)
 
-save_file_name = "inhand0117CAVS0.01_IRC2021_legends"
+save_file_name = "inhand0117CAVS0.01_IRC2021_big"
 plt.savefig(save_file_name+".png")
 plt.savefig(save_file_name+".eps")
 plt.show()
