@@ -10,7 +10,7 @@ import os
 
 
 def create_df(ID):
-    directory_path = "/home/suzuki/ros_ws/ay_tools/fingervision/suzuki/rubbing_hand/data/1114/*/rosbag/"
+    directory_path = "/home/suzuki/ros_ws/ay_tools/fingervision/suzuki/rubbing_hand/data/1121/*/rosbag/"
     ls = []
     if isinstance(ID, list):
         for id in ID:
@@ -102,4 +102,7 @@ for item in result_dict.values():
     base = item[1]
     ext = item[2]
 
-    Create_and_save_graph(df, base)
+    try:
+        Create_and_save_graph(df, base)
+    except:
+        print("error: "+base)
