@@ -10,7 +10,7 @@ import os
 
 
 def create_df(ID):
-    directory_path = "/home/suzuki/ros_ws/ay_tools/fingervision/suzuki/rubbing_hand/data/1121/*/rosbag/"
+    directory_path = "/home/suzuki/ros_ws/ay_tools/fingervision/suzuki/rubbing_hand/data/1128/*/rosbag/"
     ls = []
     if isinstance(ID, list):
         for id in ID:
@@ -101,6 +101,9 @@ for item in result_dict.values():
     df = item[0]
     base = item[1]
     ext = item[2]
+    
+    if os.path.isfile(base+"_3series.eps"):
+        continue
 
     try:
         Create_and_save_graph(df, base)
