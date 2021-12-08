@@ -1,0 +1,2 @@
+set(rubbing_hand_MESSAGE_FILES "/home/suzuki/ros_ws/ay_tools/fingervision/suzuki/rubbing_hand/msg/dynamixel_msg.msg")
+set(rubbing_hand_SERVICE_FILES "")

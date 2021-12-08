@@ -300,9 +300,9 @@ class TDxlHolding(object):
       
       #ボタン上下は指の傾き
       if self.DIRECTIONS[2] == 1:
-        rubbing.degree_of_finger += self.p*0.1
+        rubbing.offset_degree_of_finger += self.p*0.1
       elif self.DIRECTIONS[2] == -1:
-        rubbing.degree_of_finger -= self.p*0.1
+        rubbing.offset_degree_of_finger -= self.p*0.1
 
       rubbing.control_f = any(self.FLAG_MOVES[:2])
 
@@ -336,6 +336,7 @@ class TDxlHolding(object):
       if self.offset_f:
         rubbing.surface_pos = 0
         rubbing.degree_of_surface = 0
+        rubbing.offset_degree_of_finger = 0
         rubbing.running = 1
 
       if self.test_button_f:

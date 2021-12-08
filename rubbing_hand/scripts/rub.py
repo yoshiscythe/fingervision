@@ -21,6 +21,7 @@ class Rubbing():
         self.degree_of_surface = 0.0
         #指先の傾き
         self.degree_of_finger = 0.0
+        self.offset_degree_of_finger = 0.0
 
         self.deg_per_pos = 360.0/4096
         self.pos_per_deg = 4096.0/360
@@ -188,38 +189,43 @@ class Rubbing():
             self.interval = set_data
 
     def update_degfinger(self):
-        # --------------------------------------------------
-        # CAVS
-        min_deg = 1.
-        max_deg = 8.0
-        self.degree_of_finger = self.interval*(-0.44) + 18.2
-        # --------------------------------------------------
+        ad_finger = 0.
 
         # # --------------------------------------------------
-        # # CAVS thick
-        # min_deg = 0.
-        # max_deg = 6.0
-        # self.degree_of_finger = self.interval*(-0.44) + 20.2
+        # # CAVS
+        # min_deg = 1.
+        # max_deg = 8.0
+        # ad_finger = self.offset_degree_of_finger + self.interval*(-0.44) + 18.2
         # # --------------------------------------------------
+
+        # --------------------------------------------------
+        # CAVS thick
+        min_deg = 0.
+        max_deg = 6.0
+        ad_finger = self.interval*(-0.44) + 20.2
+        # --------------------------------------------------
 
         # # -----------------------------------------------------
         # # FLAT
         # min_deg = 1
         # max_deg = 7
-        # self.degree_of_finger = self.interval*(-0.585) + 18.2
+        # ad_finger = self.interval*(-0.585) + 18.2
         # # -----------------------------------------------------
 
         # # -----------------------------------------------------
         # # FLAT thick
         # min_deg = 2
         # max_deg = 11
-        # self.degree_of_finger = self.interval*(-0.434) + 18.8
+        # ad_finger = self.interval*(-0.434) + 18.8
         # # -----------------------------------------------------
 
-        if self.degree_of_finger > max_deg:
-            self.degree_of_finger = max_deg
-        if self.degree_of_finger < min_deg:
-            self.degree_of_finger = min_deg
+        if ad_finger != 0:
+            if ad_finger > max_deg:
+                ad_finger = max_deg
+            if ad_finger < min_deg:
+                ad_finger = min_deg
+
+        self.degree_of_finger = self.offset_degree_of_finger + ad_finger
 
     def Update(self):
         self.update_interval()
