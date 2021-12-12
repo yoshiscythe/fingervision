@@ -547,7 +547,6 @@ class Inhand:
             ],
             'finish': [
             ('entry',lambda: (Print('Finishing state machine'))),
-            (lambda: self.target_angle - self.get_theta() > self.angle_margin,'judge',lambda: (Print('remain {:.2f}, restart!'.format(self.target_angle - self.get_theta())), self.Substitution_process(2), self.rubbing.Set_interval(self.last_itv))),
             ('else','.exit'),
             ],
             'stop': [
