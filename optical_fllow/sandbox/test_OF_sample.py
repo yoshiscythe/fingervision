@@ -8,9 +8,9 @@
 import numpy as np
 import cv2
 
-threshold =60
-# cap = cv2.VideoCapture('optical_fllow/data/20211207/magenta.avi')
-cap = cv2.VideoCapture(4)
+threshold =30
+cap = cv2.VideoCapture('optical_fllow/data/20211207/magenta.avi')
+# cap = cv2.VideoCapture(4)
 
 # params for ShiTomasi corner detection
 feature_params = dict( maxCorners = 100,
@@ -31,6 +31,7 @@ ret, old_frame = cap.read()
 old_frame_hsv = cv2.cvtColor(old_frame, cv2.COLOR_BGR2HSV)
 old_hue = cv2.extractChannel(old_frame_hsv, 0)
 _, old_p = cv2.threshold(old_hue, threshold, 179, cv2.THRESH_BINARY)
+old_p = cv2.bitwise_not(old_p)
 # old_gray = cv2.cvtColor(old_frame, cv2.COLOR_BGR2GRAY)
 p0 = cv2.goodFeaturesToTrack(old_p, mask = None, **feature_params)
 
@@ -43,6 +44,7 @@ while(1):
     frame_hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
     frame_hue = cv2.extractChannel(frame_hsv, 0)
     _, frame_p = cv2.threshold(frame_hue, threshold, 179, cv2.THRESH_BINARY)
+    frame_p = cv2.bitwise_not(frame_p)
 
     # calculate optical flow
     p1, st, err = cv2.calcOpticalFlowPyrLK(old_p, frame_p, p0, None, **lk_params)
@@ -66,7 +68,7 @@ while(1):
     
 
     cv2.imshow('frame',img)
-    cv2.imshow("gray", frame_p)
+    cv2.imshow("hue", frame_p)
     k = cv2.waitKey(30) & 0xff
     if k == 27:
         break

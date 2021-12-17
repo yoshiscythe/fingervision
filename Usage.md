@@ -34,13 +34,17 @@
       ~~~
 
 - ロボットハンド起動
-    1.  コントローラBluetooth接続
+    1. コントローラBluetooth接続
         ~~~sh
         $ bluetoothctl
         [bluetooth]# power on
         [bluetooth]# connect B8:78:26:F7:86:9A
         [Joy-Con (L)]# exit
         ~~~
+        もしくは，シェルスクリプトで
+        ```sh
+        $ bash rubbing_hand/scripts/bt_connect.sh
+        ```
 
         - bluetoothがpower onにならないとき  
           1. まずsoftwareスイッチの状態を確認  

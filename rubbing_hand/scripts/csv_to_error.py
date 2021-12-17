@@ -14,7 +14,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import re
 
-data_directory = "/home/suzuki/ros_ws/ay_tools/fingervision/suzuki/rubbing_hand/data/0905"
+data_directory = "/home/suzuki/ros_ws/ay_tools/fingervision/suzuki/rubbing_hand/data/1212"
 
 # 入力  path: ディレクリパス
 # 出力  csv_file: 入力ディレクトリ内のすべてのcsvファイル（IDが重複した場合は日時が遅い方を取得）の絶対パスをバリュー，IDをキーとした辞書型

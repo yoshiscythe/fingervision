@@ -1,4 +1,5 @@
 #!/usr/bin/python
+#coding: utf-8
 #\file    dxl_util.py
 #\brief   Library to control a Dynamixel servo
 #\author  Akihiko Yamaguchi, info@akihikoy.net
@@ -19,6 +20,7 @@
 #Dynamixel XM430-W350: http://support.robotis.com/en/product/actuator/dynamixel_x/xm_series/xm430-w350.htm
 #Dynamixel XH430-V350: http://support.robotis.com/en/product/actuator/dynamixel_x/xh_series/xh-430-v350.htm
 
+from __future__ import print_function  #python3ライクなprint関数
 import dynamixel_sdk as dynamixel  #Using Dynamixel SDK
 import struct
 import math, time, threading

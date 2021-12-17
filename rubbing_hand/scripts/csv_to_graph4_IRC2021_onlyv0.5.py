@@ -7,8 +7,10 @@ import numpy as np
 from matplotlib.ticker import MaxNLocator
 import seaborn as sns
 
-df_CAVS = pd.read_csv("/home/suzuki/ros_ws/ay_tools/fingervision/suzuki/rubbing_hand/data/0718/CAVS_error.csv")
-df_FLAT = pd.read_csv("/home/suzuki/ros_ws/ay_tools/fingervision/suzuki/rubbing_hand/data/0718/FLAT_error.csv")
+base_dir = "/home/suzuki/ros_ws/ay_tools/fingervision/suzuki/rubbing_hand/data/1212/"
+
+df_CAVS = pd.read_csv(base_dir+"CAVS_error.csv")
+df_FLAT = pd.read_csv(base_dir+"FLAT_error.csv")
 
 def create_scatter_graph(df, x_label, x_label_display, y_label, y_label_display, ax, color, label):
     x = df[x_label].values.tolist()
@@ -82,6 +84,30 @@ def create_boxplot_graph2(dfs, x_label, x_label_display, y_label, y_label_displa
     # ax.set_xticklabels(x)
     ax.set_xlabel(x_label_display, fontsize=fontsize)
     ax.set_ylabel(y_label_display, fontsize=fontsize)
+    
+# CAVSとFLATと横に並べて一緒に箱ひげ図つくる
+# seaborn(sns)パッケージ利用
+# 参考：https://www.it-swarm-ja.com/ja/python/seaborn%E3%81%A7%E8%A4%87%E6%95%B0%E3%81%AE%E7%AE%B1%E3%81%B2%E3%81%92%E5%9B%B3%E3%82%92%E3%83%97%E3%83%AD%E3%83%83%E3%83%88%E3%81%97%E3%81%BE%E3%81%99%E3%81%8B%EF%BC%9F/831754565/
+def create_boxplot_graph3(dfs, x_label, x_label_display, y_label, y_label_display, ax, colors, labels):
+    for (df, label) in zip(dfs, labels):
+        # print(df, label)
+        df["series"] = label
+    cdf = pd.concat(dfs)
+    # mdf = pd.melt(cdf, id_vars=[x_label], var_name=[y_label])
+
+    # irekae = lambda x: x.split(',')[1]
+    cdf[y_label] = cdf[y_label].apply(irekae)
+
+    # print(cdf[y_label].head())
+
+    sns.boxplot(x=x_label, y=y_label, hue="series", data=cdf, ax=ax, whis="range", width=0.5)
+    # ax.set_xticklabels(x)
+    ax.set_xlabel(x_label_display, fontsize=fontsize)
+    ax.set_ylabel(y_label_display, fontsize=fontsize)
+
+def irekae(target):
+    target = eval(target)[1]
+    return target
 
 # rmse of angular velocity
 def create_barplot_graph(dfs, x_label, x_label_display, y_label, y_label_display, ax, colors, labels):
@@ -302,11 +328,13 @@ fig, axes = plt.subplots(2, 2, figsize=(16, 12))
 # df_FLAT = df_FLAT[df_FLAT["step"] < 3]
 
 CAVS_ruler_sin = df_CAVS[(df_CAVS["tool"] == 0) & (df_CAVS["method"] == 0) & (df_CAVS["step"] == 0.5)]
+CAVS_ruler_sin_over = df_CAVS[(df_CAVS["tool"] == 0) & (df_CAVS["method"] == 3) & (df_CAVS["step"] == 0.5)]
 CAVS_ruler_linear = df_CAVS[(df_CAVS["tool"] == 0) & (df_CAVS["method"] == 1) & (df_CAVS["step"] == 0.5)]
 CAVS_wood_sin = df_CAVS[(df_CAVS["tool"] == 1) & (df_CAVS["method"] == 0) & (df_CAVS["step"] == 0.5)]
 CAVS_wood_linear = df_CAVS[(df_CAVS["tool"] == 1) & (df_CAVS["method"] == 1) & (df_CAVS["step"] == 0.5)]
 
 FLAT_ruler_sin = df_FLAT[(df_FLAT["tool"] == 0) & (df_FLAT["method"] == 0) & (df_CAVS["step"] == 0.5)]
+FLAT_ruler_sin_over = df_FLAT[(df_FLAT["tool"] == 0) & (df_FLAT["method"] == 3) & (df_FLAT["step"] == 0.5)]
 FLAT_ruler_linear = df_FLAT[(df_FLAT["tool"] == 0) & (df_FLAT["method"] == 1) & (df_CAVS["step"] == 0.5)]
 FLAT_wood_sin = df_FLAT[(df_FLAT["tool"] == 1) & (df_FLAT["method"] == 0) & (df_CAVS["step"] == 0.5)]
 FLAT_wood_linear = df_FLAT[(df_FLAT["tool"] == 1) & (df_FLAT["method"] == 1) & (df_CAVS["step"] == 0.5)]
@@ -347,20 +375,26 @@ df_F = FLAT_ruler_sin
 # create_barplot_graph([CAVS_ruler_linear, CAVS_ruler_sin, FLAT_ruler_linear, FLAT_ruler_sin], "step", "$v_{open}$ [mm/s]", "rms_th=15", "RMSE of angular velocity", axes[0][0], colors=["red", "blue"], labels=["CAVS-fuzzy", "CAVS-vibration", "FLAT-fuzzy", "FLAT-vibration"])
 # create_barplot_graph2([CAVS_ruler_linear, CAVS_ruler_sin, FLAT_ruler_linear, FLAT_ruler_sin], "step", "$v_{open}$ [mm/s]", "last_angle_error", "RMSE of final angle", axes[1][0], colors=["red", "blue"], labels=["CAVS-fuzzy", "CAVS-vibration", "FLAT-fuzzy", "FLAT-vibration"])
 
+# ruler
+create_boxplot_graph2([CAVS_ruler_linear, CAVS_ruler_sin, FLAT_ruler_linear, FLAT_ruler_sin], "step", "$v_{open}$ [mm/s]", "max_angular_velocity", "max angular velocity", axes[0][1], colors=["red", "blue"], labels=["CAVS-fuzzy", "CAVS-vibration", "FLAT-fuzzy", "FLAT-vibration"])
+create_boxplot_graph2([CAVS_ruler_linear, CAVS_ruler_sin, FLAT_ruler_linear, FLAT_ruler_sin], "step", "$v_{open}$ [mm/s]", "elasped_time", "elapsed time", axes[1][1], colors=["red", "blue"], labels=["CAVS-fuzzy", "CAVS-vibration", "FLAT-fuzzy", "FLAT-vibration"])
+create_boxplot_graph3([CAVS_ruler_linear, CAVS_ruler_sin, FLAT_ruler_linear, FLAT_ruler_sin], "step", "$v_{open}$ [mm/s]", "rms_th=15", "accumulation square error \n of angular velocity", axes[0][0], colors=["red", "blue"], labels=["CAVS-fuzzy", "CAVS-vibration", "FLAT-fuzzy", "FLAT-vibration"])
+# create_boxplot_graph2([CAVS_ruler_linear, CAVS_ruler_sin, FLAT_ruler_linear, FLAT_ruler_sin], "step", "$v_{open}$ [mm/s]", "last_angle_error", "error of final angle", axes[1][0], colors=["red", "blue"], labels=["CAVS-fuzzy", "CAVS-vibration", "FLAT-fuzzy", "FLAT-vibration"])
+create_boxplot_graph2([CAVS_ruler_linear, CAVS_ruler_sin, CAVS_ruler_sin_over, FLAT_ruler_linear, FLAT_ruler_sin, FLAT_ruler_sin_over], "step", "$v_{open}$ [mm/s]", "last_angle_error", "error of final angle", axes[1][0], colors=["red", "blue"], labels=["CAVS-fuzzy", "CAVS-vibration", "CAVS-vibration_over", "FLAT-fuzzy", "FLAT-vibration", "FLAT-vibration_over"])
 
-# wood
-create_boxplot_graph2([CAVS_wood_linear, CAVS_wood_sin, FLAT_wood_linear, FLAT_wood_sin], "step", "$v_{open}$ [mm/s]", "max_angular_velocity", "max angular velocity", axes[0][1], colors=["red", "blue"], labels=["CAVS-fuzzy", "CAVS-vibration", "FLAT-fuzzy", "FLAT-vibration"])
-create_boxplot_graph2([CAVS_wood_linear, CAVS_wood_sin, FLAT_wood_linear, FLAT_wood_sin], "step", "$v_{open}$ [mm/s]", "elasped_time", "elapsed time", axes[1][1], colors=["red", "blue"], labels=["CAVS-fuzzy", "CAVS-vibration", "FLAT-fuzzy", "FLAT-vibration"])
-create_barplot_graph([CAVS_wood_linear, CAVS_wood_sin, FLAT_wood_linear, FLAT_wood_sin], "step", "$v_{open}$ [mm/s]", "rms_th=15", "RMSE of angular velocity", axes[0][0], colors=["red", "blue"], labels=["CAVS-fuzzy", "CAVS-vibration", "FLAT-fuzzy", "FLAT-vibration"])
-create_barplot_graph2([CAVS_wood_linear, CAVS_wood_sin, FLAT_wood_linear, FLAT_wood_sin], "step", "$v_{open}$ [mm/s]", "last_angle_error", "RMSE of final angle", axes[1][0], colors=["red", "blue"], labels=["CAVS-fuzzy", "CAVS-vibration", "FLAT-fuzzy", "FLAT-vibration"])
+# # wood
+# create_boxplot_graph2([CAVS_wood_linear, CAVS_wood_sin, FLAT_wood_linear, FLAT_wood_sin], "step", "$v_{open}$ [mm/s]", "max_angular_velocity", "max angular velocity", axes[0][1], colors=["red", "blue"], labels=["CAVS-fuzzy", "CAVS-vibration", "FLAT-fuzzy", "FLAT-vibration"])
+# create_boxplot_graph2([CAVS_wood_linear, CAVS_wood_sin, FLAT_wood_linear, FLAT_wood_sin], "step", "$v_{open}$ [mm/s]", "elasped_time", "elapsed time", axes[1][1], colors=["red", "blue"], labels=["CAVS-fuzzy", "CAVS-vibration", "FLAT-fuzzy", "FLAT-vibration"])
+# create_barplot_graph([CAVS_wood_linear, CAVS_wood_sin, FLAT_wood_linear, FLAT_wood_sin], "step", "$v_{open}$ [mm/s]", "rms_th=15", "RMSE of angular velocity", axes[0][0], colors=["red", "blue"], labels=["CAVS-fuzzy", "CAVS-vibration", "FLAT-fuzzy", "FLAT-vibration"])
+# create_barplot_graph2([CAVS_wood_linear, CAVS_wood_sin, FLAT_wood_linear, FLAT_wood_sin], "step", "$v_{open}$ [mm/s]", "last_angle_error", "RMSE of final angle", axes[1][0], colors=["red", "blue"], labels=["CAVS-fuzzy", "CAVS-vibration", "FLAT-fuzzy", "FLAT-vibration"])
 
 axes[0][1].set_ylim(ymin=0)
 axes[1][1].set_ylim(ymin=0)
 
-axes[0][0].set_ylim(ymax=250)
+# axes[0][0].set_ylim(ymax=250)
 axes[0][1].set_ylim(ymax=800)
 axes[1][0].set_ylim(ymax=25)
-axes[1][1].set_ylim(ymax=15)
+# axes[1][1].set_ylim(ymax=15)
 
 # # 凡例表示
 for ax1 in axes:
@@ -375,8 +409,10 @@ for ax1 in axes:
 # create_rmse_graph(df_CAVS, "step", ax, "red")
 # create_rmse_graph(df_FLAT, "step", ax, "blue")
 
-plt.savefig("/home/suzuki/ros_ws/ay_tools/fingervision/suzuki/rubbing_hand/data/0718/IRC2021_wood_v0.5_only.png")
-plt.savefig("/home/suzuki/ros_ws/ay_tools/fingervision/suzuki/rubbing_hand/data/0718/IRC2021_wood_v0.5_only.eps")
+save_name = base_dir+"test_ruler_v0.5_only_over"
+
+plt.savefig(save_name+".png")
+plt.savefig(save_name+".eps")
 plt.show()
 
 # plt.scatter(x=df_FLAT["step"], y=df_FLAT["error"]/60, color="blue", label="FLAT")

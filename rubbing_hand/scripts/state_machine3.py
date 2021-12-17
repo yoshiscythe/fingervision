@@ -10,7 +10,7 @@
 import rospy
 
 def Print(*args):
-  print ' '.join(map(str,args))
+  print(' '.join(map(str,args)))
 CPrint= Print
 
 
@@ -20,6 +20,7 @@ class TStateMachine(object):
     self.StartState= start_state
     self.Debug= debug
     self.r = rospy.Rate(120)
+    self.is_running = True
 
   class TAction(object):
     def __init__(self):
@@ -53,10 +54,14 @@ class TStateMachine(object):
     return actions
 
   def Run(self):
+    self.is_running = True
     self.prev_state= ''
     self.curr_state= self.StartState
     count= 0
     while self.curr_state!='':
+      if not self.is_running:
+        self.is_running = False
+        return 1
       count+=1
       if self.Debug: CPrint(2, '@',count,self.curr_state)
       if self.curr_state not in self.States:
@@ -123,6 +128,8 @@ class TStateMachine(object):
         self.curr_state= next_state
 
       self.r.sleep()
+    self.is_running = False
+    return 0
 
 if __name__=='__main__':
   import time,sys

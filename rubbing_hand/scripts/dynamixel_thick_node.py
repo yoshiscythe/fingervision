@@ -4,6 +4,8 @@
 #use bottom before this program. fpsが上がる
 #$ bash /home/suzuki/prg/DynamixelSDK/python/src/ay_Dynamixel/robots/dynamixel/fix_usb_latency.sh
 
+from __future__ import print_function
+
 import roslib; roslib.load_manifest('rubbing_hand')
 import rospy, rostopic
 rospy.init_node("dynamixel_node")
@@ -51,6 +53,7 @@ dxl= [TDynamixel1(DXL_TYPE,dev), TDynamixel1(DXL_TYPE,dev), TDynamixel1(DXL_TYPE
 # dxl[2].MIN_POSITION, dxl[2].MAX_POSITION = 700, 1600
 # dxl[3].MIN_POSITION, dxl[3].MAX_POSITION = 3700, 5000
 for id in range(len(dxl)):
+  print("ID:{}...".format(DXL_ID[id]))
   dxl[id].Id= DXL_ID[id]
   dxl[id].Baudrate= BAUDRATE
   dxl[id].OpMode= 'EXTPOS' # ただのPOSITIONだと一回転のレンジでしか動かない
@@ -519,10 +522,14 @@ for event in device.read_loop():
         holding.FLAG_MOVES[channel]  = False
         holding.DIRECTIONS[channel]  = 0
       elif event.value == 1:
+        if holding.DIRECTIONS[channel] == 0:
+          if inhand.is_running:
+            inhand.Stop_run()
+          else:
+            inhand.Start()
         holding.FLAG_MOVES[channel]  = True
         holding.DIRECTIONS[channel]  = -1
-        inhand.Start()
-        # holding.thick_f = 1
+        
 
     
 
@@ -574,6 +581,7 @@ holding.Stop()
 inhand.Stop()
 
 for id in range(len(dxl)):
+  print("ID:{}...".format(DXL_ID[id]))
   #dxl[id].PrintStatus()
   #dxl[id].PrintHardwareErrSt()
   dxl[id].DisableTorque()

@@ -1,6 +1,7 @@
 #!/usr/bin/python
 #coding: utf-8
 
+from __future__ import print_function
 import numpy as np
 import threading
 import rospy
@@ -105,6 +106,8 @@ class Inhand:
         self.grasp_itv = 20
         self.angle_margin = 3
 
+        self.sm = None
+
     def Init(self):
         self.amp = self.amp_first
         self.dec_f = [0, 0]
@@ -119,18 +122,22 @@ class Inhand:
     #インハンドマニピュレーションを開始する関数
     #Maniloop関数をスレッドで実行
     def Start(self):
-        # self.Stop()
-        self.thread= threading.Thread(name='inhand', target=self.Maniloop)
-        self.is_running= True
-        self.Init()
-        self.thread.start()
+        if not self.is_running:
+            self.thread= threading.Thread(name='inhand', target=self.Maniloop)
+            self.is_running= True
+            self.Init()
+            self.thread.start()
+
+    def Stop_run(self):
+        if self.is_running:
+            if self.sm is not None:
+                self.sm.is_running = False
+                self.is_running = False
 
     #すべてのスレッドを終了させる関数
     #プログラムの終了前に呼び出そう
     def Stop(self):
-        if self.is_running:
-            self.is_running= False
-            # self.thread.join()
+        self.Stop_run()
         if self.pub_is_running:
             self.pub_is_running = False
 
@@ -139,27 +146,6 @@ class Inhand:
     def Start_pub(self):
         pub_thread = threading.Thread(name='inhand_msg', target=self.publish_inhand_data)
         pub_thread.start()
-
-    # 初速度vel_0から最高速度vel_tまで時間timeで一定加速度で変化する速度軌跡を生成,末尾−1
-    def Create_trapezoidal_array(self, vel_t, time, vel_0 = 0):
-        acc = float(vel_t-vel_0) / time
-        array = [t*acc + vel_0 for t in range(time)]
-        # # 番兵
-        # array.append(-1)
-
-        return array
-
-    #シグナム関数
-    #今は使ってないかな
-    def sgn_(self, d_omega):
-        max_=0.001
-        min_=-0.5
-        d_pos = -d_omega*0.01
-        if d_pos>max_:
-            d_pos = max_
-        elif d_pos<min_:
-            d_pos = min_
-        return d_pos
 
     #インハンドマニピュレーションでつかったデータをpublishする関数
     #スレッドで使うことを想定
@@ -227,17 +213,6 @@ class Inhand:
         
     def Substitution_process(self, f):
         self.process_f = f
-
-    # def Action_close(self):
-    #     MV = self.MV_o[1]
-    #     print("close")
-
-    #     if self.get_alpha() > 500:
-    #         MV += -0.1
-    #         print("too fast")
-
-    #     self.MV = MV
-    #     self.rubbing.Go2itv(self.rubbing.interval-0.2, self.MV)
         
     def Decretion_amp(self):
         d_omega = self.calculate_omega_d()
@@ -355,36 +330,6 @@ class Inhand:
         return y2[-1], x_trg
 
     def Maniloop(self):
-        self.Set_open_step()
-
-
-        time_start = time.time()
-        r = rospy.Rate(self.hz)
-
-        #初期の指間距離保存
-        self.grasp_itv = self.rubbing.interval
-
-        #get the initial angle
-        avg_angle = 0
-        for i in range(60):
-            avg_angle += self.get_theta()
-            r.sleep()
-        avg_angle /= 60
-        theta0 = avg_angle
-
-        thread_cond = lambda: self.is_running and not rospy.is_shutdown()
-
-        print("start inhand manipulation! initial angle=", theta0)
-
-        last_omega_d = 0
-        rotation_f = False
-        error2 = 0
-        error = 0
-
-        def GetStartTime():
-            global start_time
-            start_time= int(time.time())
-
         # 操作：指を一定の速度で開く.物体が回転したら（目標角速度を超えたら）指を安定把持まで一瞬で閉じる．
         # 目的：指をきゅっと閉めてからどのくらいで物体の回転が止まるか調べるのだ．\Delta t(v) を調べるのじゃ．
         states_dtdetector= {
@@ -559,31 +504,58 @@ class Inhand:
             (lambda: self.get_theta()>self.target_angle,'stop',lambda: Print('over target theta! in always state')),
             ]
         }
+        self.sm= TStateMachine(states_sin_over,'start', debug=False)
+        self.Set_open_step()
 
-        sm= TStateMachine(states_sin_over,'start', debug=False)
-        self.process_f = 2
-        sm.Run()
 
-        # self.rubbing.Set_interval(self.grasp_itv)
-        # rospy.sleep(0.5)
+        time_start = time.time()
+        r = rospy.Rate(self.hz)
 
-        self.process_f = 1
+        #初期の指間距離保存
+        self.grasp_itv = self.rubbing.interval
+
+        #get the initial angle
         avg_angle = 0
         for i in range(60):
             avg_angle += self.get_theta()
             r.sleep()
-        self.process_f = 0
         avg_angle /= 60
-        elapsed_time = time.time() - time_start
-        # hyoka = omega_d_i/(time.time()-rotation_start)
-        print("elapsed time=", elapsed_time, ", last angle=", avg_angle, ", target=", self.target_angle, ", diff=", avg_angle-self.target_angle, ", error=", error/60, ", error2=", error2/60)
+        theta0 = avg_angle
+
+        thread_cond = lambda: self.is_running and not rospy.is_shutdown()
+
+        print("initial angle: {}, open velocity: {}, frequency: {}, amplitude: {}, duty ratio: {}".format(theta0, self.MV_o[0], self.sin_hz, self.amp_first, self.d_ratio))
+
+        last_omega_d = 0
+        rotation_f = False
+        error2 = 0
+        error = 0
+
+        def GetStartTime():
+            global start_time
+            start_time= int(time.time())
+
+        self.process_f = 2
+        ret = self.sm.Run()
+
+        if ret: # 外部から強制終了
+            self.process_f = 3
+            self.rubbing.Set_interval(self.grasp_itv)
+            print("強制終了しました")
+        else:   # 正常終了
+            self.process_f = 1
+            avg_angle = 0
+            for i in range(60):
+                avg_angle += self.get_theta()
+                r.sleep()
+            self.process_f = 0
+            avg_angle /= 60
+            elapsed_time = time.time() - time_start
+            # hyoka = omega_d_i/(time.time()-rotation_start)
+            print("elapsed time=", elapsed_time, ", last angle=", avg_angle, ", target=", self.target_angle, ", diff=", avg_angle-self.target_angle)
         
 
         self.is_running = False
-
-def modify_rad_curve(theta):
-    k = 0.7267534839
-    return np.degrees(np.arctan(k*np.tan(theta)))
 
 def Go2itv_client(data1, data2):
   rospy.wait_for_service('/Go2itv')
@@ -591,7 +563,7 @@ def Go2itv_client(data1, data2):
     Go2itv = rospy.ServiceProxy('/Go2itv', Set2Float64)
     Go2itv(data1, data2)
   except rospy.ServiceException, e:
-    print "Service call failed: %s"%e
+    print("Service call failed: {}".format(e))
 
 def Print(*args):
-  print ' '.join(map(str,args))
+  print(' '.join(map(str,args)))
