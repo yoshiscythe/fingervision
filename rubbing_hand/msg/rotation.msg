@@ -2,13 +2,29 @@ Header header
 
 # --------dynamixel--------
 
-# ダイナミクセルへ渡した目標指間距離
-# 取得した指間距離へ操作量を加えている
-# interval = got_interval + MV
+# ハンドの指間距離
 float64 interval
 
-# 指間距離へ加える操作量(Manipulated Variable)
+# 指間距離へ加える操作量の線形成分(Manipulated Variable)
 float64 MV
+
+# ハンドの指先角度
+# ハンドへの最終的な入力．offset_degree_of_finger + MV_degree_of_finger
+float64 degree_of_finger
+
+# ハンドの指先角度
+# MV_degree_of_finger=0のときに指間の平行を補償する値
+float64 offset_degree_of_finger
+
+# ハンドの指先角度
+# 平行からの角度変化
+float64 MV_degree_of_finger
+
+# ハンドの仮想面の傾き
+float64 degree_of_surface
+
+# ハンドの仮想面の位置
+float64 pos_of_surface
 
 # -------------------------
 
@@ -24,7 +40,7 @@ float64 obj_orientation
 # objectの角度 [deg]  obj_orientationをsmaでフィルターしてる（filter_node参照）
 float64 obj_orientation_filtered
 
-# objectの角速度 [deg/s]　obj_orientation_filteredの差分をとったものをsmaでフィルターしてる（filter_node参照）
+# objectの角速度 [deg/s] obj_orientation_filteredの差分をとったものをsmaでフィルターしてる（filter_node参照）
 float64 d_obj_orientation_filtered
 
 # -------------------------
@@ -40,9 +56,6 @@ float64 target_d_obj_orientation
 # 目標角速度と取得した角速度の差
 # d_obj_orientation_filtered - target_d_obj_orientation
 float64 omega_d
-
-# mv_sの和からすべり判定をする際のしきい値
-float64 th_slip
 
 # 取得した角速度d_obj_orientation_filteredと目標角速度target_d_obj_orientationとの差から操作量MVを決めるパラメータ
 # MV_input  = [neutral_min, neutral_max , drop]

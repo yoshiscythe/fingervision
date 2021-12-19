@@ -31,6 +31,9 @@ class Subscribe:
         elif topic == "fv_smaf":
             self.topic_name = "/fingervision/obj_orientation_smaf"
             self.topic_type = Float64Array
+        elif topic == "fv_v_smaf":
+            self.topic_name = "/fingervision/obj_orientation_v_smaf"
+            self.topic_type = Float64Array
         else:
             self.topic_name = None
             self.topic_type = None

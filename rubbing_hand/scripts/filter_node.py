@@ -388,8 +388,8 @@ class SGF:
         self.pub.publish(data)
 
 class SMAF:
-    log = {}
     def __init__(self, pub):
+        self.log = {}
         self.log["obj_orientation"] = Log()
         self.log["obj_orientation"].need_modify = False
         self.log["d_obj_orientation"] = Log(10)
@@ -413,8 +413,8 @@ class SMAF:
         self.pub.publish(data)
 
 class SMAF2:
-    log = {}
     def __init__(self, pub):
+        self.log = {}
         self.log["obj_orientation"] = Log()
         self.log["obj_orientation"].need_modify = False
         self.log["d_obj_orientation"] = Log(10)
@@ -424,9 +424,11 @@ class SMAF2:
         self.last_theta = 0
         self.last_theta_dot = 0
         self.first_f = True
+        self.offset_angle = 0.0
 
     def callback(self, msg):
-        self.log["obj_orientation"].storing(np.degrees(msg.obj_orientation))
+        angle = round_90(np.degrees(msg.obj_orientation) + self.offset_angle)
+        self.log["obj_orientation"].storing(angle)
 
         len_window = self.length_window
         y = self.log["obj_orientation"].get_log()
@@ -456,6 +458,17 @@ class SMAF2:
         data = Float64Array()
         data.data = [theta, theta_dot, theta_dot_dot, theta_dot_s, theta_dot_dot_s]
         self.pub.publish(data)
+
+def round_90(angle):
+    while not (abs(angle) <= 90):
+        if angle > 90:
+            angle -= 180
+        elif angle < -90:
+            angle += 180
+        else:
+            break
+    return angle
+
 
 def three_points_katagawa_koutai_sabunshiki(log, h, step=1):
     # https://takun-physics.net/9346/
@@ -499,29 +512,17 @@ def callback(msg, func):
 if __name__=='__main__':
     rospy.init_node('filter_node')
 
-    # obj_orientation_lkf_pub1 = rospy.Publisher(rospy.get_namespace()+"obj_orientation_lkf1", Float64Array, queue_size=1)
-    # obj_orientation_lkf_pub2 = rospy.Publisher(rospy.get_namespace()+"obj_orientation_lkf2", Float64Array, queue_size=1)
-    # obj_orientation_sgf_pub = rospy.Publisher("obj_orientation_sgf", Float64Array, queue_size=10)
     obj_orientation_smaf_pub = rospy.Publisher(rospy.get_namespace()+"obj_orientation_smaf", Float64Array, queue_size=1)
-    # my_LKF1 = LKF4(obj_orientation_lkf_pub1)
-    # my_LKF2 = LKF3(obj_orientation_lkf_pub2)
-    # my_LKF1.A = np.mat([[1,0.033], [0,1]])
-    # my_LKF2.A = np.mat([[1,0.033], [0,1]])
-    # my_LKF1.Q = np.mat([[0.647288,0], [0,0.647288]])
-    # my_LKF1.R = np.mat([[0.355608]])
-    # my_LKF1.Q *= 0.01
-    # my_LKF1.R *= 1
-    # my_LKF2.Q *= 0.64
-    # my_LKF2.R *= 0.35
-    # my_LKF2.Sigma0 = np.mat([[2,0],[0,2]])
-    # my_LKF1.A = np.mat([[1,0.00333], [0,1]])
+    obj_orientation_v_smaf_pub = rospy.Publisher(rospy.get_namespace()+"obj_orientation_v_smaf", Float64Array, queue_size=1)
 
-    # my_SGF = SGF(obj_orientation_sgf_pub)
     my_SMAF = SMAF2(obj_orientation_smaf_pub)
     my_SMAF.length_window = 10
 
-    rospy.Subscriber("/fingervision/fv_filter1_objinfo", Filter1ObjInfo, lambda msg: callback(msg,[my_SMAF]), queue_size=1)
-    # rospy.Subscriber("/fingervision/fv_filter1_objinfo", Filter1ObjInfo, my_LKF1.callback)
+    my_SMAF_v = SMAF2(obj_orientation_v_smaf_pub)
+    my_SMAF_v.length_window = 10
+    my_SMAF_v.offset_angle = -90.0
+
+    rospy.Subscriber("/fingervision/fv_filter1_objinfo", Filter1ObjInfo, lambda msg: callback(msg,[my_SMAF, my_SMAF_v]), queue_size=1)
 
     print("start filtering")
 

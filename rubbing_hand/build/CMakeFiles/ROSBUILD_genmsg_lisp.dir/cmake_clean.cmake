@@ -21,6 +21,9 @@ file(REMOVE_RECURSE
   "../msg_gen/lisp/inhand.lisp"
   "../msg_gen/lisp/_package.lisp"
   "../msg_gen/lisp/_package_inhand.lisp"
+  "../msg_gen/lisp/rotation.lisp"
+  "../msg_gen/lisp/_package.lisp"
+  "../msg_gen/lisp/_package_rotation.lisp"
 )
 
 # Per-language clean rules from dependency scanning.

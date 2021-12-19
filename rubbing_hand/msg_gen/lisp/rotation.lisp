@@ -4,9 +4,9 @@
 (cl:in-package rubbing_hand-msg)
 
 
-;//! \htmlinclude inhand.msg.html
+;//! \htmlinclude rotation.msg.html
 
-(cl:defclass <inhand> (roslisp-msg-protocol:ros-message)
+(cl:defclass <rotation> (roslisp-msg-protocol:ros-message)
   ((header
     :reader header
     :initarg :header
@@ -20,6 +20,31 @@
    (MV
     :reader MV
     :initarg :MV
+    :type cl:float
+    :initform 0.0)
+   (degree_of_finger
+    :reader degree_of_finger
+    :initarg :degree_of_finger
+    :type cl:float
+    :initform 0.0)
+   (offset_degree_of_finger
+    :reader offset_degree_of_finger
+    :initarg :offset_degree_of_finger
+    :type cl:float
+    :initform 0.0)
+   (MV_degree_of_finger
+    :reader MV_degree_of_finger
+    :initarg :MV_degree_of_finger
+    :type cl:float
+    :initform 0.0)
+   (degree_of_surface
+    :reader degree_of_surface
+    :initarg :degree_of_surface
+    :type cl:float
+    :initform 0.0)
+   (pos_of_surface
+    :reader pos_of_surface
+    :initarg :pos_of_surface
     :type cl:float
     :initform 0.0)
    (mv_s
@@ -57,11 +82,6 @@
     :initarg :omega_d
     :type cl:float
     :initform 0.0)
-   (th_slip
-    :reader th_slip
-    :initarg :th_slip
-    :type cl:float
-    :initform 0.0)
    (MV_i
     :reader MV_i
     :initarg :MV_i
@@ -84,90 +104,110 @@
    :initform (cl:make-array 0 :element-type 'cl:float :initial-element 0.0)))
 )
 
-(cl:defclass inhand (<inhand>)
+(cl:defclass rotation (<rotation>)
   ())
 
-(cl:defmethod cl:initialize-instance :after ((m <inhand>) cl:&rest args)
+(cl:defmethod cl:initialize-instance :after ((m <rotation>) cl:&rest args)
   (cl:declare (cl:ignorable args))
-  (cl:unless (cl:typep m 'inhand)
-    (roslisp-msg-protocol:msg-deprecation-warning "using old message class name rubbing_hand-msg:<inhand> is deprecated: use rubbing_hand-msg:inhand instead.")))
+  (cl:unless (cl:typep m 'rotation)
+    (roslisp-msg-protocol:msg-deprecation-warning "using old message class name rubbing_hand-msg:<rotation> is deprecated: use rubbing_hand-msg:rotation instead.")))
 
 (cl:ensure-generic-function 'header-val :lambda-list '(m))
-(cl:defmethod header-val ((m <inhand>))
+(cl:defmethod header-val ((m <rotation>))
   (roslisp-msg-protocol:msg-deprecation-warning "Using old-style slot reader rubbing_hand-msg:header-val is deprecated.  Use rubbing_hand-msg:header instead.")
   (header m))
 
 (cl:ensure-generic-function 'interval-val :lambda-list '(m))
-(cl:defmethod interval-val ((m <inhand>))
+(cl:defmethod interval-val ((m <rotation>))
   (roslisp-msg-protocol:msg-deprecation-warning "Using old-style slot reader rubbing_hand-msg:interval-val is deprecated.  Use rubbing_hand-msg:interval instead.")
   (interval m))
 
 (cl:ensure-generic-function 'MV-val :lambda-list '(m))
-(cl:defmethod MV-val ((m <inhand>))
+(cl:defmethod MV-val ((m <rotation>))
   (roslisp-msg-protocol:msg-deprecation-warning "Using old-style slot reader rubbing_hand-msg:MV-val is deprecated.  Use rubbing_hand-msg:MV instead.")
   (MV m))
 
+(cl:ensure-generic-function 'degree_of_finger-val :lambda-list '(m))
+(cl:defmethod degree_of_finger-val ((m <rotation>))
+  (roslisp-msg-protocol:msg-deprecation-warning "Using old-style slot reader rubbing_hand-msg:degree_of_finger-val is deprecated.  Use rubbing_hand-msg:degree_of_finger instead.")
+  (degree_of_finger m))
+
+(cl:ensure-generic-function 'offset_degree_of_finger-val :lambda-list '(m))
+(cl:defmethod offset_degree_of_finger-val ((m <rotation>))
+  (roslisp-msg-protocol:msg-deprecation-warning "Using old-style slot reader rubbing_hand-msg:offset_degree_of_finger-val is deprecated.  Use rubbing_hand-msg:offset_degree_of_finger instead.")
+  (offset_degree_of_finger m))
+
+(cl:ensure-generic-function 'MV_degree_of_finger-val :lambda-list '(m))
+(cl:defmethod MV_degree_of_finger-val ((m <rotation>))
+  (roslisp-msg-protocol:msg-deprecation-warning "Using old-style slot reader rubbing_hand-msg:MV_degree_of_finger-val is deprecated.  Use rubbing_hand-msg:MV_degree_of_finger instead.")
+  (MV_degree_of_finger m))
+
+(cl:ensure-generic-function 'degree_of_surface-val :lambda-list '(m))
+(cl:defmethod degree_of_surface-val ((m <rotation>))
+  (roslisp-msg-protocol:msg-deprecation-warning "Using old-style slot reader rubbing_hand-msg:degree_of_surface-val is deprecated.  Use rubbing_hand-msg:degree_of_surface instead.")
+  (degree_of_surface m))
+
+(cl:ensure-generic-function 'pos_of_surface-val :lambda-list '(m))
+(cl:defmethod pos_of_surface-val ((m <rotation>))
+  (roslisp-msg-protocol:msg-deprecation-warning "Using old-style slot reader rubbing_hand-msg:pos_of_surface-val is deprecated.  Use rubbing_hand-msg:pos_of_surface instead.")
+  (pos_of_surface m))
+
 (cl:ensure-generic-function 'mv_s-val :lambda-list '(m))
-(cl:defmethod mv_s-val ((m <inhand>))
+(cl:defmethod mv_s-val ((m <rotation>))
   (roslisp-msg-protocol:msg-deprecation-warning "Using old-style slot reader rubbing_hand-msg:mv_s-val is deprecated.  Use rubbing_hand-msg:mv_s instead.")
   (mv_s m))
 
 (cl:ensure-generic-function 'obj_orientation-val :lambda-list '(m))
-(cl:defmethod obj_orientation-val ((m <inhand>))
+(cl:defmethod obj_orientation-val ((m <rotation>))
   (roslisp-msg-protocol:msg-deprecation-warning "Using old-style slot reader rubbing_hand-msg:obj_orientation-val is deprecated.  Use rubbing_hand-msg:obj_orientation instead.")
   (obj_orientation m))
 
 (cl:ensure-generic-function 'obj_orientation_filtered-val :lambda-list '(m))
-(cl:defmethod obj_orientation_filtered-val ((m <inhand>))
+(cl:defmethod obj_orientation_filtered-val ((m <rotation>))
   (roslisp-msg-protocol:msg-deprecation-warning "Using old-style slot reader rubbing_hand-msg:obj_orientation_filtered-val is deprecated.  Use rubbing_hand-msg:obj_orientation_filtered instead.")
   (obj_orientation_filtered m))
 
 (cl:ensure-generic-function 'd_obj_orientation_filtered-val :lambda-list '(m))
-(cl:defmethod d_obj_orientation_filtered-val ((m <inhand>))
+(cl:defmethod d_obj_orientation_filtered-val ((m <rotation>))
   (roslisp-msg-protocol:msg-deprecation-warning "Using old-style slot reader rubbing_hand-msg:d_obj_orientation_filtered-val is deprecated.  Use rubbing_hand-msg:d_obj_orientation_filtered instead.")
   (d_obj_orientation_filtered m))
 
 (cl:ensure-generic-function 'target_obj_orientation-val :lambda-list '(m))
-(cl:defmethod target_obj_orientation-val ((m <inhand>))
+(cl:defmethod target_obj_orientation-val ((m <rotation>))
   (roslisp-msg-protocol:msg-deprecation-warning "Using old-style slot reader rubbing_hand-msg:target_obj_orientation-val is deprecated.  Use rubbing_hand-msg:target_obj_orientation instead.")
   (target_obj_orientation m))
 
 (cl:ensure-generic-function 'target_d_obj_orientation-val :lambda-list '(m))
-(cl:defmethod target_d_obj_orientation-val ((m <inhand>))
+(cl:defmethod target_d_obj_orientation-val ((m <rotation>))
   (roslisp-msg-protocol:msg-deprecation-warning "Using old-style slot reader rubbing_hand-msg:target_d_obj_orientation-val is deprecated.  Use rubbing_hand-msg:target_d_obj_orientation instead.")
   (target_d_obj_orientation m))
 
 (cl:ensure-generic-function 'omega_d-val :lambda-list '(m))
-(cl:defmethod omega_d-val ((m <inhand>))
+(cl:defmethod omega_d-val ((m <rotation>))
   (roslisp-msg-protocol:msg-deprecation-warning "Using old-style slot reader rubbing_hand-msg:omega_d-val is deprecated.  Use rubbing_hand-msg:omega_d instead.")
   (omega_d m))
 
-(cl:ensure-generic-function 'th_slip-val :lambda-list '(m))
-(cl:defmethod th_slip-val ((m <inhand>))
-  (roslisp-msg-protocol:msg-deprecation-warning "Using old-style slot reader rubbing_hand-msg:th_slip-val is deprecated.  Use rubbing_hand-msg:th_slip instead.")
-  (th_slip m))
-
 (cl:ensure-generic-function 'MV_i-val :lambda-list '(m))
-(cl:defmethod MV_i-val ((m <inhand>))
+(cl:defmethod MV_i-val ((m <rotation>))
   (roslisp-msg-protocol:msg-deprecation-warning "Using old-style slot reader rubbing_hand-msg:MV_i-val is deprecated.  Use rubbing_hand-msg:MV_i instead.")
   (MV_i m))
 
 (cl:ensure-generic-function 'MV_o-val :lambda-list '(m))
-(cl:defmethod MV_o-val ((m <inhand>))
+(cl:defmethod MV_o-val ((m <rotation>))
   (roslisp-msg-protocol:msg-deprecation-warning "Using old-style slot reader rubbing_hand-msg:MV_o-val is deprecated.  Use rubbing_hand-msg:MV_o instead.")
   (MV_o m))
 
 (cl:ensure-generic-function 'process_f-val :lambda-list '(m))
-(cl:defmethod process_f-val ((m <inhand>))
+(cl:defmethod process_f-val ((m <rotation>))
   (roslisp-msg-protocol:msg-deprecation-warning "Using old-style slot reader rubbing_hand-msg:process_f-val is deprecated.  Use rubbing_hand-msg:process_f instead.")
   (process_f m))
 
 (cl:ensure-generic-function 'debag-val :lambda-list '(m))
-(cl:defmethod debag-val ((m <inhand>))
+(cl:defmethod debag-val ((m <rotation>))
   (roslisp-msg-protocol:msg-deprecation-warning "Using old-style slot reader rubbing_hand-msg:debag-val is deprecated.  Use rubbing_hand-msg:debag instead.")
   (debag m))
-(cl:defmethod roslisp-msg-protocol:serialize ((msg <inhand>) ostream)
-  "Serializes a message object of type '<inhand>"
+(cl:defmethod roslisp-msg-protocol:serialize ((msg <rotation>) ostream)
+  "Serializes a message object of type '<rotation>"
   (roslisp-msg-protocol:serialize (cl:slot-value msg 'header) ostream)
   (cl:let ((bits (roslisp-utils:encode-double-float-bits (cl:slot-value msg 'interval))))
     (cl:write-byte (cl:ldb (cl:byte 8 0) bits) ostream)
@@ -179,6 +219,51 @@
     (cl:write-byte (cl:ldb (cl:byte 8 48) bits) ostream)
     (cl:write-byte (cl:ldb (cl:byte 8 56) bits) ostream))
   (cl:let ((bits (roslisp-utils:encode-double-float-bits (cl:slot-value msg 'MV))))
+    (cl:write-byte (cl:ldb (cl:byte 8 0) bits) ostream)
+    (cl:write-byte (cl:ldb (cl:byte 8 8) bits) ostream)
+    (cl:write-byte (cl:ldb (cl:byte 8 16) bits) ostream)
+    (cl:write-byte (cl:ldb (cl:byte 8 24) bits) ostream)
+    (cl:write-byte (cl:ldb (cl:byte 8 32) bits) ostream)
+    (cl:write-byte (cl:ldb (cl:byte 8 40) bits) ostream)
+    (cl:write-byte (cl:ldb (cl:byte 8 48) bits) ostream)
+    (cl:write-byte (cl:ldb (cl:byte 8 56) bits) ostream))
+  (cl:let ((bits (roslisp-utils:encode-double-float-bits (cl:slot-value msg 'degree_of_finger))))
+    (cl:write-byte (cl:ldb (cl:byte 8 0) bits) ostream)
+    (cl:write-byte (cl:ldb (cl:byte 8 8) bits) ostream)
+    (cl:write-byte (cl:ldb (cl:byte 8 16) bits) ostream)
+    (cl:write-byte (cl:ldb (cl:byte 8 24) bits) ostream)
+    (cl:write-byte (cl:ldb (cl:byte 8 32) bits) ostream)
+    (cl:write-byte (cl:ldb (cl:byte 8 40) bits) ostream)
+    (cl:write-byte (cl:ldb (cl:byte 8 48) bits) ostream)
+    (cl:write-byte (cl:ldb (cl:byte 8 56) bits) ostream))
+  (cl:let ((bits (roslisp-utils:encode-double-float-bits (cl:slot-value msg 'offset_degree_of_finger))))
+    (cl:write-byte (cl:ldb (cl:byte 8 0) bits) ostream)
+    (cl:write-byte (cl:ldb (cl:byte 8 8) bits) ostream)
+    (cl:write-byte (cl:ldb (cl:byte 8 16) bits) ostream)
+    (cl:write-byte (cl:ldb (cl:byte 8 24) bits) ostream)
+    (cl:write-byte (cl:ldb (cl:byte 8 32) bits) ostream)
+    (cl:write-byte (cl:ldb (cl:byte 8 40) bits) ostream)
+    (cl:write-byte (cl:ldb (cl:byte 8 48) bits) ostream)
+    (cl:write-byte (cl:ldb (cl:byte 8 56) bits) ostream))
+  (cl:let ((bits (roslisp-utils:encode-double-float-bits (cl:slot-value msg 'MV_degree_of_finger))))
+    (cl:write-byte (cl:ldb (cl:byte 8 0) bits) ostream)
+    (cl:write-byte (cl:ldb (cl:byte 8 8) bits) ostream)
+    (cl:write-byte (cl:ldb (cl:byte 8 16) bits) ostream)
+    (cl:write-byte (cl:ldb (cl:byte 8 24) bits) ostream)
+    (cl:write-byte (cl:ldb (cl:byte 8 32) bits) ostream)
+    (cl:write-byte (cl:ldb (cl:byte 8 40) bits) ostream)
+    (cl:write-byte (cl:ldb (cl:byte 8 48) bits) ostream)
+    (cl:write-byte (cl:ldb (cl:byte 8 56) bits) ostream))
+  (cl:let ((bits (roslisp-utils:encode-double-float-bits (cl:slot-value msg 'degree_of_surface))))
+    (cl:write-byte (cl:ldb (cl:byte 8 0) bits) ostream)
+    (cl:write-byte (cl:ldb (cl:byte 8 8) bits) ostream)
+    (cl:write-byte (cl:ldb (cl:byte 8 16) bits) ostream)
+    (cl:write-byte (cl:ldb (cl:byte 8 24) bits) ostream)
+    (cl:write-byte (cl:ldb (cl:byte 8 32) bits) ostream)
+    (cl:write-byte (cl:ldb (cl:byte 8 40) bits) ostream)
+    (cl:write-byte (cl:ldb (cl:byte 8 48) bits) ostream)
+    (cl:write-byte (cl:ldb (cl:byte 8 56) bits) ostream))
+  (cl:let ((bits (roslisp-utils:encode-double-float-bits (cl:slot-value msg 'pos_of_surface))))
     (cl:write-byte (cl:ldb (cl:byte 8 0) bits) ostream)
     (cl:write-byte (cl:ldb (cl:byte 8 8) bits) ostream)
     (cl:write-byte (cl:ldb (cl:byte 8 16) bits) ostream)
@@ -252,15 +337,6 @@
     (cl:write-byte (cl:ldb (cl:byte 8 40) bits) ostream)
     (cl:write-byte (cl:ldb (cl:byte 8 48) bits) ostream)
     (cl:write-byte (cl:ldb (cl:byte 8 56) bits) ostream))
-  (cl:let ((bits (roslisp-utils:encode-double-float-bits (cl:slot-value msg 'th_slip))))
-    (cl:write-byte (cl:ldb (cl:byte 8 0) bits) ostream)
-    (cl:write-byte (cl:ldb (cl:byte 8 8) bits) ostream)
-    (cl:write-byte (cl:ldb (cl:byte 8 16) bits) ostream)
-    (cl:write-byte (cl:ldb (cl:byte 8 24) bits) ostream)
-    (cl:write-byte (cl:ldb (cl:byte 8 32) bits) ostream)
-    (cl:write-byte (cl:ldb (cl:byte 8 40) bits) ostream)
-    (cl:write-byte (cl:ldb (cl:byte 8 48) bits) ostream)
-    (cl:write-byte (cl:ldb (cl:byte 8 56) bits) ostream))
   (cl:let ((__ros_arr_len (cl:length (cl:slot-value msg 'MV_i))))
     (cl:write-byte (cl:ldb (cl:byte 8 0) __ros_arr_len) ostream)
     (cl:write-byte (cl:ldb (cl:byte 8 8) __ros_arr_len) ostream)
@@ -313,8 +389,8 @@
     (cl:write-byte (cl:ldb (cl:byte 8 56) bits) ostream)))
    (cl:slot-value msg 'debag))
 )
-(cl:defmethod roslisp-msg-protocol:deserialize ((msg <inhand>) istream)
-  "Deserializes a message object of type '<inhand>"
+(cl:defmethod roslisp-msg-protocol:deserialize ((msg <rotation>) istream)
+  "Deserializes a message object of type '<rotation>"
   (roslisp-msg-protocol:deserialize (cl:slot-value msg 'header) istream)
     (cl:let ((bits 0))
       (cl:setf (cl:ldb (cl:byte 8 0) bits) (cl:read-byte istream))
@@ -336,6 +412,56 @@
       (cl:setf (cl:ldb (cl:byte 8 48) bits) (cl:read-byte istream))
       (cl:setf (cl:ldb (cl:byte 8 56) bits) (cl:read-byte istream))
     (cl:setf (cl:slot-value msg 'MV) (roslisp-utils:decode-double-float-bits bits)))
+    (cl:let ((bits 0))
+      (cl:setf (cl:ldb (cl:byte 8 0) bits) (cl:read-byte istream))
+      (cl:setf (cl:ldb (cl:byte 8 8) bits) (cl:read-byte istream))
+      (cl:setf (cl:ldb (cl:byte 8 16) bits) (cl:read-byte istream))
+      (cl:setf (cl:ldb (cl:byte 8 24) bits) (cl:read-byte istream))
+      (cl:setf (cl:ldb (cl:byte 8 32) bits) (cl:read-byte istream))
+      (cl:setf (cl:ldb (cl:byte 8 40) bits) (cl:read-byte istream))
+      (cl:setf (cl:ldb (cl:byte 8 48) bits) (cl:read-byte istream))
+      (cl:setf (cl:ldb (cl:byte 8 56) bits) (cl:read-byte istream))
+    (cl:setf (cl:slot-value msg 'degree_of_finger) (roslisp-utils:decode-double-float-bits bits)))
+    (cl:let ((bits 0))
+      (cl:setf (cl:ldb (cl:byte 8 0) bits) (cl:read-byte istream))
+      (cl:setf (cl:ldb (cl:byte 8 8) bits) (cl:read-byte istream))
+      (cl:setf (cl:ldb (cl:byte 8 16) bits) (cl:read-byte istream))
+      (cl:setf (cl:ldb (cl:byte 8 24) bits) (cl:read-byte istream))
+      (cl:setf (cl:ldb (cl:byte 8 32) bits) (cl:read-byte istream))
+      (cl:setf (cl:ldb (cl:byte 8 40) bits) (cl:read-byte istream))
+      (cl:setf (cl:ldb (cl:byte 8 48) bits) (cl:read-byte istream))
+      (cl:setf (cl:ldb (cl:byte 8 56) bits) (cl:read-byte istream))
+    (cl:setf (cl:slot-value msg 'offset_degree_of_finger) (roslisp-utils:decode-double-float-bits bits)))
+    (cl:let ((bits 0))
+      (cl:setf (cl:ldb (cl:byte 8 0) bits) (cl:read-byte istream))
+      (cl:setf (cl:ldb (cl:byte 8 8) bits) (cl:read-byte istream))
+      (cl:setf (cl:ldb (cl:byte 8 16) bits) (cl:read-byte istream))
+      (cl:setf (cl:ldb (cl:byte 8 24) bits) (cl:read-byte istream))
+      (cl:setf (cl:ldb (cl:byte 8 32) bits) (cl:read-byte istream))
+      (cl:setf (cl:ldb (cl:byte 8 40) bits) (cl:read-byte istream))
+      (cl:setf (cl:ldb (cl:byte 8 48) bits) (cl:read-byte istream))
+      (cl:setf (cl:ldb (cl:byte 8 56) bits) (cl:read-byte istream))
+    (cl:setf (cl:slot-value msg 'MV_degree_of_finger) (roslisp-utils:decode-double-float-bits bits)))
+    (cl:let ((bits 0))
+      (cl:setf (cl:ldb (cl:byte 8 0) bits) (cl:read-byte istream))
+      (cl:setf (cl:ldb (cl:byte 8 8) bits) (cl:read-byte istream))
+      (cl:setf (cl:ldb (cl:byte 8 16) bits) (cl:read-byte istream))
+      (cl:setf (cl:ldb (cl:byte 8 24) bits) (cl:read-byte istream))
+      (cl:setf (cl:ldb (cl:byte 8 32) bits) (cl:read-byte istream))
+      (cl:setf (cl:ldb (cl:byte 8 40) bits) (cl:read-byte istream))
+      (cl:setf (cl:ldb (cl:byte 8 48) bits) (cl:read-byte istream))
+      (cl:setf (cl:ldb (cl:byte 8 56) bits) (cl:read-byte istream))
+    (cl:setf (cl:slot-value msg 'degree_of_surface) (roslisp-utils:decode-double-float-bits bits)))
+    (cl:let ((bits 0))
+      (cl:setf (cl:ldb (cl:byte 8 0) bits) (cl:read-byte istream))
+      (cl:setf (cl:ldb (cl:byte 8 8) bits) (cl:read-byte istream))
+      (cl:setf (cl:ldb (cl:byte 8 16) bits) (cl:read-byte istream))
+      (cl:setf (cl:ldb (cl:byte 8 24) bits) (cl:read-byte istream))
+      (cl:setf (cl:ldb (cl:byte 8 32) bits) (cl:read-byte istream))
+      (cl:setf (cl:ldb (cl:byte 8 40) bits) (cl:read-byte istream))
+      (cl:setf (cl:ldb (cl:byte 8 48) bits) (cl:read-byte istream))
+      (cl:setf (cl:ldb (cl:byte 8 56) bits) (cl:read-byte istream))
+    (cl:setf (cl:slot-value msg 'pos_of_surface) (roslisp-utils:decode-double-float-bits bits)))
   (cl:let ((__ros_arr_len 0))
     (cl:setf (cl:ldb (cl:byte 8 0) __ros_arr_len) (cl:read-byte istream))
     (cl:setf (cl:ldb (cl:byte 8 8) __ros_arr_len) (cl:read-byte istream))
@@ -410,16 +536,6 @@
       (cl:setf (cl:ldb (cl:byte 8 48) bits) (cl:read-byte istream))
       (cl:setf (cl:ldb (cl:byte 8 56) bits) (cl:read-byte istream))
     (cl:setf (cl:slot-value msg 'omega_d) (roslisp-utils:decode-double-float-bits bits)))
-    (cl:let ((bits 0))
-      (cl:setf (cl:ldb (cl:byte 8 0) bits) (cl:read-byte istream))
-      (cl:setf (cl:ldb (cl:byte 8 8) bits) (cl:read-byte istream))
-      (cl:setf (cl:ldb (cl:byte 8 16) bits) (cl:read-byte istream))
-      (cl:setf (cl:ldb (cl:byte 8 24) bits) (cl:read-byte istream))
-      (cl:setf (cl:ldb (cl:byte 8 32) bits) (cl:read-byte istream))
-      (cl:setf (cl:ldb (cl:byte 8 40) bits) (cl:read-byte istream))
-      (cl:setf (cl:ldb (cl:byte 8 48) bits) (cl:read-byte istream))
-      (cl:setf (cl:ldb (cl:byte 8 56) bits) (cl:read-byte istream))
-    (cl:setf (cl:slot-value msg 'th_slip) (roslisp-utils:decode-double-float-bits bits)))
   (cl:let ((__ros_arr_len 0))
     (cl:setf (cl:ldb (cl:byte 8 0) __ros_arr_len) (cl:read-byte istream))
     (cl:setf (cl:ldb (cl:byte 8 8) __ros_arr_len) (cl:read-byte istream))
@@ -482,31 +598,35 @@
     (cl:setf (cl:aref vals i) (roslisp-utils:decode-double-float-bits bits))))))
   msg
 )
-(cl:defmethod roslisp-msg-protocol:ros-datatype ((msg (cl:eql '<inhand>)))
-  "Returns string type for a message object of type '<inhand>"
-  "rubbing_hand/inhand")
-(cl:defmethod roslisp-msg-protocol:ros-datatype ((msg (cl:eql 'inhand)))
-  "Returns string type for a message object of type 'inhand"
-  "rubbing_hand/inhand")
-(cl:defmethod roslisp-msg-protocol:md5sum ((type (cl:eql '<inhand>)))
-  "Returns md5sum for a message object of type '<inhand>"
-  "266b6584c02ea6d87499d928f5c0eec9")
-(cl:defmethod roslisp-msg-protocol:md5sum ((type (cl:eql 'inhand)))
-  "Returns md5sum for a message object of type 'inhand"
-  "266b6584c02ea6d87499d928f5c0eec9")
-(cl:defmethod roslisp-msg-protocol:message-definition ((type (cl:eql '<inhand>)))
-  "Returns full string definition for message of type '<inhand>"
-  (cl:format cl:nil "Header header~%~%# --------dynamixel--------~%~%# ダイナミクセルへ渡した目標指間距離~%# 取得した指間距離へ操作量を加えている~%# interval = got_interval + MV~%float64 interval~%~%# 指間距離へ加える操作量(Manipulated Variable)~%float64 MV~%~%# -------------------------~%~%# --------fingervision-----~%~%# Array of slips (slip distribution), which is a serialized list of 3x3 matrix.~%# Each cell in the 3x3 matrix is the sum of moving pixels in the cell.~%float32[] mv_s~%~%# objectの角度 [deg]~%float64 obj_orientation~%~%# objectの角度 [deg]  obj_orientationをsmaでフィルターしてる（filter_node参照）~%float64 obj_orientation_filtered~%~%# objectの角速度 [deg/s]　obj_orientation_filteredの差分をとったものをsmaでフィルターしてる（filter_node参照）~%float64 d_obj_orientation_filtered~%~%# -------------------------~%~%# ---------inhand----------~%~%# 目標角度~%float64 target_obj_orientation~%~%# 目標角速度~%float64 target_d_obj_orientation~%~%# 目標角速度と取得した角速度の差~%# d_obj_orientation_filtered - target_d_obj_orientation~%float64 omega_d~%~%# mv_sの和からすべり判定をする際のしきい値~%float64 th_slip~%~%# 取得した角速度d_obj_orientation_filteredと目標角速度target_d_obj_orientationとの差から操作量MVを決めるパラメータ~%# MV_input  = [neutral_min, neutral_max , drop]~%# MV_output = [open, close, quick_close]~%# drop < d_obj_orientation_filtered : quick_close~%# d_omega <= neutral_min : open~%# neutral_min < d_omega <= neutral_max : 0~%# neutral_max < d_omega : close~%float64[] MV_i~%float64[] MV_o~%~%# マニピュレーション実行区間を表すフラグ~%# 0: してない， 1:マニピュレーション終了後の数秒間， 2:マニピュレーション中, 3:途中終了した~%int32 process_f~%~%# -------------------------~%~%# なんでも入れていいよ~%float64[] debag~%================================================================================~%MSG: std_msgs/Header~%# Standard metadata for higher-level stamped data types.~%# This is generally used to communicate timestamped data ~%# in a particular coordinate frame.~%# ~%# sequence ID: consecutively increasing ID ~%uint32 seq~%#Two-integer timestamp that is expressed as:~%# * stamp.sec: seconds (stamp_secs) since epoch (in Python the variable is called 'secs')~%# * stamp.nsec: nanoseconds since stamp_secs (in Python the variable is called 'nsecs')~%# time-handling sugar is provided by the client library~%time stamp~%#Frame this data is associated with~%string frame_id~%~%~%"))
-(cl:defmethod roslisp-msg-protocol:message-definition ((type (cl:eql 'inhand)))
-  "Returns full string definition for message of type 'inhand"
-  (cl:format cl:nil "Header header~%~%# --------dynamixel--------~%~%# ダイナミクセルへ渡した目標指間距離~%# 取得した指間距離へ操作量を加えている~%# interval = got_interval + MV~%float64 interval~%~%# 指間距離へ加える操作量(Manipulated Variable)~%float64 MV~%~%# -------------------------~%~%# --------fingervision-----~%~%# Array of slips (slip distribution), which is a serialized list of 3x3 matrix.~%# Each cell in the 3x3 matrix is the sum of moving pixels in the cell.~%float32[] mv_s~%~%# objectの角度 [deg]~%float64 obj_orientation~%~%# objectの角度 [deg]  obj_orientationをsmaでフィルターしてる（filter_node参照）~%float64 obj_orientation_filtered~%~%# objectの角速度 [deg/s]　obj_orientation_filteredの差分をとったものをsmaでフィルターしてる（filter_node参照）~%float64 d_obj_orientation_filtered~%~%# -------------------------~%~%# ---------inhand----------~%~%# 目標角度~%float64 target_obj_orientation~%~%# 目標角速度~%float64 target_d_obj_orientation~%~%# 目標角速度と取得した角速度の差~%# d_obj_orientation_filtered - target_d_obj_orientation~%float64 omega_d~%~%# mv_sの和からすべり判定をする際のしきい値~%float64 th_slip~%~%# 取得した角速度d_obj_orientation_filteredと目標角速度target_d_obj_orientationとの差から操作量MVを決めるパラメータ~%# MV_input  = [neutral_min, neutral_max , drop]~%# MV_output = [open, close, quick_close]~%# drop < d_obj_orientation_filtered : quick_close~%# d_omega <= neutral_min : open~%# neutral_min < d_omega <= neutral_max : 0~%# neutral_max < d_omega : close~%float64[] MV_i~%float64[] MV_o~%~%# マニピュレーション実行区間を表すフラグ~%# 0: してない， 1:マニピュレーション終了後の数秒間， 2:マニピュレーション中, 3:途中終了した~%int32 process_f~%~%# -------------------------~%~%# なんでも入れていいよ~%float64[] debag~%================================================================================~%MSG: std_msgs/Header~%# Standard metadata for higher-level stamped data types.~%# This is generally used to communicate timestamped data ~%# in a particular coordinate frame.~%# ~%# sequence ID: consecutively increasing ID ~%uint32 seq~%#Two-integer timestamp that is expressed as:~%# * stamp.sec: seconds (stamp_secs) since epoch (in Python the variable is called 'secs')~%# * stamp.nsec: nanoseconds since stamp_secs (in Python the variable is called 'nsecs')~%# time-handling sugar is provided by the client library~%time stamp~%#Frame this data is associated with~%string frame_id~%~%~%"))
-(cl:defmethod roslisp-msg-protocol:serialization-length ((msg <inhand>))
+(cl:defmethod roslisp-msg-protocol:ros-datatype ((msg (cl:eql '<rotation>)))
+  "Returns string type for a message object of type '<rotation>"
+  "rubbing_hand/rotation")
+(cl:defmethod roslisp-msg-protocol:ros-datatype ((msg (cl:eql 'rotation)))
+  "Returns string type for a message object of type 'rotation"
+  "rubbing_hand/rotation")
+(cl:defmethod roslisp-msg-protocol:md5sum ((type (cl:eql '<rotation>)))
+  "Returns md5sum for a message object of type '<rotation>"
+  "77da36f383a433e37a402442dac57089")
+(cl:defmethod roslisp-msg-protocol:md5sum ((type (cl:eql 'rotation)))
+  "Returns md5sum for a message object of type 'rotation"
+  "77da36f383a433e37a402442dac57089")
+(cl:defmethod roslisp-msg-protocol:message-definition ((type (cl:eql '<rotation>)))
+  "Returns full string definition for message of type '<rotation>"
+  (cl:format cl:nil "Header header~%~%# --------dynamixel--------~%~%# ハンドの指間距離~%float64 interval~%~%# 指間距離へ加える操作量の線形成分(Manipulated Variable)~%float64 MV~%~%# ハンドの指先角度~%# ハンドへの最終的な入力．offset_degree_of_finger + MV_degree_of_finger~%float64 degree_of_finger~%~%# ハンドの指先角度~%# MV_degree_of_finger=0のときに指間の平行を補償する値~%float64 offset_degree_of_finger~%~%# ハンドの指先角度~%# 平行からの角度変化~%float64 MV_degree_of_finger~%~%# ハンドの仮想面の傾き~%float64 degree_of_surface~%~%# ハンドの仮想面の位置~%float64 pos_of_surface~%~%# -------------------------~%~%# --------fingervision-----~%~%# Array of slips (slip distribution), which is a serialized list of 3x3 matrix.~%# Each cell in the 3x3 matrix is the sum of moving pixels in the cell.~%float32[] mv_s~%~%# objectの角度 [deg]~%float64 obj_orientation~%~%# objectの角度 [deg]  obj_orientationをsmaでフィルターしてる（filter_node参照）~%float64 obj_orientation_filtered~%~%# objectの角速度 [deg/s] obj_orientation_filteredの差分をとったものをsmaでフィルターしてる（filter_node参照）~%float64 d_obj_orientation_filtered~%~%# -------------------------~%~%# ---------inhand----------~%~%# 目標角度~%float64 target_obj_orientation~%~%# 目標角速度~%float64 target_d_obj_orientation~%~%# 目標角速度と取得した角速度の差~%# d_obj_orientation_filtered - target_d_obj_orientation~%float64 omega_d~%~%# 取得した角速度d_obj_orientation_filteredと目標角速度target_d_obj_orientationとの差から操作量MVを決めるパラメータ~%# MV_input  = [neutral_min, neutral_max , drop]~%# MV_output = [open, close, quick_close]~%# drop < d_obj_orientation_filtered : quick_close~%# d_omega <= neutral_min : open~%# neutral_min < d_omega <= neutral_max : 0~%# neutral_max < d_omega : close~%float64[] MV_i~%float64[] MV_o~%~%# マニピュレーション実行区間を表すフラグ~%# 0: してない， 1:マニピュレーション終了後の数秒間， 2:マニピュレーション中, 3:途中終了した~%int32 process_f~%~%# -------------------------~%~%# なんでも入れていいよ~%float64[] debag~%================================================================================~%MSG: std_msgs/Header~%# Standard metadata for higher-level stamped data types.~%# This is generally used to communicate timestamped data ~%# in a particular coordinate frame.~%# ~%# sequence ID: consecutively increasing ID ~%uint32 seq~%#Two-integer timestamp that is expressed as:~%# * stamp.sec: seconds (stamp_secs) since epoch (in Python the variable is called 'secs')~%# * stamp.nsec: nanoseconds since stamp_secs (in Python the variable is called 'nsecs')~%# time-handling sugar is provided by the client library~%time stamp~%#Frame this data is associated with~%string frame_id~%~%~%"))
+(cl:defmethod roslisp-msg-protocol:message-definition ((type (cl:eql 'rotation)))
+  "Returns full string definition for message of type 'rotation"
+  (cl:format cl:nil "Header header~%~%# --------dynamixel--------~%~%# ハンドの指間距離~%float64 interval~%~%# 指間距離へ加える操作量の線形成分(Manipulated Variable)~%float64 MV~%~%# ハンドの指先角度~%# ハンドへの最終的な入力．offset_degree_of_finger + MV_degree_of_finger~%float64 degree_of_finger~%~%# ハンドの指先角度~%# MV_degree_of_finger=0のときに指間の平行を補償する値~%float64 offset_degree_of_finger~%~%# ハンドの指先角度~%# 平行からの角度変化~%float64 MV_degree_of_finger~%~%# ハンドの仮想面の傾き~%float64 degree_of_surface~%~%# ハンドの仮想面の位置~%float64 pos_of_surface~%~%# -------------------------~%~%# --------fingervision-----~%~%# Array of slips (slip distribution), which is a serialized list of 3x3 matrix.~%# Each cell in the 3x3 matrix is the sum of moving pixels in the cell.~%float32[] mv_s~%~%# objectの角度 [deg]~%float64 obj_orientation~%~%# objectの角度 [deg]  obj_orientationをsmaでフィルターしてる（filter_node参照）~%float64 obj_orientation_filtered~%~%# objectの角速度 [deg/s] obj_orientation_filteredの差分をとったものをsmaでフィルターしてる（filter_node参照）~%float64 d_obj_orientation_filtered~%~%# -------------------------~%~%# ---------inhand----------~%~%# 目標角度~%float64 target_obj_orientation~%~%# 目標角速度~%float64 target_d_obj_orientation~%~%# 目標角速度と取得した角速度の差~%# d_obj_orientation_filtered - target_d_obj_orientation~%float64 omega_d~%~%# 取得した角速度d_obj_orientation_filteredと目標角速度target_d_obj_orientationとの差から操作量MVを決めるパラメータ~%# MV_input  = [neutral_min, neutral_max , drop]~%# MV_output = [open, close, quick_close]~%# drop < d_obj_orientation_filtered : quick_close~%# d_omega <= neutral_min : open~%# neutral_min < d_omega <= neutral_max : 0~%# neutral_max < d_omega : close~%float64[] MV_i~%float64[] MV_o~%~%# マニピュレーション実行区間を表すフラグ~%# 0: してない， 1:マニピュレーション終了後の数秒間， 2:マニピュレーション中, 3:途中終了した~%int32 process_f~%~%# -------------------------~%~%# なんでも入れていいよ~%float64[] debag~%================================================================================~%MSG: std_msgs/Header~%# Standard metadata for higher-level stamped data types.~%# This is generally used to communicate timestamped data ~%# in a particular coordinate frame.~%# ~%# sequence ID: consecutively increasing ID ~%uint32 seq~%#Two-integer timestamp that is expressed as:~%# * stamp.sec: seconds (stamp_secs) since epoch (in Python the variable is called 'secs')~%# * stamp.nsec: nanoseconds since stamp_secs (in Python the variable is called 'nsecs')~%# time-handling sugar is provided by the client library~%time stamp~%#Frame this data is associated with~%string frame_id~%~%~%"))
+(cl:defmethod roslisp-msg-protocol:serialization-length ((msg <rotation>))
   (cl:+ 0
      (roslisp-msg-protocol:serialization-length (cl:slot-value msg 'header))
      8
      8
-     4 (cl:reduce #'cl:+ (cl:slot-value msg 'mv_s) :key #'(cl:lambda (ele) (cl:declare (cl:ignorable ele)) (cl:+ 4)))
      8
+     8
+     8
+     8
+     8
+     4 (cl:reduce #'cl:+ (cl:slot-value msg 'mv_s) :key #'(cl:lambda (ele) (cl:declare (cl:ignorable ele)) (cl:+ 4)))
      8
      8
      8
@@ -518,12 +638,17 @@
      4
      4 (cl:reduce #'cl:+ (cl:slot-value msg 'debag) :key #'(cl:lambda (ele) (cl:declare (cl:ignorable ele)) (cl:+ 8)))
 ))
-(cl:defmethod roslisp-msg-protocol:ros-message-to-list ((msg <inhand>))
+(cl:defmethod roslisp-msg-protocol:ros-message-to-list ((msg <rotation>))
   "Converts a ROS message object to a list"
-  (cl:list 'inhand
+  (cl:list 'rotation
     (cl:cons ':header (header msg))
     (cl:cons ':interval (interval msg))
     (cl:cons ':MV (MV msg))
+    (cl:cons ':degree_of_finger (degree_of_finger msg))
+    (cl:cons ':offset_degree_of_finger (offset_degree_of_finger msg))
+    (cl:cons ':MV_degree_of_finger (MV_degree_of_finger msg))
+    (cl:cons ':degree_of_surface (degree_of_surface msg))
+    (cl:cons ':pos_of_surface (pos_of_surface msg))
     (cl:cons ':mv_s (mv_s msg))
     (cl:cons ':obj_orientation (obj_orientation msg))
     (cl:cons ':obj_orientation_filtered (obj_orientation_filtered msg))
@@ -531,7 +656,6 @@
     (cl:cons ':target_obj_orientation (target_obj_orientation msg))
     (cl:cons ':target_d_obj_orientation (target_d_obj_orientation msg))
     (cl:cons ':omega_d (omega_d msg))
-    (cl:cons ':th_slip (th_slip msg))
     (cl:cons ':MV_i (MV_i msg))
     (cl:cons ':MV_o (MV_o msg))
     (cl:cons ':process_f (process_f msg))

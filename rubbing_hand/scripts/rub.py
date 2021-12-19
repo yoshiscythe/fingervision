@@ -22,6 +22,7 @@ class Rubbing():
         #指先の傾き
         self.degree_of_finger = 0.0
         self.offset_degree_of_finger = 0.0
+        self.MV_degree_of_finger = 0.0
 
         self.deg_per_pos = 360.0/4096
         self.pos_per_deg = 4096.0/360
@@ -36,6 +37,7 @@ class Rubbing():
         self.offset_r_dist = 0
         self.offset_l_dist = 0
         self.go2itv_f = 0
+        self.go2deg_f = 0
 
         self.itv_max = 180
         self.itv_min = 16
@@ -173,6 +175,16 @@ class Rubbing():
 
         return True
 
+    # 指先角度の変更
+    # 角度が変更されると操作済みフラグを立てる。
+    # Update()で毎ステップの終わりに折る
+    def Set_degree(self, data):
+        self.MV_degree_of_finger = data
+        self.control_f = True
+        self.go2deg_f = False
+
+        return True
+
     # Go2itv()用の目標距離アップデート
     # go2itv_arrayの先頭から順に目標値へセット
     # Set_interval()でインターバルが変更されてるとgo2itvは終了
@@ -188,6 +200,21 @@ class Rubbing():
 
             self.interval = set_data
 
+    # Go2deg()用の目標距離アップデート
+    # go2deg_arrayの先頭から順に目標値へセット
+    # コントロールフラグが立ってるとgo2itvは終了
+    def update_MV_deg(self):
+        if self.go2deg_f:
+            # 指定した位置の要素を削除し、その値を取得
+            set_data, self.go2deg_array = self.go2deg_array[0], self.go2deg_array[1:]
+
+            # 番兵もしくはインターバルの変更を感知すると終了
+            if set_data == -1 or self.control_f:
+                self.go2deg_f = 0
+                return
+
+            self.MV_degree_of_finger = set_data
+
     def update_degfinger(self):
         ad_finger = 0.
 
@@ -195,7 +222,7 @@ class Rubbing():
         # # CAVS
         # min_deg = 1.
         # max_deg = 8.0
-        # ad_finger = self.offset_degree_of_finger + self.interval*(-0.44) + 18.2
+        # ad_finger = self.MV_degree_of_finger + self.interval*(-0.44) + 18.2
         # # --------------------------------------------------
 
         # --------------------------------------------------
@@ -224,11 +251,14 @@ class Rubbing():
                 ad_finger = max_deg
             if ad_finger < min_deg:
                 ad_finger = min_deg
+        
+        self.offset_degree_of_finger = ad_finger
 
-        self.degree_of_finger = self.offset_degree_of_finger + ad_finger
+        self.degree_of_finger = self.MV_degree_of_finger + self.offset_degree_of_finger
 
     def Update(self):
         self.update_interval()
+        self.update_MV_deg()
         self.range_check()
         self.update_degfinger()
         self.control_f = False
@@ -247,6 +277,21 @@ class Rubbing():
         self.go2itv_array = np.append(self.go2itv_array, [itv_goal, -1])
         self.go2itv_array = self.go2itv_array[1:]
         self.go2itv_f = 1
+
+        return True
+
+    # MV_deg_of_fingerを現在の指先角度から入力した指先角度deg_goalまで、入力された速度runvel[deg/sec]で動かす
+    # 指先角度のアレイを生成してupdate_MV_deg()によって順に動かす
+    def Go2deg(self, deg_goal, runvel= 1.0):
+        hz = self.get_current_dynamixel_hz()
+        deg_start = self.MV_degree_of_finger
+        if deg_start > deg_goal:
+            runvel = -abs(runvel)
+        runstep = runvel/float(hz)
+        self.go2deg_array = np.arange(deg_start, deg_goal, runstep)
+        self.go2deg_array = np.append(self.go2deg_array, [deg_goal, -1])
+        self.go2deg_array = self.go2deg_array[1:]
+        self.go2deg_f = 1
 
         return True
 

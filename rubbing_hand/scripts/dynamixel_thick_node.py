@@ -27,6 +27,7 @@ from rub import Rubbing, PID
 import yaml
 from subscribe import Subscribe
 from inhand_statemachine_util import Inhand
+from rotation_statemachine_util import Rotation
 # from inhand_util import Inhand
 
 file_name = "/home/suzuki/ros_ws/ay_tools/fingervision/suzuki/rubbing_hand/scripts/init_pos.yaml"
@@ -39,6 +40,7 @@ param_pub = rospy.Publisher("dynamixel_param", dynamixel_param_msg, queue_size=1
 sub_fv_prox = Subscribe("ProxVision")
 sub_fv_filtered1_objinfo = Subscribe("Filter1ObjInfo")
 sub_fv_smaf = Subscribe("fv_smaf")
+sub_fv_v_smaf = Subscribe("fv_v_smaf")
 
 #Setup the device
 DXL_ID= [1,2,3,4]   #Note: value and 
@@ -303,9 +305,9 @@ class TDxlHolding(object):
       
       #ボタン上下は指の傾き
       if self.DIRECTIONS[2] == 1:
-        rubbing.offset_degree_of_finger += self.p*0.1
+        rubbing.MV_degree_of_finger += self.p*0.1
       elif self.DIRECTIONS[2] == -1:
-        rubbing.offset_degree_of_finger -= self.p*0.1
+        rubbing.MV_degree_of_finger -= self.p*0.1
 
       rubbing.control_f = any(self.FLAG_MOVES[:2])
 
@@ -339,7 +341,7 @@ class TDxlHolding(object):
       if self.offset_f:
         rubbing.surface_pos = 0
         rubbing.degree_of_surface = 0
-        rubbing.offset_degree_of_finger = 0
+        rubbing.MV_degree_of_finger = 0
         rubbing.running = 1
 
       if self.test_button_f:
@@ -423,12 +425,14 @@ rubbing = Rubbing()
 rubbing.filename = file_name
 rubbing.read_initial_position()
 rubbing.holding = holding
-inhand = Inhand(rubbing, sub_fv_filtered1_objinfo, sub_fv_smaf)
+# manipulation = Inhand(rubbing, sub_fv_filtered1_objinfo, sub_fv_smaf)
+manipulation = Rotation(rubbing, sub_fv_filtered1_objinfo, sub_fv_v_smaf)
 holding.Start()
 trg = 0
 
 rospy.Service('Set_interval', SetFloat64, lambda srv:rubbing.Set_interval(srv.data))
 rospy.Service('Go2itv', Set2Float64, lambda srv:rubbing.Go2itv(srv.data1, srv.data2))
+rospy.Service('Go2deg', Set2Float64, lambda srv:rubbing.Go2deg(srv.data1, srv.data2))
 rospy.Service('Go2itv_sin', SetFloat64_array, lambda srv:rubbing.Go2itv_sin(srv.data[0], srv.data[1], srv.data[2], srv.data[3]))
 rospy.Service('Pulse_deformed', SetFloat64_array, lambda srv:rubbing.Pulse_deformed(srv.data[0], srv.data[1], srv.data[2], srv.data[3], srv.data[4]))
 
@@ -523,10 +527,10 @@ for event in device.read_loop():
         holding.DIRECTIONS[channel]  = 0
       elif event.value == 1:
         if holding.DIRECTIONS[channel] == 0:
-          if inhand.is_running:
-            inhand.Stop_run()
+          if manipulation.is_running:
+            manipulation.Stop_run()
           else:
-            inhand.Start()
+            manipulation.Start()
         holding.FLAG_MOVES[channel]  = True
         holding.DIRECTIONS[channel]  = -1
         
@@ -578,7 +582,7 @@ for event in device.read_loop():
 # is_running[0]= False
 # t1.join()
 holding.Stop()
-inhand.Stop()
+manipulation.Stop()
 
 for id in range(len(dxl)):
   print("ID:{}...".format(DXL_ID[id]))

@@ -11,6 +11,7 @@ file(REMOVE_RECURSE
   "../msg_gen/cpp/include/rubbing_hand/dynamixel_msg.h"
   "../msg_gen/cpp/include/rubbing_hand/dynamixel_param_msg.h"
   "../msg_gen/cpp/include/rubbing_hand/inhand.h"
+  "../msg_gen/cpp/include/rubbing_hand/rotation.h"
 )
 
 # Per-language clean rules from dependency scanning.

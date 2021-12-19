@@ -12,6 +12,7 @@ file(REMOVE_RECURSE
   "../src/rubbing_hand/msg/_dynamixel_msg.py"
   "../src/rubbing_hand/msg/_dynamixel_param_msg.py"
   "../src/rubbing_hand/msg/_inhand.py"
+  "../src/rubbing_hand/msg/_rotation.py"
 )
 
 # Per-language clean rules from dependency scanning.
