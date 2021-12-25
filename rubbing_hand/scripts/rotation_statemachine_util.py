@@ -91,7 +91,7 @@ class Rotation:
 
         # close_type,0:parallel, 1: distal, -1: proximal
         self.close_type = 0
-        self.deg = {"distal": 3, "proximal": -3, "parallel": 0}
+        self.deg = {"distal": 5, "proximal": -5, "parallel": 0}
         self.v_deg = 5.
 
     def Init(self):
@@ -306,7 +306,7 @@ class Rotation:
         }
 
         self.sm= TStateMachine(states_sin,'start', debug=False)
-        self.Set_open_step()
+        # self.Set_open_step()
 
 
         time_start = time.time()
