@@ -77,7 +77,7 @@ class Rotation:
 
         self.margin_time_2stop = 1./60*6
 
-        self.amp = 3.
+        self.amp = 1.
         self.dec_f = [0, 0]
 
         self.sin_hz = 5.
@@ -91,7 +91,7 @@ class Rotation:
 
         # close_type,0:parallel, 1: distal, -1: proximal
         self.close_type = 0
-        self.deg = {"distal": 5, "proximal": -5, "parallel": 0}
+        self.deg = {"distal": 3, "proximal": -3, "parallel": 0}
         self.v_deg = 5.
 
     def Init(self):
@@ -240,10 +240,19 @@ class Rotation:
         self.log["angle"].storing(self.get_theta())
         y = self.log["angle"].get_log()
         if len(y) > 10:
-            if all(abs(np.array(y[-60:])) < self.angle_margin):
-                print(np.array(y[-60:]) < self.angle_margin)
+            if all(abs(np.array(y[-5:])) < self.angle_margin):
+                # print(np.array(y[-60:]) < self.angle_margin)
                 self.terminate_f = True
         # ------------------------------------------------------------------
+        # theta = self.get_theta()
+        # if self.close_type == 1:
+        #     set_degree = min(theta/30*self.deg["distal"],self.deg["distal"])
+        # elif self.close_type == -1:
+        #     set_degree = max(-theta/30*self.deg["proximal"],self.deg["proximal"])
+        #     print(set_degree)
+        # else:
+        #     set_degree = 0
+        # self.rubbing.Set_degree(set_degree)
 
     def Maniloop(self):
         states_sin= {
@@ -289,7 +298,7 @@ class Rotation:
             ('else','finish'),
             ],
             'always': [
-            ('deny',["start", "finish", "stop"]),
+            ('deny',["start", "finish", "stop",'judge_type']),
             ("process", lambda: self.Process_always()),
             (lambda: self.get_theta() >= 0 if self.close_type==-1 else (self.get_theta() < 0 if self.close_type==1 else False), "judge_type"),
             (lambda: self.terminate_f, 'stop', lambda: (Print('Held vertical for 1 sec.'), self.break_terminate_f())),
@@ -297,7 +306,7 @@ class Rotation:
         }
 
         self.sm= TStateMachine(states_sin,'start', debug=False)
-        # self.Set_open_step()
+        self.Set_open_step()
 
 
         time_start = time.time()

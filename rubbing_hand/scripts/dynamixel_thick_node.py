@@ -339,7 +339,7 @@ class TDxlHolding(object):
 
       # 指先を平行に保つの開始
       if self.offset_f:
-        rubbing.surface_pos = 0
+        # rubbing.surface_pos = 0
         rubbing.degree_of_surface = 0
         rubbing.MV_degree_of_finger = 0
         rubbing.running = 1
