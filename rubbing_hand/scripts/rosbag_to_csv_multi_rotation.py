@@ -24,13 +24,13 @@ def create_df(ID):
     for l in ls:
         base, ext = os.path.splitext(l)
 
-        if os.path.isfile(base+".csv"):
-            continue
+        # if os.path.isfile(base+".csv"):
+        #     continue
 
         # The bag file should be in the same directory as your terminal
         bag = rosbag.Bag(l)
-        topic = '/inhand'
-        column_names = ['time', 'angle', "angular velocity", "gripper position", "gripper velocity", "process"]
+        topic = '/rotation'
+        column_names = ['time', 'angle', "angular velocity", "gripper position", "gripper velocity", "process", "degree of finger"]
         df = pd.DataFrame(columns=column_names)
 
         first_f=False
@@ -41,6 +41,7 @@ def create_df(ID):
             gripper_position = msg.interval
             manipulated_variable = msg.MV
             process_f = msg.process_f
+            MV_degree_of_finger = msg.MV_degree_of_finger
 
             if not first_f:
                 start_time = time
@@ -52,7 +53,8 @@ def create_df(ID):
                 'angular velocity': angular_velocity,
                 "gripper position": gripper_position,
                 "gripper velocity": manipulated_variable,
-                "process": process_f},
+                "process": process_f,
+                "degree of finger": MV_degree_of_finger},
                 ignore_index=True
             )
         result_dict[base] = [df, base, ext]
