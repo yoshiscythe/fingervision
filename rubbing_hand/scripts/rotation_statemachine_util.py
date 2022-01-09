@@ -301,7 +301,7 @@ class Rotation:
             ('deny',["start", "finish", "stop",'judge_type']),
             ("process", lambda: self.Process_always()),
             (lambda: self.get_theta() >= 0 if self.close_type==-1 else (self.get_theta() < 0 if self.close_type==1 else False), "judge_type"),
-            (lambda: self.terminate_f, 'stop', lambda: (Print('Held vertical for 1 sec.'), self.break_terminate_f())),
+            (lambda: self.terminate_f, 'stop', lambda: (Print('Held vertical for 5 frame.'), self.break_terminate_f())),
             ]
         }
 

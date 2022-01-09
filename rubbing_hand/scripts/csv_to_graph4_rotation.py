@@ -365,16 +365,16 @@ labelsize=16
 # 凡例のサイズ
 lfontsize=16
 
-df_CAVS = df_CAVS[(df_CAVS["deg"]>0) & (df_CAVS["failure"]==0)]
-df_FLAT = df_FLAT[(df_FLAT["deg"]>0) & (df_FLAT["failure"]==0)]
+# df_CAVS = df_CAVS[(df_CAVS["deg"]>0) & (df_CAVS["failure"]==0)]
+# df_FLAT = df_FLAT[(df_FLAT["deg"]>0) & (df_FLAT["failure"]==0)]
 
 # ruler
 create_boxplot_graph2([df_CAVS, df_FLAT], "deg", "deg", "max_angular_velocity", "max angular velocity", axes[0][1], colors=["blue", "red"], labels=["CAVS", "FLAT"])
 create_boxplot_graph2([df_CAVS, df_FLAT], "deg", "deg", "elasped_time", "elapsed time", axes[1][1], colors=["blue", "red"], labels=["CAVS", "FLAT"])
 create_barplot_graph3([df_CAVS, df_FLAT], "deg", "deg", "rms_th=15rms", "RMSE of angular velocity", axes[0][0], colors=["blue", "red"], labels=["CAVS", "FLAT"])
 create_boxplot_graph2([df_CAVS, df_FLAT], "deg", "deg", "last_angle_error", "final angle", axes[1][0], colors=["blue", "red"], labels=["CAVS", "FLAT"])
-create_boxplot_graph2([df_CAVS, df_FLAT], "deg", "deg", "i_omega", "integral angle movement", axes[0][2], colors=["blue", "red"], labels=["CAVS", "FLAT"])
-create_boxplot_graph2([df_CAVS, df_FLAT], "deg", "deg", "i_omega_abs", "all angle movement", axes[1][2], colors=["blue", "red"], labels=["CAVS", "FLAT"])
+create_boxplot_graph2([df_CAVS, df_FLAT], "deg", "deg", "angle_movement", "angle movement", axes[0][2], colors=["blue", "red"], labels=["CAVS", "FLAT"])
+# create_boxplot_graph2([df_CAVS, df_FLAT], "deg", "deg", "i_omega_abs", "all angle movement", axes[1][2], colors=["blue", "red"], labels=["CAVS", "FLAT"])
 
 # axes[0][2].set_ylim(ymin=-10)
 # axes[1][1].set_ylim(ymin=0)
@@ -392,7 +392,7 @@ for ax1 in axes:
 #         ax.tick_params(labelsize=labelsize)
 
 
-save_name = base_dir+"i_omega"
+save_name = base_dir+"0109_FLAT5re"
 
 plt.savefig(save_name+".png")
 plt.savefig(save_name+".eps")

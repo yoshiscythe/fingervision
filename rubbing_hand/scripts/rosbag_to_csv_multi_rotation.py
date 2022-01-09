@@ -24,8 +24,8 @@ def create_df(ID):
     for l in ls:
         base, ext = os.path.splitext(l)
 
-        # if os.path.isfile(base+".csv"):
-        #     continue
+        if os.path.isfile(base+".csv"):
+            continue
 
         # The bag file should be in the same directory as your terminal
         bag = rosbag.Bag(l)
@@ -66,7 +66,7 @@ fs = 30
 ls = 20
 lgs = 20
 
-ID = "CAVS"
+ID = "FLAT"
 
 
 
