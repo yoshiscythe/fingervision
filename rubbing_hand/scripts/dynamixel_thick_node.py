@@ -425,8 +425,8 @@ rubbing = Rubbing()
 rubbing.filename = file_name
 rubbing.read_initial_position()
 rubbing.holding = holding
-# manipulation = Inhand(rubbing, sub_fv_filtered1_objinfo, sub_fv_smaf)
-manipulation = Rotation(rubbing, sub_fv_filtered1_objinfo, sub_fv_v_smaf)
+manipulation = Inhand(rubbing, sub_fv_filtered1_objinfo, sub_fv_smaf)
+# manipulation = Rotation(rubbing, sub_fv_filtered1_objinfo, sub_fv_v_smaf)
 holding.Start()
 trg = 0
 

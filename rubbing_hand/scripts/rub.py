@@ -40,7 +40,7 @@ class Rubbing():
         self.go2deg_f = 0
 
         self.itv_max = 180
-        self.itv_min = 16
+        self.itv_min = 10
 
         self.running = 0
         self.control_f = False

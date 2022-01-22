@@ -504,7 +504,7 @@ class Inhand:
             (lambda: self.get_theta()>self.target_angle,'stop',lambda: Print('over target theta! in always state')),
             ]
         }
-        self.sm= TStateMachine(states_sin_over,'start', debug=False)
+        self.sm= TStateMachine(states_sin,'start', debug=False)
         self.Set_open_step()
 
 
