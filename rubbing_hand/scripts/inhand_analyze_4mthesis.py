@@ -61,23 +61,51 @@ def create_df_analyze(df_dict, surface):
 
 def create_graph(df, result_dict):
     base = "/home/suzuki/ros_ws/ay_tools/fingervision/suzuki/rubbing_hand/data/0117/test/"
-    fig, axes = plt.subplots(nrows=2, ncols=2, figsize=(16, 12))
-    df.plot(x="time", y=['angle', "angular_velocity"],subplots=True, ax=[axes[0][0], axes[1][0]], legend=False)
-    df.plot(x="interval", y=['angle', "angular_velocity"],subplots=True, ax=[axes[0][1], axes[1][1]], legend=False)
+    fig, axes = plt.subplots(nrows=2, ncols=2, figsize=(20, 6), sharex="col", sharey="row")
 
-    x_min=-10
-    x_max=20
+    df_open = df[df["interval"] < float(result_dict["itv"])]
+    df_stay = df[df["interval"] >= float(result_dict["itv"])]
+
+    df_open.plot(x="time", y=['angle', "angular_velocity"],subplots=True, ax=[axes[0][0], axes[1][0]], legend=False, color="b")
+    df_open.plot(x="interval", y=['angle', "angular_velocity"],subplots=True, ax=[axes[0][1], axes[1][1]], legend=False, color="b")
+
+    df_stay.plot(x="time", y=['angle', "angular_velocity"],subplots=True, ax=[axes[0][0], axes[1][0]], legend=False, color="r")
+    df_stay.plot(x="interval", y=['angle', "angular_velocity"],subplots=True, ax=[axes[0][1], axes[1][1]], legend=False, color="r")
+
+    y_min=-10
+    y_max=20
 
     axes[0][0].set_ylim(-5, 90)
     axes[0][1].set_ylim(-5, 90)
     axes[1][0].set_ylim(-5, 200)
     axes[1][1].set_ylim(-5, 200)
 
-    axes[0][0].vlines(result_dict["time_at_max_omega"], x_min, x_max, linestyles='solid')
-    axes[0][0].vlines(result_dict["time_at_finish"], x_min, x_max, linestyles='dashed')
+    x_min = 0
+    x_max = 9 if result_dict["surface"] == "CAVS" else 12
+    itv_min = 20 if result_dict["surface"] == "CAVS" else 18
+    itv_max = 23.5 if result_dict["surface"] == "CAVS" else 20
 
-    axes[0][1].vlines(result_dict["time_at_max_omega"], x_min, x_max, linestyles='solid')
-    axes[0][1].vlines(result_dict["time_at_finish"], x_min, x_max, linestyles='dashed')
+    axes[0][0].set_xlim(x_min, x_max)
+    axes[1][0].set_xlim(x_min, x_max)
+    axes[0][1].set_xlim(itv_min, itv_max)
+    axes[1][1].set_xlim(itv_min, itv_max)
+
+    fs = 30
+    ls = 20
+    lgs = 20
+
+    axes[0][0].set_ylabel("angle\n $"+r"\theta$ [deg]", fontsize=fs)
+    axes[0][0].yaxis.set_ticks(np.arange(0, 91, 30))
+    axes[0][0].tick_params(labelsize=ls) 
+    axes[1][0].set_ylabel("angular velocity\n $"+r"\dot{\theta}$ [deg/s]", fontsize=fs)
+    axes[1][0].set_xlabel("time\n $"+r"t$ [s]", fontsize=fs)
+    axes[1][0].yaxis.set_ticks(np.arange(0, 201, 100))
+    axes[1][0].tick_params(labelsize=ls) 
+    axes[1][1].set_xlabel("gripper position\n $"+r"p$ [mm]", fontsize=fs)
+    axes[1][1].xaxis.set_ticks(np.arange(itv_min, itv_max+1, 0.5))
+    axes[1][1].tick_params(labelsize=ls) 
+
+    fig.subplots_adjust(bottom=0.3)
 
     save_name = result_dict["surface"]+result_dict["itv"]
 

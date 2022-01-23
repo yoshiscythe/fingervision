@@ -9,7 +9,7 @@ import glob
 import os
 import re
 
-base_path = "/home/suzuki/ros_ws/ay_tools/fingervision/suzuki/rubbing_hand/data/1212/"
+base_path = "/home/suzuki/ros_ws/ay_tools/fingervision/suzuki/rubbing_hand/data/2022/0122/"
 
 def create_df(ID):
     directory_path = base_path+"*/rosbag/"
@@ -136,7 +136,7 @@ def Create_and_save_graph(df, base, id, force_dict):
     plt.cla()
 
 save_path=base_path+"force_graph/"
-ID = "FLAT"
+ID = "CAVS"
 fs = 30
 ls = 20
 lgs = 20

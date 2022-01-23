@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 #coding: utf-8
 
 import csv
@@ -9,7 +9,7 @@ import pandas as pd
 
 # 重力加速度[m/s^2]
 g_acc = 9.80665
-data_directory = "/home/suzuki/ros_ws/ay_tools/fingervision/suzuki/rubbing_hand/data/1212/ELF/"
+data_directory = "/home/suzuki/ros_ws/ay_tools/fingervision/suzuki/rubbing_hand/data/2022/0122/ELF/"
 
 # data_directory内のcsvファイルのパスをリストで取得
 def create_ls(data_directory):
@@ -34,8 +34,8 @@ for l in ls:
     df = df.dropna(how="all", axis=1)
     df = df.set_axis(['seconds', 'force'], axis='columns')
 
-    # gf->N変換
-    df["force"] = df["force"]*g_acc/1000
+    # # gf->N変換
+    # df["force"] = df["force"]*g_acc/1000
 
     # 保存ファイル名作成
     base, ext = os.path.splitext(l)

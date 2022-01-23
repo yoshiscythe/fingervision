@@ -14,7 +14,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import re
 
-data_directory = "/home/suzuki/ros_ws/ay_tools/fingervision/suzuki/rubbing_hand/data/1212"
+data_directory = "/home/suzuki/ros_ws/ay_tools/fingervision/suzuki/rubbing_hand/data/2022/0122"
 
 # 入力  path: ディレクリパス
 # 出力  csv_file: 入力ディレクトリ内のすべてのcsvファイル（IDが重複した場合は日時が遅い方を取得）の絶対パスをバリュー，IDをキーとした辞書型
@@ -106,14 +106,14 @@ if FLAT_columns:
     FLAT_rename_columns_dict = Generate_rename_columns_dict(FLAT_columns)
     df_id_FLAT = df_id_FLAT.rename(columns=FLAT_rename_columns_dict)
     df_id_FLAT = df_id_FLAT.set_index("id")
-    df_id_FLAT = df_id_FLAT.dropna(subset=['step'])
+    df_id_FLAT = df_id_FLAT.dropna(how='any')
 CAVS_columns = [s for s in columns_list if s.startswith("CAVS")]
 if CAVS_columns:
     df_id_CAVS = df_id.loc[:, CAVS_columns]
     CAVS_rename_columns_dict = Generate_rename_columns_dict(CAVS_columns)
     df_id_CAVS = df_id_CAVS.rename(columns=CAVS_rename_columns_dict)
     df_id_CAVS = df_id_CAVS.set_index("id")
-    df_id_CAVS = df_id_CAVS.dropna(subset=['step'])
+    df_id_CAVS = df_id_CAVS.dropna(how='any')
     # print(df_id_CAVS)
 
 print("read csv")
