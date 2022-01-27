@@ -19,7 +19,7 @@ def create_df(path, surface):
         df_tmp.set_axis(['angle', 'interval'], axis='columns', inplace=True)
         df_tmp['angle'] = -df_tmp['angle'].rolling(5, center=True).mean()
         df_tmp["time"] = [i/hz for i in df_tmp.index.tolist()]
-        df_tmp["angular_velocity"] = df_tmp["angle"].diff().rolling(5, center=True).mean()*hz  # angleの移動平均をangular velocityにしてる
+        df_tmp["angular_velocity"] = df_tmp["angle"].diff().rolling(10, center=True).mean()*hz  # angleの移動平均をangular velocityにしてる
         df_dict[itv] = df_tmp
     return df_dict
 
@@ -35,6 +35,10 @@ def calcurate_error(df, itv):
     lug = time_at_max_omega - time_at_finish
     error_dict["time_at_finish"] = df["time"].iloc[time_at_finish]
     error_dict["lug"] = lug
+
+    after_list = list((df[df['interval'] >= float(itv)])["angle"].dropna(how='any'))
+    moving_angle_after = after_list[-1] - after_list[0]
+    error_dict["moving_angle_after"] = moving_angle_after
 
     return error_dict
 
@@ -56,12 +60,14 @@ def create_df_analyze(df_dict, surface):
             df_analyze = pd.DataFrame(columns=column_names)
         df_analyze = df_analyze.append(result_dict,ignore_index=True)
 
-        create_graph(df, result_dict)
+        # create_graph(df, result_dict)
     return df_analyze
 
 def create_graph(df, result_dict):
-    base = "/home/suzuki/ros_ws/ay_tools/fingervision/suzuki/rubbing_hand/data/0117/test/"
-    fig, axes = plt.subplots(nrows=2, ncols=2, figsize=(20, 6), sharex="col", sharey="row")
+    figsize_x = 24
+    figsize_y = 20
+    base = "/home/suzuki/ros_ws/ay_tools/fingervision/suzuki/rubbing_hand/data/0117/test2/"
+    fig, axes = plt.subplots(nrows=2, ncols=2, figsize=(figsize_x, figsize_y), sharex="col", sharey="row")
 
     df_open = df[df["interval"] < float(result_dict["itv"])]
     df_stay = df[df["interval"] >= float(result_dict["itv"])]
@@ -75,8 +81,8 @@ def create_graph(df, result_dict):
     y_min=-10
     y_max=20
 
-    axes[0][0].set_ylim(-5, 90)
-    axes[0][1].set_ylim(-5, 90)
+    axes[0][0].set_ylim(-5, 70)
+    axes[0][1].set_ylim(-5, 70)
     axes[1][0].set_ylim(-5, 200)
     axes[1][1].set_ylim(-5, 200)
 
@@ -95,7 +101,7 @@ def create_graph(df, result_dict):
     lgs = 20
 
     axes[0][0].set_ylabel("angle\n $"+r"\theta$ [deg]", fontsize=fs)
-    axes[0][0].yaxis.set_ticks(np.arange(0, 91, 30))
+    axes[0][0].yaxis.set_ticks(np.arange(0, 61, 20))
     axes[0][0].tick_params(labelsize=ls) 
     axes[1][0].set_ylabel("angular velocity\n $"+r"\dot{\theta}$ [deg/s]", fontsize=fs)
     axes[1][0].set_xlabel("time\n $"+r"t$ [s]", fontsize=fs)
@@ -107,7 +113,7 @@ def create_graph(df, result_dict):
 
     fig.subplots_adjust(bottom=0.3)
 
-    save_name = result_dict["surface"]+result_dict["itv"]
+    save_name = str(figsize_x)+str(figsize_y)+result_dict["surface"]+result_dict["itv"]
 
     plt.savefig(base+save_name+".eps")
     plt.savefig(base+save_name+".png")
@@ -127,7 +133,9 @@ df_analyze_FLAT = create_df_analyze(df_FLAT, "FLAT")
 
 df_analyze = pd.concat([df_analyze_CAVS, df_analyze_FLAT])
 
-save_file_name = "inhand0117CAVS0.01_IRC2021_big"
+df_analyze.to_csv("/home/suzuki/ros_ws/ay_tools/fingervision/suzuki/rubbing_hand/data/0117/analyze.csv")
+
+# save_file_name = "inhand0117CAVS0.01_IRC2021_big"
 # plt.savefig(save_file_name+".png")
 # plt.savefig(save_file_name+".eps")
 # plt.show()
