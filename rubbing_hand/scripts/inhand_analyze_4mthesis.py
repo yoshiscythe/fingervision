@@ -31,14 +31,24 @@ def calcurate_error(df, itv):
     error_dict["max_angular_velocity"] = max_angular_velocity
     error_dict["time_at_max_omega"] = df["time"].iloc[time_at_max_omega]
 
-    time_at_finish = list(df.loc[(df['interval'] >= float(itv))].index)[0]
-    lug = time_at_max_omega - time_at_finish
-    error_dict["time_at_finish"] = df["time"].iloc[time_at_finish]
+    index_at_finish = list(df.loc[(df['interval'] >= float(itv))].index)[0]
+    lug = time_at_max_omega - index_at_finish
+    time_at_finish = df["time"].iloc[index_at_finish]
+    error_dict["time_at_finish"] = time_at_finish
     error_dict["lug"] = lug
 
     after_list = list((df[df['interval'] >= float(itv)])["angle"].dropna(how='any'))
     moving_angle_after = after_list[-1] - after_list[0]
     error_dict["moving_angle_after"] = moving_angle_after
+
+    angle_at_fin =  after_list[0]
+    time_at_overlist = list(df[(df['interval'] >= float(itv)) & (df['angle'] >= angle_at_fin + 10)]["time"])
+    slip_lug = time_at_overlist[0] - time_at_finish if time_at_overlist else 0
+    error_dict["slip_lug"] = slip_lug
+
+    time_at_overvellist = list(df[(df['interval'] >= float(itv)) & (df['angular_velocity'] >= 15)]["time"])
+    slip_lug_angular = time_at_overvellist[0] - time_at_finish if time_at_overvellist else 0
+    error_dict["slip_lug_angular"] = slip_lug_angular
 
     return error_dict
 
@@ -123,6 +133,37 @@ def create_graph(df, result_dict):
 
     plt.cla()
 
+def create_hist(df):
+    plt.cla()
+
+    # ax1 = df[df["surface"]=="CAVS"]["max_angular_velocity"]
+    # ax2 = df[df["surface"]=="FLAT"]["max_angular_velocity"]
+    # edges = range(0, 160, 20)
+
+    # plt.hist([ax1, ax2], bins=edges, label=["CAVS", "FLAT"])
+    # plt.legend(loc="upper right", fontsize=13)
+    # plt.xlabel("max angular velocity [deg/s]", fontsize=20)
+    # plt.ylabel("frequency", fontsize=20)
+    # plt.subplots_adjust(bottom=0.13)
+
+    ax1 = df[(df["surface"]=="CAVS") & (df["slip_lug_angular"]>0)]["slip_lug_angular"]
+    ax2 = df[(df["surface"]=="FLAT") & (df["slip_lug_angular"]>0)]["slip_lug_angular"]
+    edges = range(0, 10, 1)
+
+    plt.hist([ax1, ax2], bins=edges, label=["CAVS", "FLAT"])
+    plt.legend(loc="upper right", fontsize=13)
+    plt.xlabel("lug time [s]", fontsize=20)
+    plt.ylabel("frequency", fontsize=20)
+    plt.subplots_adjust(bottom=0.13)
+
+    base = "/home/suzuki/ros_ws/ay_tools/fingervision/suzuki/rubbing_hand/data/0117/hist/"
+    save_name = "hist_slip_lug"
+
+    # plt.savefig(base+save_name+".eps")
+    # plt.savefig(base+save_name+".png")
+
+    plt.show()
+
 fz =50
 
 df_CAVS = create_df("/home/suzuki/ros_ws/ay_tools/fingervision/suzuki/rubbing_hand/data/0117/inhand0117CAVS0.01_shusei.csv", True)
@@ -132,6 +173,8 @@ df_analyze_CAVS = create_df_analyze(df_CAVS, "CAVS")
 df_analyze_FLAT = create_df_analyze(df_FLAT, "FLAT")
 
 df_analyze = pd.concat([df_analyze_CAVS, df_analyze_FLAT])
+
+create_hist(df_analyze)
 
 df_analyze.to_csv("/home/suzuki/ros_ws/ay_tools/fingervision/suzuki/rubbing_hand/data/0117/analyze.csv")
 

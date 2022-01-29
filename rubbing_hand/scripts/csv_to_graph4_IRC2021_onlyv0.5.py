@@ -369,18 +369,18 @@ df_F = FLAT_ruler_sin
 # create_barplot_graph([CAVS_ruler_linear, CAVS_ruler_sin], "step", "$v_{open}$ [mm/s]", "rms_th=15", "RMSE of angular velocity", axes[0][0], colors=["red", "blue"], labels=["CAVS-fuzzy", "CAVS-vibration"])
 # create_barplot_graph2([CAVS_ruler_linear, CAVS_ruler_sin], "step", "$v_{open}$ [mm/s]", "last_angle_error", "RMSE of final angle", axes[1][0], colors=["red", "blue"], labels=["CAVS-fuzzy", "CAVS-vibration"])
 
+# ruler
+create_boxplot_graph2([CAVS_ruler_linear, CAVS_ruler_sin, FLAT_ruler_linear, FLAT_ruler_sin], "step", "$v_{open}$ [mm/s]", "max_angular_velocity", "max angular velocity", axes[0][1], colors=["red", "blue"], labels=["CAVS-non-dither", "CAVS-dither", "FLAT-non-dither", "FLAT-dither"])
+create_boxplot_graph2([CAVS_ruler_linear, CAVS_ruler_sin, FLAT_ruler_linear, FLAT_ruler_sin], "step", "$v_{open}$ [mm/s]", "elasped_time", "elapsed time", axes[1][1], colors=["red", "blue"], labels=["CAVS-non-dither", "CAVS-dither", "FLAT-non-dither", "FLAT-dither"])
+create_barplot_graph([CAVS_ruler_linear, CAVS_ruler_sin, FLAT_ruler_linear, FLAT_ruler_sin], "step", "$v_{open}$ [mm/s]", "rms_th=15", "RMSE of angular velocity", axes[0][0], colors=["red", "blue"], labels=["CAVS-non-dither", "CAVS-dither", "FLAT-non-dither", "FLAT-dither"])
+create_boxplot_graph2([CAVS_ruler_linear, CAVS_ruler_sin, FLAT_ruler_linear, FLAT_ruler_sin], "step", "$v_{open}$ [mm/s]", "last_angle_error", "final angle error", axes[1][0], colors=["red", "blue"], labels=["CAVS-non-dither", "CAVS-dither", "FLAT-non-dither", "FLAT-dither"])
+
 # # ruler
 # create_boxplot_graph2([CAVS_ruler_linear, CAVS_ruler_sin, FLAT_ruler_linear, FLAT_ruler_sin], "step", "$v_{open}$ [mm/s]", "max_angular_velocity", "max angular velocity", axes[0][1], colors=["red", "blue"], labels=["CAVS-fuzzy", "CAVS-vibration", "FLAT-fuzzy", "FLAT-vibration"])
 # create_boxplot_graph2([CAVS_ruler_linear, CAVS_ruler_sin, FLAT_ruler_linear, FLAT_ruler_sin], "step", "$v_{open}$ [mm/s]", "elasped_time", "elapsed time", axes[1][1], colors=["red", "blue"], labels=["CAVS-fuzzy", "CAVS-vibration", "FLAT-fuzzy", "FLAT-vibration"])
-# create_barplot_graph([CAVS_ruler_linear, CAVS_ruler_sin, FLAT_ruler_linear, FLAT_ruler_sin], "step", "$v_{open}$ [mm/s]", "rms_th=15", "RMSE of angular velocity", axes[0][0], colors=["red", "blue"], labels=["CAVS-fuzzy", "CAVS-vibration", "FLAT-fuzzy", "FLAT-vibration"])
-# create_barplot_graph2([CAVS_ruler_linear, CAVS_ruler_sin, FLAT_ruler_linear, FLAT_ruler_sin], "step", "$v_{open}$ [mm/s]", "last_angle_error", "RMSE of final angle", axes[1][0], colors=["red", "blue"], labels=["CAVS-fuzzy", "CAVS-vibration", "FLAT-fuzzy", "FLAT-vibration"])
-
-# ruler
-create_boxplot_graph2([CAVS_ruler_linear, CAVS_ruler_sin, FLAT_ruler_linear, FLAT_ruler_sin], "step", "$v_{open}$ [mm/s]", "max_angular_velocity", "max angular velocity", axes[0][1], colors=["red", "blue"], labels=["CAVS-fuzzy", "CAVS-vibration", "FLAT-fuzzy", "FLAT-vibration"])
-create_boxplot_graph2([CAVS_ruler_linear, CAVS_ruler_sin, FLAT_ruler_linear, FLAT_ruler_sin], "step", "$v_{open}$ [mm/s]", "elasped_time", "elapsed time", axes[1][1], colors=["red", "blue"], labels=["CAVS-fuzzy", "CAVS-vibration", "FLAT-fuzzy", "FLAT-vibration"])
-create_boxplot_graph3([CAVS_ruler_linear, CAVS_ruler_sin, FLAT_ruler_linear, FLAT_ruler_sin], "step", "$v_{open}$ [mm/s]", "rms_th=15", "accumulation square error \n of angular velocity", axes[0][0], colors=["red", "blue"], labels=["CAVS-fuzzy", "CAVS-vibration", "FLAT-fuzzy", "FLAT-vibration"])
-# create_boxplot_graph2([CAVS_ruler_linear, CAVS_ruler_sin, FLAT_ruler_linear, FLAT_ruler_sin], "step", "$v_{open}$ [mm/s]", "last_angle_error", "error of final angle", axes[1][0], colors=["red", "blue"], labels=["CAVS-fuzzy", "CAVS-vibration", "FLAT-fuzzy", "FLAT-vibration"])
-create_boxplot_graph2([CAVS_ruler_linear, CAVS_ruler_sin, CAVS_ruler_sin_over, FLAT_ruler_linear, FLAT_ruler_sin, FLAT_ruler_sin_over], "step", "$v_{open}$ [mm/s]", "last_angle_error", "error of final angle", axes[1][0], colors=["red", "blue"], labels=["CAVS-fuzzy", "CAVS-vibration", "CAVS-vibration_over", "FLAT-fuzzy", "FLAT-vibration", "FLAT-vibration_over"])
+# create_boxplot_graph3([CAVS_ruler_linear, CAVS_ruler_sin, FLAT_ruler_linear, FLAT_ruler_sin], "step", "$v_{open}$ [mm/s]", "rms_th=15", "accumulation square error \n of angular velocity", axes[0][0], colors=["red", "blue"], labels=["CAVS-fuzzy", "CAVS-vibration", "FLAT-fuzzy", "FLAT-vibration"])
+# # create_boxplot_graph2([CAVS_ruler_linear, CAVS_ruler_sin, FLAT_ruler_linear, FLAT_ruler_sin], "step", "$v_{open}$ [mm/s]", "last_angle_error", "error of final angle", axes[1][0], colors=["red", "blue"], labels=["CAVS-fuzzy", "CAVS-vibration", "FLAT-fuzzy", "FLAT-vibration"])
+# create_boxplot_graph2([CAVS_ruler_linear, CAVS_ruler_sin, CAVS_ruler_sin_over, FLAT_ruler_linear, FLAT_ruler_sin, FLAT_ruler_sin_over], "step", "$v_{open}$ [mm/s]", "last_angle_error", "error of final angle", axes[1][0], colors=["red", "blue"], labels=["CAVS-fuzzy", "CAVS-vibration", "CAVS-vibration_over", "FLAT-fuzzy", "FLAT-vibration", "FLAT-vibration_over"])
 
 # # wood
 # create_boxplot_graph2([CAVS_wood_linear, CAVS_wood_sin, FLAT_wood_linear, FLAT_wood_sin], "step", "$v_{open}$ [mm/s]", "max_angular_velocity", "max angular velocity", axes[0][1], colors=["red", "blue"], labels=["CAVS-fuzzy", "CAVS-vibration", "FLAT-fuzzy", "FLAT-vibration"])
@@ -409,7 +409,7 @@ for ax1 in axes:
 # create_rmse_graph(df_CAVS, "step", ax, "red")
 # create_rmse_graph(df_FLAT, "step", ax, "blue")
 
-save_name = base_dir+"test_ruler_v0.5_only_over"
+save_name = base_dir+"ruler_v0.5_only_box"
 
 plt.savefig(save_name+".png")
 plt.savefig(save_name+".eps")
