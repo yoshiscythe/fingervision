@@ -44,9 +44,9 @@ def print_target_position_FLAT(df):
 
 hz = 42.3
 fz =50
-offsettime = 10 #FLAT:5, CAVS:10
+offsettime = 5 #FLAT:5, CAVS:10
 
-df = pd.read_csv("/home/suzuki/ros_ws/ay_tools/fingervision/suzuki/rubbing_hand/data/0117/inhand0117CAVS0.01_shusei.csv", header=0)
+df = pd.read_csv("/home/suzuki/ros_ws/ay_tools/fingervision/suzuki/rubbing_hand/data/0117/inhand0117FLAT0.01_shusei.csv", header=0)
 df = df.iloc[int(hz*offsettime):, :].reset_index(drop=True)
 orientations = -df.iloc[:, ::2]
 # orientations = orientations.iloc[:570]
@@ -71,7 +71,7 @@ cm_red = plt.get_cmap("Reds")
 
 #colormapサンプル
 #https://matplotlib.org/examples/color/colormaps_reference.html
-ax = orientations.plot(x="time", color=generate_cm(cm_blue,len(orientations.columns)-1), figsize=(18, 13), xlim=[0,15], ylim=[-5, 70], fontsize=fz, legend=False, linestyle='solid')
+ax = orientations.plot(x="time", color=generate_cm(cm_blue,len(orientations.columns)-1), figsize=(18, 10), xlim=[0,15], ylim=[-5, 70], fontsize=fz, legend=False, linestyle='solid')
 
 orientations_goal = []
 interval_list = []
@@ -107,9 +107,11 @@ ax.set_ylabel(r"angle $\theta$ [deg]", fontsize = fz)
 # lg=ax.legend(legend_list, fontsize=25, loc="upper right", title="target position")
 # lg.get_title().set_fontsize(20)
 
-print_target_position(orientations)
+plt.subplots_adjust(bottom=0.15)
 
-save_file_name = "inhand0117CAVS0.01_IRC2021_big"
+print_target_position_FLAT(orientations)
+
+save_file_name = "inhand0117FLAT0.01_mthesis"
 plt.savefig(save_file_name+".png")
 plt.savefig(save_file_name+".eps")
 plt.show()
