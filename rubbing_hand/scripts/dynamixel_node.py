@@ -54,24 +54,6 @@ dxl[0].SetupPosSyncWrite()
 dxl[0].SetupSyncRead()
 
 
-# def ReadKeyboard(is_running, key_cmd, key_locker):
-#   kbhit= TKBHit()
-#   dt_hold= 0.1
-#   t_prev= 0
-#   while is_running[0]:
-#     c= kbhit.KBHit()
-#     if c is not None or time.time()-t_prev>dt_hold:
-#       with key_locker:
-#         key_cmd[0]= c
-#       t_prev= time.time()
-#     time.sleep(0.0025)
-
-# key_cmd= [None]
-# key_locker= threading.RLock()
-# is_running= [True]
-# t1= threading.Thread(name='t1', target=lambda a1=is_running,a2=key_cmd,a3=key_locker: ReadKeyboard(a1,a2,a3))
-# t1.start()
-
 
 #------------------------------------------------------------------------------
 
@@ -138,13 +120,6 @@ class TDxlHolding(object):
     self.clb_cur_th = 10
     self.calibration_f = 0
 
-    
-
-  # #Set target velocity.
-  # #  trg_vel: Target velocity.
-  # def SetTarget(self, trg_vel, ids = 0):
-  #   for id in ids:
-  #     self.trg_vel[id] = trg_vel
 
   def SetTarget(self, trg_pos, max_pwm=None, id = 0):
     self.trg_pos[id]= trg_pos
@@ -219,8 +194,6 @@ class TDxlHolding(object):
     #擦り動作用アレイ
     thick_array = self.Gen_thick_array()
 
-    rate= TRate(self.ctrl_rate)
-
     #Virtual offset:
     self.trg_offset= 0.0
 
@@ -242,19 +215,6 @@ class TDxlHolding(object):
       dy_data.Pwm = pwm
       dy_data.Cur = cur
       data_pub.publish(dy_data)
-
-      # #スティックX軸はモータ２（左指近位関節）を動かす
-      # #曲げる方向を正とした
-      # if self.DIRECTIONS[0] == 1:
-      #   self.trg_pos[1] = dxl[1].Position()-self.p
-      # elif self.DIRECTIONS[0] == -1:
-      #   self.trg_pos[1] = dxl[1].Position()+self.p
-
-      # #スティックY軸はモータ１（左指遠位関節）を動かす
-      # if self.DIRECTIONS[1] == 1:
-      #   self.trg_pos[0] = dxl[0].Position()-self.p
-      # elif self.DIRECTIONS[1] == -1:
-      #   self.trg_pos[0] = dxl[0].Position()+self.p
 
       #スティックX軸は擦り動作
       if self.DIRECTIONS[0] == 1:
@@ -279,13 +239,6 @@ class TDxlHolding(object):
         rubbing.degree_of_finger += self.p*0.1
       elif self.DIRECTIONS[2] == -1:
         rubbing.degree_of_finger -= self.p*0.1
-
-      # if self.DIRECTIONS[4] == 1:
-      #   self.trg_vel[0] = self.v
-      #   self.trg_vel[2] = self.v
-      # elif self.DIRECTIONS[4] == -1:
-      #   self.trg_vel[0] = -self.v
-      #   self.trg_vel[2] = -self.v
 
       #自動擦り動作用
       if self.thick_f:
@@ -316,17 +269,9 @@ class TDxlHolding(object):
         self.Manual_Calibration_initial_position()
         self.calibration_f = 0
 
-      # print(self.trg_pos)
       self.controller(self.trg_pos)
 
-      # print ''  
-      # print rubbing.surface_pos, rubbing.interval
       update_fps = 1/(time.time() - start)
-      # print "fps: ", update_fps
-      # # for id in range(len(dxl)):
-      # #   print pos[id],
-      # # print ''
-      # print '\033[3A', 
 
       #各種パラメータをパブリッシュ
       dy_param = dynamixel_param_msg()
@@ -335,9 +280,6 @@ class TDxlHolding(object):
       dy_param.fps = update_fps
       dy_param.trg_pos = self.trg_pos
       param_pub.publish(dy_param)
-
-
-      # rate.sleep()
 
 #------------------------------------------------------------------------------
 
@@ -482,14 +424,6 @@ for event in device.read_loop():
       elif event.value == 0:
         holding.offset_f = 0
 
-      # if event.value == 1:
-      #   with port_locker:
-      #     for id in range(len(dxl)):           #リブート
-      #       dxl[id].Reboot()
-      #       time.sleep(0.1)
-      #       dxl[id].EnableTorque()
-      #       print(id, 'Done')
-
   elif event.type == evdev.ecodes.EV_ABS:
     # print("{} {} {}".format(event.timestamp(), event.code, event.value))
 
@@ -517,8 +451,6 @@ for event in device.read_loop():
         holding.FLAG_MOVES[channel]  = True
         holding.DIRECTIONS[channel]  = -1
 
-# is_running[0]= False
-# t1.join()
 holding.Stop()
 
 for id in range(len(dxl)):
