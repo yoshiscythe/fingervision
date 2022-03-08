@@ -151,7 +151,8 @@ def create_barplot_graph(dfs, x_label, x_label_display, y_label, y_label_display
     color_stuck = []
     # shift_table = [1, 0]
     # shift_table = [-1, 2, 1, 0]
-    shift_table = [0, 0, 0, 0, 0, 0]
+    # shift_table = [0, 0, 0, 0, 0, 0]
+    shift_table = [0, 0, 0, 0, 0, 0, 0, 0]
     for patch in ax.patches :
         color_stuck.append(patch.get_facecolor())
     color_stuck = list(set(color_stuck))
@@ -333,6 +334,9 @@ fig, axes = plt.subplots(2, 2, figsize=(16, 12))
 CAVS_ruler_sin = df_CAVS[(df_CAVS["method"] == 0) & (df_CAVS["protrusion"] == 9)]
 CAVS_ruler_linear = df_CAVS[(df_CAVS["method"] == 1) & (df_CAVS["protrusion"] == 9)]
 
+CAVS_ruler_sin_16 = df_CAVS[(df_CAVS["method"] == 0) & (df_CAVS["protrusion"] == 16)]
+CAVS_ruler_linear_16 = df_CAVS[(df_CAVS["method"] == 1) & (df_CAVS["protrusion"] == 16)]
+
 FLAT_ruler_sin = df_FLAT[df_FLAT["method"] == 0]
 FLAT_ruler_linear = df_FLAT[df_FLAT["method"] == 1]
 
@@ -353,10 +357,10 @@ df_F = FLAT_ruler_sin
 
 
 # ruler
-create_boxplot_graph2([df_CAVS25_linear, df_CAVS25_sin, FLAT_ruler_linear, FLAT_ruler_sin, CAVS_ruler_linear, CAVS_ruler_sin], "step", "$v_{open}$ [mm/s]", "max_angular_velocity", "max angular velocity", axes[0][1], colors=["red", "blue"], labels=["CAVS(25)-non-dither", "CAVS(25)-dither", "FLAT-non-dither", "FLAT-dither", "CAVS(9)-non-dither", "CAVS(9)-dither"])
-create_boxplot_graph2([df_CAVS25_linear, df_CAVS25_sin, FLAT_ruler_linear, FLAT_ruler_sin, CAVS_ruler_linear, CAVS_ruler_sin], "step", "$v_{open}$ [mm/s]", "elasped_time", "elapsed time", axes[1][1], colors=["red", "blue"], labels=["CAVS(25)-non-dither", "CAVS(25)-dither", "FLAT-non-dither", "FLAT-dither", "CAVS(9)-non-dither", "CAVS(9)-dither"])
-create_barplot_graph([df_CAVS25_linear, df_CAVS25_sin, FLAT_ruler_linear, FLAT_ruler_sin, CAVS_ruler_linear, CAVS_ruler_sin], "step", "$v_{open}$ [mm/s]", "rms_th=15", "RMSE of angular velocity", axes[0][0], colors=["red", "blue"], labels=["CAVS(25)-non-dither", "CAVS(25)-dither", "FLAT-non-dither", "FLAT-dither", "CAVS(9)-non-dither", "CAVS(9)-dither"])
-create_boxplot_graph2([df_CAVS25_linear, df_CAVS25_sin, FLAT_ruler_linear, FLAT_ruler_sin, CAVS_ruler_linear, CAVS_ruler_sin], "step", "$v_{open}$ [mm/s]", "last_angle_error", "final angle error", axes[1][0], colors=["red", "blue"], labels=["CAVS(25)-non-dither", "CAVS(25)-dither", "FLAT-non-dither", "FLAT-dither", "CAVS(9)-non-dither", "CAVS(9)-dither"])
+create_boxplot_graph2([df_CAVS25_linear, df_CAVS25_sin, FLAT_ruler_linear, FLAT_ruler_sin, CAVS_ruler_linear, CAVS_ruler_sin, CAVS_ruler_linear_16, CAVS_ruler_sin_16], "step", "$v_{open}$ [mm/s]", "max_angular_velocity", "max angular velocity", axes[0][1], colors=["red", "blue"], labels=["CAVS(25)-non-dither", "CAVS(25)-dither", "FLAT-non-dither", "FLAT-dither", "CAVS(9)-non-dither", "CAVS(9)-dither", "CAVS(16)-non-dither", "CAVS(16)-dither"])
+create_boxplot_graph2([df_CAVS25_linear, df_CAVS25_sin, FLAT_ruler_linear, FLAT_ruler_sin, CAVS_ruler_linear, CAVS_ruler_sin, CAVS_ruler_linear_16, CAVS_ruler_sin_16], "step", "$v_{open}$ [mm/s]", "elasped_time", "elapsed time", axes[1][1], colors=["red", "blue"], labels=["CAVS(25)-non-dither", "CAVS(25)-dither", "FLAT-non-dither", "FLAT-dither", "CAVS(9)-non-dither", "CAVS(9)-dither", "CAVS(16)-non-dither", "CAVS(16)-dither"])
+create_barplot_graph([df_CAVS25_linear, df_CAVS25_sin, FLAT_ruler_linear, FLAT_ruler_sin, CAVS_ruler_linear, CAVS_ruler_sin, CAVS_ruler_linear_16, CAVS_ruler_sin_16], "step", "$v_{open}$ [mm/s]", "rms_th=15", "RMSE of angular velocity", axes[0][0], colors=["red", "blue"], labels=["CAVS(25)-non-dither", "CAVS(25)-dither", "FLAT-non-dither", "FLAT-dither", "CAVS(9)-non-dither", "CAVS(9)-dither", "CAVS(16)-non-dither", "CAVS(16)-dither"])
+create_boxplot_graph2([df_CAVS25_linear, df_CAVS25_sin, FLAT_ruler_linear, FLAT_ruler_sin, CAVS_ruler_linear, CAVS_ruler_sin, CAVS_ruler_linear_16, CAVS_ruler_sin_16], "step", "$v_{open}$ [mm/s]", "last_angle_error", "final angle error", axes[1][0], colors=["red", "blue"], labels=["CAVS(25)-non-dither", "CAVS(25)-dither", "FLAT-non-dither", "FLAT-dither", "CAVS(9)-non-dither", "CAVS(9)-dither", "CAVS(16)-non-dither", "CAVS(16)-dither"])
 
 axes[0][1].set_ylim(ymin=0)
 axes[1][1].set_ylim(ymin=0)
@@ -379,7 +383,7 @@ for ax1 in axes:
 # create_rmse_graph(df_CAVS, "step", ax, "red")
 # create_rmse_graph(df_FLAT, "step", ax, "blue")
 
-save_name = base_dir+"v0.5_ruler_3surfaces"
+save_name = base_dir+"v0.5_ruler_4surfaces"
 
 plt.savefig(save_name+".png")
 plt.savefig(save_name+".eps")

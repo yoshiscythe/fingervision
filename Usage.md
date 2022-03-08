@@ -77,7 +77,7 @@
         ```
         ノード起動
         ~~~sh
-        $ rosrun rubbing_hand dynamixel_thick_node.py 
+        $ rosrun rubbing_hand dynamixel_node.py 
         ~~~
         USBと電源挿してるか確認
 
@@ -92,6 +92,40 @@
   $ sudo modprobe uvcvideo quirks=128
   ~~~
   
+# キーバインド
+![](image4md/2022-03-08-17-17-14.png)
+
+- ーボタン  
+  パラレル操作開始ボタン  
+  ノード起動したらとりあえず押す
+
+- キャプチャーボタン  
+  終了ボタン  
+  これで終了せずにCtr+Cとかすると正常に終了しません
+
+- Lスティック   
+  上下：開閉  
+  左右：スライド  
+
+- 方向ボタン  
+  上下：指先の傾き  
+  左右：指先の傾き    
+
+- Lボタン
+  押してる間操作が速くなる
+
+- ZLボタン  
+  押してる間操作が更に速くなる
+
+- SLボタン  
+  キャリブレーション
+
+- SRボタン  
+  プログラム開始
+
+- シンクロボタン  
+  Bluetooth接続の際に   
+
 # データ採集
 - rosbag   
   Sample 
@@ -127,7 +161,7 @@ rosbag_to_csv_multi.pyで作成したcsvを使ってerror計算
 csv_to_error.pyで作成したerror記載のcsvを使ってグラフ作成
 
 ## csv -> png
-**csv_to_timeseriesgraph.py**
+**csv_to_timeseriesgraph.py**   
 rosbag_to_csv_multi.pyで作成したcsvを使って，angle/angular velocity/gripper positionのグラフ作成
 
 # 録画

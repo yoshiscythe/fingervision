@@ -1,12 +1,14 @@
 #!/usr/bin/python
 #coding: utf-8
 #Control dynamixel with key input (velocity control ver 1).
+#use bottom before this program. fpsが上がる
+#$ bash fix_usb_latency.sh
 
 import roslib; roslib.load_manifest('rubbing_hand')
 import rospy
 rospy.init_node("dynamixel_node")
 
-from rubbing_hand.msg import dynamixel_msg
+from rubbing_hand.msg import dynamixel_msg, dynamixel_param_msg
 
 from dxl_util import *
 from _config import *
@@ -21,14 +23,15 @@ import evdev
 from rub import Rubbing, PID
 import yaml
 
-file_name = "/home/suzuki/prg/DynamixelSDK/python/src/ay_Dynamixel/robots/dynamixel/init_pos.yaml"
+file_name = "/home/suzuki/ros_ws/ay_tools/fingervision/suzuki/rubbing_hand/scripts/init_pos.yaml"
 
 #ROSのpublisher設定
-pub = rospy.Publisher("dynamixel_data", dynamixel_msg)
+data_pub = rospy.Publisher("dynamixel_data", dynamixel_msg)
+param_pub = rospy.Publisher("dynamixel_param", dynamixel_param_msg)
 
 #Setup the device
 DXL_ID= [1,2,3,4]   #Note: value and 
-BAUDRATE= 57600
+BAUDRATE= 2e6
 DXL_TYPE= 'XM430-W350'
 dev='/dev/ttyUSB0'
 dxl= [TDynamixel1(DXL_TYPE,dev), TDynamixel1(DXL_TYPE,dev), TDynamixel1(DXL_TYPE,dev), TDynamixel1(DXL_TYPE,dev)]
@@ -39,13 +42,16 @@ dxl= [TDynamixel1(DXL_TYPE,dev), TDynamixel1(DXL_TYPE,dev), TDynamixel1(DXL_TYPE
 for id in range(len(dxl)):
   dxl[id].Id= DXL_ID[id]
   dxl[id].Baudrate= BAUDRATE
-  dxl[id].OpMode= 'POSITION'
+  dxl[id].OpMode= 'EXTPOS' # ただのPOSITIONだと一回転のレンジでしか動かない
   dxl[id].Setup()
-  dxl[id].SetPosGain(150, 50, 10)
-  # dxl[id].SetPosGain(900, 0, 0)
+  dxl[id].SetPosLimit(-4095, 4095)
+  dxl[id].SetBaudRate(BAUDRATE)
+  # dxl[id].SetPosGain(500, 50, 10) #fps20ちょっと
+  # dxl[id].SetPosGain(150, 50, 10)  #fps7くらいの時に使ってた
+  dxl[id].SetPosGain(900, 0, 0)
   dxl[id].EnableTorque()
-# dxl[0].SetupPosSyncWrite()
-# dxl[0].SetupSyncRead()
+dxl[0].SetupPosSyncWrite()
+dxl[0].SetupSyncRead()
 
 
 # def ReadKeyboard(is_running, key_cmd, key_locker):
@@ -106,7 +112,7 @@ class TDxlHolding(object):
     self.max_pwm= [100 for id in range(len(dxl))]
     self.is_running= False
     self.dv = 0
-    self.p = 10
+    self.p = 1
     self.v = 10
 
     self.th_p= 3
@@ -125,6 +131,12 @@ class TDxlHolding(object):
     self.init_pos_l = 2048
 
     self.offset_f = 0
+
+    self.thick_i = 0
+    self.thick_f = 0
+
+    self.clb_cur_th = 10
+    self.calibration_f = 0
 
     
 
@@ -149,8 +161,63 @@ class TDxlHolding(object):
       self.is_running= False
       self.thread.join()
 
+  def Gen_thick_array(self, step = 1, max = 15, repeat = 2):
+    thick_array = []
+    array1 = range(0, max, step) + [max for i in range(max)]
+    array2 = range(max, -max, -step) + [-max for i in range(max)]
+    array3 = range(-max, -step, step)
+    for i in range(repeat):
+      thick_array += array1 + array2 + array3
+    thick_array += [0]
+    return thick_array
+
+  def Calibration_initial_position(self):
+    clb_step_l = 1
+    clb_step_r = 1
+    while(1):
+      pos, vel, pwm, cur = self.observer()
+      if cur[0] > self.clb_cur_th:
+        clb_step_l = 0
+      elif cur[2] < -self.clb_cur_th:
+        clb_step_r = 0
+      if not (clb_step_l+clb_step_r):
+        print(pos)
+        clb_init_pos_l = pos[0] - 876
+        clb_init_pos_r = pos[2] + 844
+        rubbing.write_initial_position(clb_init_pos_l, clb_init_pos_r)
+        rubbing.init_pos_r = clb_init_pos_r
+        rubbing.init_pos_l = clb_init_pos_l
+        break
+      self.trg_pos[0] += clb_step_l
+      self.trg_pos[2] -= clb_step_r
+      self.controller(self.trg_pos)
+
+  def Manual_Calibration_initial_position(self):
+    for id in range(len(dxl)):
+      dxl[id].DisableTorque()
+    time.sleep(1)
+    print("根本関節を最大まで開き、その状態から指先関節は限界まで閉じるようにしてください。\nその後SLボタンを押してください")
+    while(1):
+      if self.FLAG_MOVES[4]:
+        pos, vel, pwm, cur = self.observer()
+        clb_init_pos_l = pos[0] - 876
+        clb_init_pos_r = pos[2] + 844
+        clb_init_pos_l_dist = pos[1]
+        clb_init_pos_r_dist = pos[3]
+        rubbing.write_initial_position(clb_init_pos_l, clb_init_pos_r, clb_init_pos_l_dist, clb_init_pos_r_dist)
+        rubbing.init_pos_r = clb_init_pos_r
+        rubbing.init_pos_l = clb_init_pos_l
+        rubbing.init_pos_r_dist = clb_init_pos_r_dist
+        rubbing.init_pos_l_dist = clb_init_pos_l_dist
+        for id in range(len(dxl)):
+          dxl[id].EnableTorque()
+        break
+
   def Loop(self):
     sign= lambda x: 1 if x>0 else -1 if x<0 else 0
+
+    #擦り動作用アレイ
+    thick_array = self.Gen_thick_array()
 
     rate= TRate(self.ctrl_rate)
 
@@ -162,14 +229,19 @@ class TDxlHolding(object):
 
       #モータの情報取得
       # pos = [dxl[id].Position() for id in range(len(dxl))]
-      pos, vel, pwm = self.observer()
+      pos, vel, pwm, cur = self.observer()
 
-      #取得した情報パブリッシュ
+      for i in range(4):
+        self.trg_pos[i] = pos[i]
+
+      #取得した情報をパブリッシュ
       dy_data = dynamixel_msg()
       dy_data.header.stamp = rospy.Time.now()
       dy_data.Pos = pos
       dy_data.Vel = vel
-      pub.publish(dy_data)
+      dy_data.Pwm = pwm
+      dy_data.Cur = cur
+      data_pub.publish(dy_data)
 
       # #スティックX軸はモータ２（左指近位関節）を動かす
       # #曲げる方向を正とした
@@ -184,33 +256,29 @@ class TDxlHolding(object):
       # elif self.DIRECTIONS[1] == -1:
       #   self.trg_pos[0] = dxl[0].Position()+self.p
 
-      #スティックX軸はスリ動作
+      #スティックX軸は擦り動作
       if self.DIRECTIONS[0] == 1:
-        rubbing.surface_pos = rubbing.surface_pos + self.v*0.1
+        rubbing.surface_pos = rubbing.surface_pos - self.v*0.05
       elif self.DIRECTIONS[0] == -1:
-        rubbing.surface_pos = rubbing.surface_pos - self.v*0.1
+        rubbing.surface_pos = rubbing.surface_pos + self.v*0.05
       
-      #スティックY軸は指缶距離の調整
+      #スティックY軸は指缶距離調整
       if self.DIRECTIONS[1] == 1:
-        rubbing.interval = rubbing.interval + 1
+        rubbing.interval = rubbing.interval - self.p*0.1
       elif self.DIRECTIONS[1] == -1:
-        rubbing.interval = rubbing.interval - 1
+        rubbing.interval = rubbing.interval + self.p*0.1
 
-      # #ボタン左右はモータ4（右指近位関節）を動かす
-      # if self.DIRECTIONS[3] == 1:
-      #   self.trg_vel[3] = self.v
-      # elif self.DIRECTIONS[3] == -1:
-      #   self.trg_vel[3] = -self.v
-      # else:
-      #   self.trg_vel[3] = 0
+      #ボタン左右は仮想面の傾き
+      if self.DIRECTIONS[3] == 1:
+        rubbing.degree_of_surface -= self.p*0.1
+      elif self.DIRECTIONS[3] == -1:
+        rubbing.degree_of_surface += self.p*0.1
       
-      # #ボタン上下はモータ3（右指遠位関節）を動かす
-      # if self.DIRECTIONS[2] == 1:
-      #   self.trg_vel[2] = self.v
-      # elif self.DIRECTIONS[2] == -1:
-      #   self.trg_vel[2] = -self.v
-      # else:
-      #   self.trg_vel[2] = 0  
+      #ボタン上下は指の傾き
+      if self.DIRECTIONS[2] == 1:
+        rubbing.degree_of_finger += self.p*0.1
+      elif self.DIRECTIONS[2] == -1:
+        rubbing.degree_of_finger -= self.p*0.1
 
       # if self.DIRECTIONS[4] == 1:
       #   self.trg_vel[0] = self.v
@@ -219,40 +287,55 @@ class TDxlHolding(object):
       #   self.trg_vel[0] = -self.v
       #   self.trg_vel[2] = -self.v
 
+      #自動擦り動作用
+      if self.thick_f:
+        if self.thick_i < len(thick_array):
+          auto_surface_pos = thick_array[self.thick_i]
+          self.thick_i += 1
+          rubbing.surface_pos = auto_surface_pos
+        else:
+          self.thick_i = 0
+          self.thick_f = 0
+
       #目標位置の計算
       if rubbing.running:
+        rubbing.range_check()
         a, b = rubbing.calculation_degree()
         pos_r, pos_l = rubbing.deg2pos(a, b)
-        self.trg_pos[2], self.trg_pos[0] = pos_r, pos_l
+        pos_r_dist, pos_l_dist = rubbing.calculation_pos_dist()
+        self.trg_pos[2], self.trg_pos[0] = int(pos_r), int(pos_l)
+        self.trg_pos[3], self.trg_pos[1] = int(pos_r_dist), int(pos_l_dist)
 
-      #キャリブレーションした位置をコンフィグファイルから取得
+      # 指先を平行に保つの開始
       if self.offset_f:
-        # rubbing.init_pos_r = pos[2]
-        # rubbing.init_pos_l = pos[0]
-        with open(file_name) as file:
-          obj = yaml.safe_load(file)
-          rubbing.init_pos_r = obj['init_pos_r']
-          rubbing.init_pos_l = obj['init_pos_l'] 
+        rubbing.surface_pos = 0
         rubbing.running = 1
 
-      # self.controller(self.trg_pos)
-      # for id in range(len(dxl)):
-      #   # if (self.trg_vel[id] > 0 and dxl[id].Position() > dxl[id].MAX_POSITION) or (self.trg_vel[id] < 0 and dxl[id].Position() < dxl[id].MIN_POSITION):
-      #   #   self.trg_vel[id] = 0
-      #   self.controller(int(self.trg_pos[id]), id)
-      # print ''
+      if self.calibration_f:
+        # self.Calibration_initial_position()
+        self.Manual_Calibration_initial_position()
+        self.calibration_f = 0
 
-      #目標位置送信
+      # print(self.trg_pos)
       self.controller(self.trg_pos)
 
-      print ''  
-      print rubbing.surface_pos, rubbing.interval
+      # print ''  
+      # print rubbing.surface_pos, rubbing.interval
       update_fps = 1/(time.time() - start)
-      print "fps: ", update_fps
-      # for id in range(len(dxl)):
-      #   print pos[id],
-      # print ''
-      print '\033[3A', 
+      # print "fps: ", update_fps
+      # # for id in range(len(dxl)):
+      # #   print pos[id],
+      # # print ''
+      # print '\033[3A', 
+
+      #各種パラメータをパブリッシュ
+      dy_param = dynamixel_param_msg()
+      dy_param.surface_pos = rubbing.surface_pos
+      dy_param.interval = rubbing.interval
+      dy_param.fps = update_fps
+      dy_param.trg_pos = self.trg_pos
+      param_pub.publish(dy_param)
+
 
       # rate.sleep()
 
@@ -270,11 +353,11 @@ def holding_observer(id = 0):
 #     dxl[id].SetVelocity(target_velocity)
 
 def holding_controller(target_position, id = 0):
-  print target_position,
+  # print target_position,
   with port_locker:
     dxl[id].MoveTo(target_position, blocking=False)
 
-def syncpos_cotroller(target):
+def syncpos_controller(target):
   with port_locker:
     dxl[0].SetPosition4PosSync(target)
 
@@ -284,12 +367,15 @@ def sync_observer():
     pos = dxl[0].ReadXSync("PRESENT_POSITION")
     vel = dxl[0].ReadXSync("PRESENT_VELOCITY")
     pwm = dxl[0].ReadXSync("PRESENT_PWM")
-  return pos, vel, pwm
+    cur = dxl[0].ReadXSync("PRESENT_CURRENT")
+  return pos, vel, pwm, cur
 
 rubbing = Rubbing()
+rubbing.filename = file_name
+rubbing.read_initial_position()
 holding= TDxlHolding()
-holding.observer= holding_observer
-holding.controller= holding_controller
+holding.observer= sync_observer
+holding.controller= syncpos_controller
 for id in range(len(dxl)):
   holding.SetTarget(dxl[id].Position(), dxl[id].Read('GOAL_PWM')*0.9, id)
 holding.Start()
@@ -304,6 +390,7 @@ def Search_device(device_name):
   print('cannot find '+device_name)
   return None
 
+#ジョイコンのキー信号取得のため
 device_fn = Search_device("Joy-Con (L)")
 device = evdev.InputDevice(device_fn)
 print(device)
@@ -374,6 +461,7 @@ for event in device.read_loop():
       elif event.value == 1:
         holding.FLAG_MOVES[channel]  = True
         holding.DIRECTIONS[channel]  = 1
+        holding.calibration_f = 1
 
     elif event.code == 309:         # SRボタン
       channel = 4       
@@ -383,6 +471,7 @@ for event in device.read_loop():
       elif event.value == 1:
         holding.FLAG_MOVES[channel]  = True
         holding.DIRECTIONS[channel]  = -1
+        holding.thick_f = 1
 
     
 
